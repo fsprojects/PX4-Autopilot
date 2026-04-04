@@ -1,11 +1,11 @@
 {
-  "last_run": "2026-04-04T17:14:21Z",
-  "run_id": "23983646113",
+  "last_run": "2026-04-04T17:37:00Z",
+  "run_id": "23984032059",
   "lean_version": "4.29.0",
   "lean_available": true,
   "ci_created": true,
   "mathlib_available": false,
-  "mathlib_note": "lakefile.toml configured; blocked by network firewall (reservoir.lean-lang.org); run lake update when network available",
+  "mathlib_note": "lakefile.toml now DOES NOT require mathlib (removed in run4). Use stdlib-only tactics.",
   "fv_targets": [
     {
       "id": "constrain",
@@ -14,16 +14,18 @@
       "phase": 5,
       "status": "8 theorems proved: constrain_ge_lo, constrain_le_hi, constrain_in_range, constrain_of_mem, constrain_of_lt_lo, constrain_of_gt_hi, constrain_idempotent, constrain_mono. 0 sorry.",
       "lean_file": "formal-verification/lean/FVSquad/MathFunctions.lean",
-      "informal_spec": "formal-verification/specs/constrain_informal.md"
+      "informal_spec": "formal-verification/specs/constrain_informal.md",
+      "correspondence": "abstraction - Int model, NaN not modelled"
     },
     {
       "id": "signNoZero",
       "name": "math::signNoZero",
       "file": "src/lib/mathlib/math/Functions.hpp",
       "phase": 5,
-      "status": "6 theorems proved: signNoZero_nonneg, signNoZero_neg, signNoZero_ne_zero, signNoZero_values, signNoZero_zero, signNoZero_sq. 0 sorry.",
+      "status": "6 theorems proved. 0 sorry. WARNING: NaN mismatch found - C++ float version returns 0 for NaN, violating signNoZero_ne_zero safety property for float callers.",
       "lean_file": "formal-verification/lean/FVSquad/MathFunctions.lean",
-      "informal_spec": "formal-verification/specs/signNoZero_informal.md"
+      "informal_spec": "formal-verification/specs/signNoZero_informal.md",
+      "correspondence": "abstraction + mismatch for NaN - documented in CORRESPONDENCE.md"
     },
     {
       "id": "countSetBits",
@@ -31,16 +33,18 @@
       "file": "src/lib/mathlib/math/Functions.hpp",
       "phase": 5,
       "status": "9 concrete examples + countSetBits_pow2 proved by induction. 0 sorry.",
-      "lean_file": "formal-verification/lean/FVSquad/MathFunctions.lean"
+      "lean_file": "formal-verification/lean/FVSquad/MathFunctions.lean",
+      "correspondence": "exact for Nat/uint types"
     },
     {
       "id": "SlewRate",
       "name": "SlewRate::update",
       "file": "src/lib/slew_rate/SlewRate.hpp",
       "phase": 5,
-      "status": "5 theorems proved: slewUpdate_rate_bounded, slewUpdate_reaches_target, slewUpdate_nondecreasing, slewUpdate_nonincreasing, slewUpdate_no_overshoot. 0 sorry.",
+      "status": "8 theorems proved: slewUpdate_change_ge, slewUpdate_change_le, slewUpdate_reaches_target, slewUpdate_nondecreasing, slewUpdate_nonincreasing, slewUpdate_no_overshoot_up, slewUpdate_no_overshoot_down, slewUpdate_steady_state. 0 sorry.",
       "lean_file": "formal-verification/lean/FVSquad/SlewRate.lean",
-      "informal_spec": "formal-verification/specs/slewrate_informal.md"
+      "informal_spec": "formal-verification/specs/slewrate_informal.md",
+      "correspondence": "abstraction - Int model, float/state/dt product not modelled"
     },
     {
       "id": "interpolate",
@@ -54,7 +58,7 @@
       "name": "math::deadzone",
       "file": "src/lib/mathlib/math/Functions.hpp",
       "phase": 1,
-      "status": "research only. Piecewise structure; output-in-range trivial via outer constrain"
+      "status": "research only. Piecewise structure; output-in-range tractable now. Good next target."
     },
     {
       "id": "wrap_pi",
@@ -85,31 +89,34 @@
       "status": "research only. FIFO ordering, index wraparound"
     }
   ],
-  "open_prs": [
-    "lean-squad/fv-slewrate-proofs-run2",
-    "lean-squad/fv-research-mathlib-tools-run3"
+  "open_prs": [],
+  "correspondence_done": true,
+  "correspondence_file": "formal-verification/CORRESPONDENCE.md",
+  "bugs_found": [
+    {
+      "id": "signNoZero_nan",
+      "description": "signNoZero<float> returns 0 for NaN inputs; violates safety property signNoZero_ne_zero for float callers",
+      "severity": "medium",
+      "status": "documented in CORRESPONDENCE.md, no issue filed yet"
+    }
   ],
   "tool_recommendations": {
-    "lean4_mathlib": "primary - pure math functions (all current targets)",
+    "lean4_stdlib": "primary - pure math functions (all current targets done)",
+    "lean4_mathlib": "when network available - wrap_pi, AlphaFilter convergence",
     "cbmc": "next recommended - C++ integer overflow, array bounds",
     "infer": "quick wins - memory safety, null dereference",
     "tla_plus": "arming FSM, mission FSM - temporal properties",
     "gappa": "EKF floating-point rounding error"
   },
   "notes": [
-    "Mathlib unavailable (network firewall) - lakefile.toml already configured, run lake update when network available",
-    "Mathlib workarounds: (1) pre-download in Docker, (2) GitHub-hosted runner with internet, (3) wait for firewall exception",
-    "lake build passes with 0 sorry (all proofs complete, run 2)",
-    "CI workflow created at .github/workflows/lean-ci.yml",
-    "split tactic + omega handles Int if-then-else proofs well",
-    "native_decide works for countSetBits concrete values",
-    "countSetBits_pow2 proved via countSetBits_two_mul helper + Nat.two_pow_pos",
-    "countSetBits uses WF recursion (termination_by n); use .eq_def for unfolding",
-    "AVOID Unicode like +/- and x inside comments - use ASCII",
-    "SlewRate proofs: use simp only [..., constrain] then split <;> omega for case analysis",
-    "Run 3: updated RESEARCH.md + TARGETS.md with Mathlib analysis, FV tools survey, 8 new targets",
-    "Next target: interpolate (phase 1->5, boundary cases tractable), or deadzone (output-in-range easy)",
-    "wrap_pi is highest-value Mathlib-specific target",
-    "PR for run 2 (slewrate) is still a pending issue/patch - needs manual creation by maintainer due to workflow permission"
+    "Mathlib REMOVED from lakefile.toml - use stdlib-only tactics (omega, simp, by_cases, native_decide)",
+    "split_ifs is NOT available without Mathlib - use by_cases + simp [show ...]",
+    "split_ifs requires Mathlib import - AVOID using split_ifs",
+    "For if-then-else goals: use by_cases on the condition, then simp [hcond] or simp [show not_cond from ...]",
+    "lake build passes with 0 sorry (all proofs complete, run 4)",
+    "CI workflow at .github/workflows/lean-ci.yml",
+    "signNoZero NaN bug: C++ returns 0 for NaN, documented in CORRESPONDENCE.md",
+    "Next target: deadzone (phase 1->5, output-in-range tractable, no Mathlib needed)",
+    "Next target: interpolate (phase 1->5, boundary cases tractable, need Rat for interior)"
   ]
 }
