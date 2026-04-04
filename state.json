@@ -49,7 +49,7 @@
   ],
   "open_prs": [],
   "notes": [
-    "Mathlib unavailable (network firewall) - using stdlib only",
+    "Mathlib NOT included in lakefile.toml - need to add require mathlib and run lake update. No firewall blocks exist (0 blocked in run 23982815807).",
     "lake build passes with 0 sorry (all proofs complete)",
     "CI workflow created at .github/workflows/lean-ci.yml",
     "split tactic + omega handles Int if-then-else proofs well",
