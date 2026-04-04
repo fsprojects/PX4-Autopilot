@@ -1,6 +1,6 @@
 {
-  "last_run": "2026-04-04T16:25:11Z",
-  "run_id": "23982815807",
+  "last_run": "2026-04-04T16:52:55Z",
+  "run_id": "23983277650",
   "lean_version": "4.29.0",
   "lean_available": true,
   "ci_created": true,
@@ -10,7 +10,7 @@
       "name": "math::constrain",
       "file": "src/lib/mathlib/math/Limits.hpp",
       "phase": 5,
-      "status": "impl+spec done, 7 theorems proved (constrain_ge_lo, constrain_le_hi, constrain_in_range, constrain_of_mem, constrain_of_lt_lo, constrain_of_gt_hi, constrain_idempotent, constrain_mono), 0 sorry",
+      "status": "8 theorems proved: constrain_ge_lo, constrain_le_hi, constrain_in_range, constrain_of_mem, constrain_of_lt_lo, constrain_of_gt_hi, constrain_idempotent, constrain_mono. 0 sorry.",
       "lean_file": "formal-verification/lean/FVSquad/MathFunctions.lean",
       "informal_spec": "formal-verification/specs/constrain_informal.md"
     },
@@ -19,7 +19,7 @@
       "name": "math::signNoZero",
       "file": "src/lib/mathlib/math/Functions.hpp",
       "phase": 5,
-      "status": "impl+spec done, 6 theorems proved (signNoZero_nonneg, signNoZero_neg, signNoZero_ne_zero, signNoZero_values, signNoZero_zero, signNoZero_sq), 0 sorry",
+      "status": "6 theorems proved: signNoZero_nonneg, signNoZero_neg, signNoZero_ne_zero, signNoZero_values, signNoZero_zero, signNoZero_sq. 0 sorry.",
       "lean_file": "formal-verification/lean/FVSquad/MathFunctions.lean",
       "informal_spec": "formal-verification/specs/signNoZero_informal.md"
     },
@@ -28,15 +28,16 @@
       "name": "math::countSetBits",
       "file": "src/lib/mathlib/math/Functions.hpp",
       "phase": 5,
-      "status": "impl+spec done, 9 concrete examples via native_decide, countSetBits_pow2 proved by induction, 0 sorry",
+      "status": "9 concrete examples + countSetBits_pow2 proved by induction. 0 sorry.",
       "lean_file": "formal-verification/lean/FVSquad/MathFunctions.lean"
     },
     {
       "id": "SlewRate",
       "name": "SlewRate::update",
       "file": "src/lib/slew_rate/SlewRate.hpp",
-      "phase": 2,
-      "status": "informal spec done at formal-verification/specs/slewrate_informal.md, Lean proof pending",
+      "phase": 5,
+      "status": "5 theorems proved: slewUpdate_rate_bounded, slewUpdate_reaches_target, slewUpdate_nondecreasing, slewUpdate_nonincreasing, slewUpdate_no_overshoot. 0 sorry.",
+      "lean_file": "formal-verification/lean/FVSquad/SlewRate.lean",
       "informal_spec": "formal-verification/specs/slewrate_informal.md"
     },
     {
@@ -44,20 +45,25 @@
       "name": "math::interpolate",
       "file": "src/lib/mathlib/math/Functions.hpp",
       "phase": 1,
-      "status": "research only, float model needed"
+      "status": "research only, needs rational/scaled-integer model decision"
     }
   ],
-  "open_prs": [],
+  "open_prs": [
+    "lean-squad/fv-slewrate-proofs-run2"
+  ],
   "notes": [
-    "Mathlib NOT included in lakefile.toml - need to add require mathlib and run lake update. No firewall blocks exist (0 blocked in run 23982815807).",
-    "lake build passes with 0 sorry (all proofs complete)",
+    "Mathlib unavailable (network firewall) - using stdlib only",
+    "lake build passes with 0 sorry (all proofs complete, run 2)",
     "CI workflow created at .github/workflows/lean-ci.yml",
     "split tactic + omega handles Int if-then-else proofs well",
     "native_decide works for countSetBits concrete values",
-    "countSetBits_pow2 proved via countSetBits_unfold helper + Nat.pow_succ rewrite",
-    "constrain_of_mem is key helper: apply first, then prove bounds separately",
-    "For constrain proofs: use split tactic (not split_ifs), then omega/exact",
-    "Next target: SlewRate::update (phase 2->3->4->5)",
-    "After SlewRate: interpolate (needs rational/Int model decision)"
+    "countSetBits_pow2 proved via countSetBits_two_mul helper + Nat.two_pow_pos",
+    "countSetBits uses WF recursion (termination_by n); use .eq_def for unfolding",
+    "AVOID /-...-/ inside doc comments (causes parser issues as nested comment)",
+    "AVOID Unicode like +/- (±) and x (×) inside comments - use ASCII",
+    "SlewRate proofs: use simp only [..., constrain] then split <;> omega for case analysis",
+    "omega handles 2*m/2=m and 2*m%2=0 (linear arithmetic with fixed divisors)",
+    "Previous run (23982815807) PR was blocked by workflows permission - use separate PR without CI next time if needed",
+    "Next target: interpolate (phase 1->5), needs model decision: scaled int or rational approx"
   ]
 }
