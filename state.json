@@ -1,6 +1,6 @@
 {
-  "last_run": "2026-04-04T18:01:59Z",
-  "run_id": "23984451294",
+  "last_run": "2026-04-04T19:04:00Z",
+  "run_id": "23985242804",
   "lean_version": "4.29.0",
   "lean_available": true,
   "ci_created": true,
@@ -60,8 +60,11 @@
       "id": "interpolate",
       "name": "math::interpolate",
       "file": "src/lib/mathlib/math/Functions.hpp",
-      "phase": 1,
-      "status": "research only. Boundary cases tractable with stdlib; interior monotonicity needs Rat or Mathlib.Analysis. Good next target for Rat model similar to deadzone."
+      "phase": 5,
+      "status": "10 theorems proved: interpolate_clamped_low/high, interpolate_at_low/high, interpolate_const, interpolate_slope_nonneg, interpolate_mono_interior, interpolate_le_high, interpolate_ge_low, interpolate_identity_slope. 0 sorry.",
+      "lean_file": "formal-verification/lean/FVSquad/Interpolate.lean",
+      "informal_spec": "formal-verification/specs/interpolate_informal.md",
+      "correspondence": "abstraction - Rat model, precondition x_low < x_high explicit"
     },
     {
       "id": "wrap_pi",
@@ -82,22 +85,28 @@
       "name": "AlphaFilter::update",
       "file": "src/lib/mathlib/math/filter/AlphaFilter.hpp",
       "phase": 1,
-      "status": "research only. No-overshoot tractable; convergence needs Mathlib topology"
+      "status": "research only. No-overshoot tractable; convergence needs Mathlib topology. Similar pattern to SlewRate - integer model approach recommended."
     },
     {
       "id": "RingBuffer",
       "name": "RingBuffer circular buffer",
       "file": "src/modules/sensors/vehicle_optical_flow/RingBuffer.hpp",
       "phase": 1,
-      "status": "research only. FIFO ordering, index wraparound"
+      "status": "research only. FIFO ordering, index wraparound - omega tractable"
     }
   ],
   "open_prs": [
     {
-      "branch": "lean-squad/fv-deadzone-run5-15887703ab",
+      "branch": "lean-squad/fv-deadzone-run5-15887703ab-167d881181375681",
       "description": "deadzone spec + 10 proofs (2 sorry for range theorems)"
+    },
+    {
+      "branch": "lean-squad/fv-tasks-run6-critique-2a52a271af",
+      "description": "interpolate spec + 10 proofs (0 sorry) + CRITIQUE.md"
     }
   ],
+  "critique_done": true,
+  "critique_file": "formal-verification/CRITIQUE.md",
   "correspondence_done": true,
   "correspondence_file": "formal-verification/CORRESPONDENCE.md",
   "bugs_found": [
@@ -105,39 +114,50 @@
       "id": "signNoZero_nan",
       "description": "signNoZero<float> returns 0 for NaN inputs; violates safety property signNoZero_ne_zero for float callers",
       "severity": "medium",
-      "status": "documented in CORRESPONDENCE.md, no issue filed yet"
+      "status": "documented in CORRESPONDENCE.md and CRITIQUE.md, no issue filed yet - recommend filing"
     }
   ],
   "rat_proven_lemmas": [
     "Rat.lt_iff_sub_pos: a < b ↔ 0 < b - a",
     "Rat.mul_pos: 0 < a → 0 < b → 0 < a*b",
+    "Rat.mul_nonneg: 0 ≤ a → 0 ≤ b → 0 ≤ a*b",
     "Rat.mul_le_mul_of_nonneg_right: a ≤ b → 0 ≤ c → a*c ≤ b*c",
-    "Rat.mul_neg_iff_of_pos_right: 0 < c → (a*c < 0 ↔ a < 0)",
+    "Rat.mul_le_mul_of_nonneg_left: a ≤ b → 0 ≤ c → c*a ≤ c*b",
     "Rat.inv_pos: 0 < a⁻¹ ↔ 0 < a",
     "Rat.mul_inv_cancel: a ≠ 0 → a*a⁻¹ = 1",
+    "Rat.inv_mul_cancel: a ≠ 0 → a⁻¹*a = 1",
     "Rat.abs_of_nonneg: 0 ≤ x → x.abs = x",
     "Rat.abs_of_nonpos: x ≤ 0 → x.abs = -x",
     "Rat.sub_eq_add_neg: a - b = a + (-b)",
-    "Rat.add_le_add_right: a + c ≤ b + c ↔ a ≤ b",
-    "Rat.add_lt_add_right: a + c < b + c ↔ a < b",
+    "Rat.add_le_add_right (iff): a + c ≤ b + c ↔ a ≤ b",
+    "Rat.add_lt_add_right (iff): a + c < b + c ↔ a < b",
     "Rat.neg_lt_neg_iff: -a < -b ↔ b < a",
-    "Rat.neg_le_iff: -(a) ≤ b ↔ ??? (use for neg_nonpos from nonneg)",
-    "Rat.neg_add: -(a+b) = -a + -b",
     "Rat.neg_mul: -a * b = -(a*b)",
+    "Rat.mul_neg: a * -b = -(a*b)",
+    "Rat.mul_add: a*(b+c) = a*b + a*c (as simp with sub_eq_add_neg, mul_add, mul_neg)",
     "Rat.neg_neg: --a = a",
-    "Rat.neg_sub: -(a-b) = b-a",
-    "Rat.one_mul: 1 * a = a",
+    "Rat.sub_add_cancel: a - b + b = a",
+    "Rat.zero_add: 0 + a = a",
     "Rat.mul_one: a * 1 = a",
-    "Rat.ne_of_gt: a > b → b ≠ a (or a ≠ b)",
+    "Rat.one_mul: 1 * a = a",
+    "Rat.mul_assoc: (a*b)*c = a*(b*c)",
+    "Rat.ne_of_gt: a > b → a ≠ b",
     "Rat.not_lt: ¬(a < b) ↔ b ≤ a",
     "Rat.not_le: ¬(a ≤ b) ↔ b < a",
     "Rat.le_of_lt: a < b → a ≤ b",
     "Rat.le_trans: transitive",
+    "Rat.le_refl: a ≤ a (use as term, not applied)",
     "Rat.div_def: a / b = a * b⁻¹",
-    "Rat.neg_lt_neg_iff: -a < -b ↔ b < a",
-    "Rat.inv_eq_of_mul_eq_one: a*b=1 → b=a⁻¹ (use for 1⁻¹=1)",
+    "Rat.le_iff_sub_nonneg: a ≤ b ↔ 0 ≤ b - a",
+    "Rat.le_sub_iff: a ≤ b - c ↔ a + c ≤ b",
+    "Rat.sub_self: a - a = 0",
+    "Rat.zero_mul: 0 * a = 0",
+    "Rat.add_comm: a + b = b + a",
+    "Rat.add_left_comm: a + (b + c) = b + (a + c)",
+    "Rat.lt_irrefl: ¬(a < a) (use as term, not applied to arg)",
+    "Std.lt_trans: a < b → b < c → a < c",
     "Std.lt_of_lt_of_le: a < b → b ≤ c → a < c",
-    "KEY: x + dz < 0 from x < -dz: use Rat.add_lt_add_right + sub_self"
+    "simp [Rat.sub_eq_add_neg, Rat.mul_add, Rat.mul_neg, Rat.add_comm, Rat.add_left_comm]: equiv to ring for mul_sub patterns"
   ],
   "rat_unavailable_lemmas": [
     "linarith (needs Mathlib)",
@@ -145,28 +165,36 @@
     "norm_num (does not work on Rat expressions without Mathlib)",
     "decide (doesn't reduce Rat arithmetic easily)",
     "native_decide (cannot evaluate Rat code)",
+    "set tactic (needs Mathlib)",
     "Rat.sub_zero, Rat.div_one, Rat.inv_one (not in core, use manual rewrites)",
-    "Rat.lt_trans (use Std.lt_of_lt_of_le instead)",
-    "Rat.div_pos, Rat.div_le_iff (not available)"
+    "Rat.lt_trans (use Std.lt_trans)",
+    "Rat.lt_of_lt_of_le (use Std.lt_of_lt_of_le)",
+    "Rat.mul_sub (use simp [sub_eq_add_neg, mul_add, mul_neg])",
+    "sub_nonneg.mpr (use Rat.le_iff_sub_nonneg.mp)",
+    "le_refl with argument (use Rat.le_refl as term)",
+    "mul_le_mul_of_nonneg_left without Rat. prefix",
+    "ha ▸ ... for rewriting in term mode (use rw [ha] at h instead)"
   ],
   "tool_recommendations": {
     "lean4_stdlib": "primary - pure math functions using Int or Rat",
     "lean4_mathlib": "when network available - wrap_pi, AlphaFilter convergence, Rat linarith/ring",
-    "cbmc": "next recommended - C++ integer overflow, array bounds",
+    "cbmc": "next recommended - C++ integer overflow, array bounds, interpolateN invariants",
     "infer": "quick wins - memory safety, null dereference",
     "tla_plus": "arming FSM, mission FSM - temporal properties",
-    "gappa": "EKF floating-point rounding error"
+    "gappa": "EKF floating-point rounding error, SlewRate float precision"
   },
   "notes": [
     "Mathlib REMOVED from lakefile.toml - use stdlib-only tactics (omega, simp, by_cases, Rat.* lemmas)",
     "split_ifs NOT available without Mathlib - use by_cases + simp [hcond]",
-    "For if-then-else goals: use by_cases on condition, then simp [hcond]",
-    "lake build passes for all files (0-2 sorry depending on target)",
+    "For if-then-else goals: split, then rename_i to name the new hypothesis",
+    "After split isFalse.isFalse: rename_i h1 h2 names BOTH outer and inner False hypothesis",
+    "Use rename_i h1 for the outer isFalse, then split again, rename_i h2 for inner",
+    "lake build passes for all files (2 sorry in Deadzone for range theorems)",
     "CI workflow at .github/workflows/lean-ci.yml",
-    "signNoZero NaN bug: C++ returns 0 for NaN, documented in CORRESPONDENCE.md",
-    "Rat model works well for piecewise-linear functions (deadzone, interpolate)",
-    "Next target: interpolate (similar Rat model to deadzone, boundary proofs tractable)",
-    "deadzone range proofs (le_one negative, ge_neg_one) need Mathlib linarith",
-    "KEY Rat pattern: use sub_eq_add_neg + neg_add + neg_neg for algebraic rewrites"
+    "signNoZero NaN bug: C++ returns 0 for NaN, documented in CORRESPONDENCE.md and CRITIQUE.md",
+    "interpolate_at_high key proof: use simp [sub_eq_add_neg, mul_add, mul_neg, add_comm, add_left_comm] to rearrange, then Rat.sub_add_cancel",
+    "Rat.mul_le_mul_of_nonneg_left arg order: (hval ≤ hval2) → (0 ≤ c) → (c * hval ≤ c * hval2)",
+    "For ha_mul rewriting: use rw [ha_mul] at h; exact h instead of ha_mul ▸ ...",
+    "CRITIQUE.md created: honest assessment with proved theorem table, gaps, bug findings"
   ]
 }
