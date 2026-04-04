@@ -2,9 +2,13 @@ name = "FVSquad"
 version = "0.1.0"
 defaultTargets = ["fvsquad"]
 
+require mathlib from git
+  "https://github.com/leanprover-community/mathlib4.git"
+
 [[lean_lib]]
 name = "FVSquad"
 
 [[lean_exe]]
 name = "fvsquad"
 root = "Main"
+
