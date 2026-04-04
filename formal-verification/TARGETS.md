@@ -5,13 +5,29 @@
 Priority-ordered list of formal verification targets. See `RESEARCH.md` for detailed
 rationale. Phase legend: 1=Research, 2=Informal Spec, 3=Lean Spec, 4=Implementation, 5=Proofs.
 
+## Lean 4 Targets (stdlib-only proofs)
+
 | # | Name | File | Phase | Status | Lean File | Notes |
 |---|------|------|-------|--------|-----------|-------|
-| 1 | `math::constrain<Int>` | `src/lib/mathlib/math/Limits.hpp` | 5 | ✅ Proved | `lean/FVSquad/MathFunctions.lean` | 7 theorems proved |
-| 2 | `math::signNoZero<Int>` | `src/lib/mathlib/math/Functions.hpp` | 5 | ✅ Proved | `lean/FVSquad/MathFunctions.lean` | 5 theorems proved |
-| 3 | `math::countSetBits` | `src/lib/mathlib/math/Functions.hpp` | 5 | 🔄 Partial | `lean/FVSquad/MathFunctions.lean` | 1 sorry (pow2 inductive) |
-| 4 | `SlewRate::update` | `src/lib/slew_rate/SlewRate.hpp` | 2 | 🔄 Informal spec | — | Depends on constrain |
-| 5 | `math::interpolate` | `src/lib/mathlib/math/Functions.hpp` | 1 | ⬜ Research | — | Float model needed |
+| 1 | `math::constrain<Int>` | `src/lib/mathlib/math/Limits.hpp` | 5 | ✅ Proved | `lean/FVSquad/MathFunctions.lean` | 8 theorems, 0 sorry |
+| 2 | `math::signNoZero<Int>` | `src/lib/mathlib/math/Functions.hpp` | 5 | ✅ Proved | `lean/FVSquad/MathFunctions.lean` | 6 theorems, 0 sorry |
+| 3 | `math::countSetBits` | `src/lib/mathlib/math/Functions.hpp` | 5 | ✅ Proved | `lean/FVSquad/MathFunctions.lean` | 9 concrete + pow2 induction |
+| 4 | `SlewRate::update` | `src/lib/slew_rate/SlewRate.hpp` | 5 | ✅ Proved | `lean/FVSquad/SlewRate.lean` | 5 theorems, 0 sorry |
+| 5 | `math::interpolate` | `src/lib/mathlib/math/Functions.hpp` | 1 | ⬜ Research | — | Needs scaled-int or Mathlib/Rat model |
+| 6 | `math::deadzone` | `src/lib/mathlib/math/Functions.hpp` | 1 | ⬜ Research | — | Piecewise structure |
+| 7 | `matrix::wrap_pi` | `src/lib/matrix/matrix/` | 1 | ⬜ Research | — | Needs Mathlib Real/fract |
+| 8 | `WelfordMean` online mean/variance | `src/lib/mathlib/math/WelfordMean.hpp` | 1 | ⬜ Research | — | Inductive recurrence |
+| 9 | `AlphaFilter::update` | `src/lib/mathlib/math/filter/AlphaFilter.hpp` | 1 | ⬜ Research | — | No-overshoot tractable; convergence needs Mathlib |
+| 10 | `RingBuffer` circular buffer | `src/modules/sensors/vehicle_optical_flow/RingBuffer.hpp` | 1 | ⬜ Research | — | Index arithmetic, FIFO ordering |
+
+## Non-Lean Targets (other tools recommended)
+
+| # | Name | Tool | Status | Notes |
+|---|------|------|--------|-------|
+| 11 | Commander arming FSM | TLA+ | ⬜ Not started | Safety/liveness properties; temporal logic |
+| 12 | Mission execution FSM | TLA+ | ⬜ Not started | State reachability, no-deadlock |
+| 13 | Integer overflow checks | CBMC | ⬜ Not started | `constrain`, `interpolateN`, RingBuffer indices |
+| 14 | Float rounding error (EKF) | Gappa | ⬜ Not started | Innovation gate, altitude fuser |
 
 ## Phase Descriptions
 
@@ -20,3 +36,10 @@ rationale. Phase legend: 1=Research, 2=Informal Spec, 3=Lean Spec, 4=Implementat
 - **Phase 3 – Lean Spec**: Lean 4 type definitions and `theorem` stubs (with `sorry`)
 - **Phase 4 – Implementation**: Lean functional model of the C++ implementation
 - **Phase 5 – Proofs**: `sorry`-free proofs (or documented remaining stubs)
+
+## Mathlib Dependency Notes
+
+Targets 5, 7, 9 (interpolate, wrap_pi, AlphaFilter convergence) are significantly easier
+with `Mathlib` available. The `lakefile.toml` already requires Mathlib; once network
+access to `reservoir.lean-lang.org` is available, run `lake update` to enable it. No
+other code changes are needed. See `RESEARCH.md §Tool Choice` for details.
