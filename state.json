@@ -1,0 +1,57 @@
+{
+  "last_run": "2026-04-04T16:10:00Z",
+  "run_id": "23982360437",
+  "lean_version": "4.29.0",
+  "lean_available": true,
+  "ci_created": true,
+  "fv_targets": [
+    {
+      "id": "constrain",
+      "name": "math::constrain",
+      "file": "src/lib/mathlib/math/Limits.hpp",
+      "phase": 4,
+      "status": "impl+spec done, 7 theorems proved, no sorry",
+      "lean_file": "formal-verification/lean/FVSquad/MathFunctions.lean",
+      "informal_spec": "formal-verification/specs/constrain_informal.md"
+    },
+    {
+      "id": "signNoZero",
+      "name": "math::signNoZero",
+      "file": "src/lib/mathlib/math/Functions.hpp",
+      "phase": 4,
+      "status": "impl+spec done, 5 theorems proved, no sorry",
+      "lean_file": "formal-verification/lean/FVSquad/MathFunctions.lean"
+    },
+    {
+      "id": "countSetBits",
+      "name": "math::countSetBits",
+      "file": "src/lib/mathlib/math/Functions.hpp",
+      "phase": 4,
+      "status": "impl+spec done, concrete examples, 1 sorry (pow2 inductive)",
+      "lean_file": "formal-verification/lean/FVSquad/MathFunctions.lean"
+    },
+    {
+      "id": "interpolate",
+      "name": "math::interpolate",
+      "file": "src/lib/mathlib/math/Functions.hpp",
+      "phase": 1,
+      "status": "research only"
+    },
+    {
+      "id": "SlewRate",
+      "name": "SlewRate::update",
+      "file": "src/lib/slew_rate/SlewRate.hpp",
+      "phase": 1,
+      "status": "research only, depends on constrain"
+    }
+  ],
+  "open_prs": [],
+  "notes": [
+    "Mathlib unavailable (network firewall) - using stdlib only",
+    "lake build passes with 1 sorry (countSetBits_pow2)",
+    "CI workflow created at .github/workflows/lean-ci.yml",
+    "omega tactic handles if-then-else on Int well",
+    "native_decide works for countSetBits concrete values",
+    "constrainNat needs by_cases approach due to omega cast limitations on Nat if-then-else"
+  ]
+}
