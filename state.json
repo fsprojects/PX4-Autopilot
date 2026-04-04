@@ -1,11 +1,11 @@
 {
-  "last_run": "2026-04-04T17:37:00Z",
-  "run_id": "23984032059",
+  "last_run": "2026-04-04T18:01:59Z",
+  "run_id": "23984451294",
   "lean_version": "4.29.0",
   "lean_available": true,
   "ci_created": true,
   "mathlib_available": false,
-  "mathlib_note": "lakefile.toml now DOES NOT require mathlib (removed in run4). Use stdlib-only tactics.",
+  "mathlib_note": "lakefile.toml does NOT require mathlib (stdlib-only). Use stdlib-only tactics.",
   "fv_targets": [
     {
       "id": "constrain",
@@ -47,18 +47,21 @@
       "correspondence": "abstraction - Int model, float/state/dt product not modelled"
     },
     {
+      "id": "deadzone",
+      "name": "math::deadzone",
+      "file": "src/lib/mathlib/math/Functions.hpp",
+      "phase": 5,
+      "status": "10 theorems proved: deadzone_in_dz, signR_of_nonneg, signR_of_neg, deadzone_pos_eq, deadzone_neg_eq, deadzone_pos, deadzone_neg, deadzone_no_dz_pos, deadzone_at_max, deadzone_at_min. 2 sorry: deadzone_le_one (negative branch) and deadzone_ge_neg_one (range bounds, need Mathlib linarith).",
+      "lean_file": "formal-verification/lean/FVSquad/Deadzone.lean",
+      "informal_spec": "formal-verification/specs/deadzone_informal.md",
+      "correspondence": "abstraction - Rat model, float semantics/NaN not modelled"
+    },
+    {
       "id": "interpolate",
       "name": "math::interpolate",
       "file": "src/lib/mathlib/math/Functions.hpp",
       "phase": 1,
-      "status": "research only. Boundary cases tractable with stdlib; interior monotonicity needs Rat or Mathlib.Analysis"
-    },
-    {
-      "id": "deadzone",
-      "name": "math::deadzone",
-      "file": "src/lib/mathlib/math/Functions.hpp",
-      "phase": 1,
-      "status": "research only. Piecewise structure; output-in-range tractable now. Good next target."
+      "status": "research only. Boundary cases tractable with stdlib; interior monotonicity needs Rat or Mathlib.Analysis. Good next target for Rat model similar to deadzone."
     },
     {
       "id": "wrap_pi",
@@ -89,7 +92,12 @@
       "status": "research only. FIFO ordering, index wraparound"
     }
   ],
-  "open_prs": [],
+  "open_prs": [
+    {
+      "branch": "lean-squad/fv-deadzone-run5-15887703ab",
+      "description": "deadzone spec + 10 proofs (2 sorry for range theorems)"
+    }
+  ],
   "correspondence_done": true,
   "correspondence_file": "formal-verification/CORRESPONDENCE.md",
   "bugs_found": [
@@ -100,23 +108,65 @@
       "status": "documented in CORRESPONDENCE.md, no issue filed yet"
     }
   ],
+  "rat_proven_lemmas": [
+    "Rat.lt_iff_sub_pos: a < b ↔ 0 < b - a",
+    "Rat.mul_pos: 0 < a → 0 < b → 0 < a*b",
+    "Rat.mul_le_mul_of_nonneg_right: a ≤ b → 0 ≤ c → a*c ≤ b*c",
+    "Rat.mul_neg_iff_of_pos_right: 0 < c → (a*c < 0 ↔ a < 0)",
+    "Rat.inv_pos: 0 < a⁻¹ ↔ 0 < a",
+    "Rat.mul_inv_cancel: a ≠ 0 → a*a⁻¹ = 1",
+    "Rat.abs_of_nonneg: 0 ≤ x → x.abs = x",
+    "Rat.abs_of_nonpos: x ≤ 0 → x.abs = -x",
+    "Rat.sub_eq_add_neg: a - b = a + (-b)",
+    "Rat.add_le_add_right: a + c ≤ b + c ↔ a ≤ b",
+    "Rat.add_lt_add_right: a + c < b + c ↔ a < b",
+    "Rat.neg_lt_neg_iff: -a < -b ↔ b < a",
+    "Rat.neg_le_iff: -(a) ≤ b ↔ ??? (use for neg_nonpos from nonneg)",
+    "Rat.neg_add: -(a+b) = -a + -b",
+    "Rat.neg_mul: -a * b = -(a*b)",
+    "Rat.neg_neg: --a = a",
+    "Rat.neg_sub: -(a-b) = b-a",
+    "Rat.one_mul: 1 * a = a",
+    "Rat.mul_one: a * 1 = a",
+    "Rat.ne_of_gt: a > b → b ≠ a (or a ≠ b)",
+    "Rat.not_lt: ¬(a < b) ↔ b ≤ a",
+    "Rat.not_le: ¬(a ≤ b) ↔ b < a",
+    "Rat.le_of_lt: a < b → a ≤ b",
+    "Rat.le_trans: transitive",
+    "Rat.div_def: a / b = a * b⁻¹",
+    "Rat.neg_lt_neg_iff: -a < -b ↔ b < a",
+    "Rat.inv_eq_of_mul_eq_one: a*b=1 → b=a⁻¹ (use for 1⁻¹=1)",
+    "Std.lt_of_lt_of_le: a < b → b ≤ c → a < c",
+    "KEY: x + dz < 0 from x < -dz: use Rat.add_lt_add_right + sub_self"
+  ],
+  "rat_unavailable_lemmas": [
+    "linarith (needs Mathlib)",
+    "ring (needs Mathlib for Rat)",
+    "norm_num (does not work on Rat expressions without Mathlib)",
+    "decide (doesn't reduce Rat arithmetic easily)",
+    "native_decide (cannot evaluate Rat code)",
+    "Rat.sub_zero, Rat.div_one, Rat.inv_one (not in core, use manual rewrites)",
+    "Rat.lt_trans (use Std.lt_of_lt_of_le instead)",
+    "Rat.div_pos, Rat.div_le_iff (not available)"
+  ],
   "tool_recommendations": {
-    "lean4_stdlib": "primary - pure math functions (all current targets done)",
-    "lean4_mathlib": "when network available - wrap_pi, AlphaFilter convergence",
+    "lean4_stdlib": "primary - pure math functions using Int or Rat",
+    "lean4_mathlib": "when network available - wrap_pi, AlphaFilter convergence, Rat linarith/ring",
     "cbmc": "next recommended - C++ integer overflow, array bounds",
     "infer": "quick wins - memory safety, null dereference",
     "tla_plus": "arming FSM, mission FSM - temporal properties",
     "gappa": "EKF floating-point rounding error"
   },
   "notes": [
-    "Mathlib REMOVED from lakefile.toml - use stdlib-only tactics (omega, simp, by_cases, native_decide)",
-    "split_ifs is NOT available without Mathlib - use by_cases + simp [show ...]",
-    "split_ifs requires Mathlib import - AVOID using split_ifs",
-    "For if-then-else goals: use by_cases on the condition, then simp [hcond] or simp [show not_cond from ...]",
-    "lake build passes with 0 sorry (all proofs complete, run 4)",
+    "Mathlib REMOVED from lakefile.toml - use stdlib-only tactics (omega, simp, by_cases, Rat.* lemmas)",
+    "split_ifs NOT available without Mathlib - use by_cases + simp [hcond]",
+    "For if-then-else goals: use by_cases on condition, then simp [hcond]",
+    "lake build passes for all files (0-2 sorry depending on target)",
     "CI workflow at .github/workflows/lean-ci.yml",
     "signNoZero NaN bug: C++ returns 0 for NaN, documented in CORRESPONDENCE.md",
-    "Next target: deadzone (phase 1->5, output-in-range tractable, no Mathlib needed)",
-    "Next target: interpolate (phase 1->5, boundary cases tractable, need Rat for interior)"
+    "Rat model works well for piecewise-linear functions (deadzone, interpolate)",
+    "Next target: interpolate (similar Rat model to deadzone, boundary proofs tractable)",
+    "deadzone range proofs (le_one negative, ge_neg_one) need Mathlib linarith",
+    "KEY Rat pattern: use sub_eq_add_neg + neg_add + neg_neg for algebraic rewrites"
   ]
 }
