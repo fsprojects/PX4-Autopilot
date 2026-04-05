@@ -1,6 +1,6 @@
 {
-  "last_run": "2026-04-05T15:38:00Z",
-  "run_id": "24004718593",
+  "last_run": "2026-04-05T16:45:00Z",
+  "run_id": "24005740363",
   "lean_version": "4.29.0",
   "lean_available": true,
   "ci_created": true,
@@ -13,16 +13,14 @@
     {"id":"deadzone","phase":5,"status":"12 proved, 0 sorry (all range theorems proved without Mathlib)","lean_file":"lean/FVSquad/Deadzone.lean"},
     {"id":"interpolate","phase":5,"status":"10 proved, 0 sorry","lean_file":"lean/FVSquad/Interpolate.lean"},
     {"id":"AlphaFilter","phase":5,"status":"12 proved, 0 sorry (ge_sample, mono_state, iterate_formula all proved)","lean_file":"lean/FVSquad/AlphaFilter.lean","informal_spec":"specs/alphafilter_informal.md"},
-    {"id":"WelfordMean","phase":4,"status":"6 proved, 2 sorry (m2Change_nonneg + m2_nonneg - need Rat.div_nonneg from Mathlib)","lean_file":"lean/FVSquad/WelfordMean.lean","informal_spec":"specs/welfordmean_informal.md","notes":"Key theorem: welfordFold_mean proved by induction. mean_step_algebra: (m+(x-m)/(n+1))*(n+1) = m*n+x. M2 sorry blocked by @[irreducible] Rat.inv. Fix: needs Mathlib or prove Rat.inv_nonneg manually for nat-cast denominators."},
-    {"id":"wrap_pi","phase":1,"status":"research only - needs Mathlib Real/fract"},
+    {"id":"wrap_pi","phase":3,"status":"8 proved (wrapInt), 6 sorry (wrapRat needs Mathlib floor). Informal spec written.","lean_file":"lean/FVSquad/WrapAngle.lean","informal_spec":"specs/wrapangle_informal.md","notes":"Part1 wrapInt: all 8 proved. Part2 wrapRat: axiom def + 6 sorry theorems needing Mathlib.Algebra.Order.Floor. Next: add Mathlib dep or prove wrapInt properties suffice."},
+    {"id":"WelfordMean","phase":2,"status":"Informal spec written. Lean file NOT in repo (run10 branch was lost). Needs Task 4 redo.","informal_spec":"specs/welfordmean_informal.md","notes":"Key theorem: welfordFold_mean proved by induction. mean_step_algebra: (m+(x-m)/(n+1))*(n+1) = m*n+x. M2 sorry blocked by @[irreducible] Rat.inv. Fix: needs Mathlib or prove Rat.inv_nonneg manually for nat-cast denominators."},
     {"id":"RingBuffer","phase":1,"status":"research only - omega for index arithmetic"}
   ],
-  "open_prs": [
-    {"branch":"lean-squad/fv-welfordmean-impl-proofs-run10-24004718593","description":"WelfordMean Lean spec+proofs (run10) - 6 proved, 2 sorry"}
-  ],
+  "open_prs": [],
   "bugs_found": [{"id":"signNoZero_nan","description":"signNoZero<float> returns 0 for NaN, violates ne_zero. Loop callers: rtl_direct_mission_land.cpp:73, mission_base.cpp:80 get step=0 (infinite loop risk). TECS.cpp:198, FlightTaskOrbit.cpp:138 get 0 (incorrect sign).","status":"GitHub issue filed run9"}],
   "total_theorems": 61,
-  "total_sorry": 2,
+  "total_sorry": 6,
   "notes": [
     "Rat.sub_add_cancel/Rat.sub_self: IMPLICIT args - use bare (no obvious args)",
     "Rat.add_le_add_right: shared term on RIGHT (a+c <= b+c). For left-shared: add_comm first.",
@@ -32,11 +30,12 @@
     "AlphaFilter iterate_formula fix: use 'induction n generalizing state' (NOT plain induction)",
     "CI at .github/workflows/lean-ci.yml - working, no Mathlib deps needed",
     "WelfordMean mean_step_algebra: (m+(x-m)/(n+1))*(n+1) = m*n+x; key: Rat.div_mul_cancel hn + Rat.mul_add",
-    "WelfordMean natCast_succ: use simp [Rat.natCast_add, show (↑(1:Nat):Rat)=1 from by decide]",
-    "WelfordMean natCast_add_one_ne_zero: use Rat.ne_of_gt (which gives b≠a from a<b)",
-    "WelfordMean rat_mul_self_nonneg: use @Rat.le_total 0 a (le_total has implicit args only!)",
-    "WelfordMean foldl mean helper: key step - rw [hperm, ih_s]; simp only [welfordUpdate, natCast_succ]; rw [mean_step_algebra]",
-    "WelfordMean M2 sorry: delta*(x-newMean) = delta^2*count/(count+1) >= 0; blocked by @[irreducible] Rat.inv (no Rat.div_nonneg in core); fix: use Mathlib or prove Rat.inv_pos for positive Rat",
-    "WelfordMean from_init: need natCast_succ 0 to prove x/(↑0+1) = x (can't use decide on Rat.add/inv)"
+    "ring tactic NOT available in Lean 4 stdlib - use omega for linear Int arithmetic",
+    "linarith tactic NOT available in Lean 4 stdlib (it's in Mathlib) - use omega for Int",
+    "Rat ordering: linarith not available; use Rat.le_of_lt, Rat.lt_trans explicitly",
+    "Int.ediv_add_emod DEPRECATED - use Int.mul_ediv_add_emod instead",
+    "wrapInt_congruent proof: use Int.mul_ediv_add_emod + Int.neg_mul + Int.mul_comm + omega",
+    "wrapInt_periodic proof: omega for heq + Int.add_mul_emod_self_right for the mod step",
+    "wrapRat sorry: needs Mathlib.Algebra.Order.Floor (Int.floor_nonneg, Int.lt_floor_add_one)"
   ]
 }
