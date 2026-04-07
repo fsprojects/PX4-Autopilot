@@ -1,6 +1,6 @@
 {
-  "last_run": "2026-04-07T03:30:00Z",
-  "run_id": "24062795552",
+  "last_run": "2026-04-07T09:19:58Z",
+  "run_id": "24073943853",
   "lean_version": "4.29.0",
   "lean_available": true,
   "ci_created": true,
@@ -72,23 +72,17 @@
       "informal_spec": "specs/lerp_informal.md"
     },
     {
-      "id": "negate_int16",
+      "id": "expo",
       "phase": 5,
-      "status": "13 proved, 0 sorry. BUG: not a global involution - negate(negate(-32767))=-32768. INT16_MAX special case incorrect. Bug issue filed.",
-      "lean_file": "lean/FVSquad/Negate.lean",
-      "informal_spec": "specs/negate_informal.md",
-      "notes": "Model: Fin 65536 (two's complement). Counterexample: v=32769 (-32767). Involution holds for [1,32766] and [32770,65535] subranges. Only INT16_MIN needs special case."
+      "status": "15 proved, 1 sorry (expo_in_range needs Mathlib non-linear ineq: x^2 <= 1)",
+      "lean_file": "lean/FVSquad/Expo.lean",
+      "informal_spec": "specs/expo_informal.md",
+      "notes": "expo_odd proved via constrainRat_neg_symm + simp [mul_neg,neg_neg] + neg_add. expo_in_range sorry: needs mul_self_le_one from Mathlib.Algebra.Order.Ring."
     },
     {
       "id": "RingBuffer",
       "phase": 1,
       "status": "research only - omega for index arithmetic"
-    },
-    {
-      "id": "expo",
-      "phase": 1,
-      "status": "research only - MEDIUM. RC stick expo curve (1-e)*x+e*x^3.",
-      "notes": "Odd symmetry, zero at zero, bounded output. Depends on constrain (proved)."
     },
     {
       "id": "MedianFilter",
@@ -97,7 +91,9 @@
       "notes": "Model with List.mergeSort instead of qsort. bounded by min/max of window."
     }
   ],
-  "open_prs": [],
+  "open_prs": [
+    {"number": "pending", "branch": "lean-squad/expo-spec-run16", "description": "expo informal spec + Lean proofs (run16)"}
+  ],
   "bugs_found": [
     {
       "id": "signNoZero_nan",
@@ -110,35 +106,33 @@
       "status": "GitHub issue filed (run 15)"
     }
   ],
-  "total_theorems": 102,
-  "total_proved": 94,
-  "total_sorry": 8,
+  "total_theorems": 117,
+  "total_proved": 109,
+  "total_sorry": 9,
   "ci_status": "healthy - toolchain pinned v4.29.0, cache on lake-manifest",
-  "correspondence_last_updated": "2026-04-07T03:30:00Z",
-  "critique_last_updated": "2026-04-06T17:10:00Z",
-  "run15_tasks": "Task 3 (negate_int16 Lean spec + 13 proofs) + Task 6 (CORRESPONDENCE.md update with negate section)",
+  "run16_tasks": "Task 2 (expo informal spec) + Task 3 (expo Lean spec: 15 proofs, 1 sorry for expo_in_range)",
   "notes": [
+    "set tactic NOT available in Lean 4 stdlib (it's in Mathlib/Std) - avoid it",
+    "norm_num tactic NOT available in Lean 4 stdlib (unreachable if simp closes goal first)",
+    "linarith NOT available, ring NOT available, ring_nf NOT available",
+    "For Rat subtraction: use Rat.sub_eq_add_neg + Rat.neg_zero + Rat.add_zero to prove a-0=a",
+    "Rat.neg_add: -(a+b) = -a + -b (both implicit args). rw [<- Rat.neg_add] rewrites -a+-b to -(a+b)",
+    "Rat.le_iff_lt_or_eq.mp: a <= b -> a < b | a = b (useful for case splits on clamped boundaries)",
+    "Rat.neg_le_iff.mp rfl: proves -1 <= 1",
+    "Rat.not_lt.mpr rfl: proves various ¬(a < b) for specific values (e.g. ¬0>1, ¬1<-1)",
+    "constrainRat neg_symm: use Rat.neg_lt_neg h + rw [Rat.neg_neg], Rat.neg_le_neg",
+    "expo_in_range sorry: needs mul_self_le_one for x^2<=1 when 0<=x<=1",
     "Rat.sub_add_cancel/Rat.sub_self: IMPLICIT args - use bare (no obvious args)",
     "Rat.add_le_add_right: shared term on RIGHT (a+c <= b+c). For left-shared: add_comm first.",
     "x^0=1: use 'have h0 := by simp' (simp knows pow_zero)",
-    "Rat.add_le_add_left: c+a <= c+b iff a<=b (note: c on LEFT)",
     "AlphaFilter ge_sample fix: use Rat.neg_le_neg on (alpha*(state-sample) <= state-sample), then rewrite -(alpha*(state-sample)) = alpha*(sample-state) using <- Rat.mul_neg + Rat.neg_sub",
     "AlphaFilter iterate_formula fix: use 'induction n generalizing state' (NOT plain induction)",
     "CI at .github/workflows/lean-ci.yml - working, lake update step added run12",
     "WelfordMean mean_step_algebra: need (n+1) NOT n+1 in function def.",
-    "ring tactic NOT available in Lean 4 stdlib - use omega for linear Int arithmetic",
-    "linarith tactic NOT available in Lean 4 stdlib (it's in Mathlib) - use omega for Int",
-    "split_ifs tactic NOT available in Lean 4 stdlib - use if_neg/if_pos instead",
     "succ_cast_ne_zero: exact_mod_cast Nat.succ_ne_zero n works for ((n+1):Rat) <> 0",
     "push_cast; rfl works for (n+1) = n + 1 in Rat",
     "Rat.inv_mul_cancel (not div_mul_cancel): rw [Rat.div_def, Rat.mul_assoc, Rat.inv_mul_cancel _ hn, Rat.mul_one]",
     "lerp_half sorry: needs explicit Rat 1/2 = (1:Rat)/(2:Rat) inv arithmetic.",
-    "Fin 65536 model for int16: values 0..32767 are positive, 32768..65535 are negative",
-    "INT16_MAX=32767, INT16_MIN bit pattern=32768. Two's complement neg: (65536-v)%65536.",
-    "For Fin-based proofs: use 'apply Fin.ext; simp only [negate16, if_neg h1, if_neg h2]' pattern",
-    "After rw [h_nv] to concrete Fin value, conditions in if become nat equalities omega can handle",
-    "Avoid 'rw [h]' inside Fin.mk-containing goals - use simp only or restructure to nat level first",
-    "suffices h : (f x).val = v.val from Fin.ext h - useful pattern for Fin goals",
-    "Next target: expo (RC stick curve) or MedianFilter"
+    "Next target: MedianFilter or negate_int16 (Lean file not committed yet)"
   ]
 }
