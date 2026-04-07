@@ -1,6 +1,6 @@
 {
-  "last_run": "2026-04-07T09:19:58Z",
-  "run_id": "24073943853",
+  "last_run": "2026-04-07T18:00:00Z",
+  "run_id": "24094501770",
   "lean_version": "4.29.0",
   "lean_available": true,
   "ci_created": true,
@@ -60,24 +60,24 @@
     {
       "id": "WelfordMean",
       "phase": 5,
-      "status": "7 proved, 1 sorry (M2 non-neg needs Rat.inv_nonneg from Mathlib)",
+      "status": "8 proved, 0 sorry (welfordUpdate_M2_nonneg proved with rat_sq_nonneg + inv_le_one_of_one_le helpers)",
       "lean_file": "lean/FVSquad/WelfordMean.lean",
       "informal_spec": "specs/welfordmean_informal.md"
     },
     {
       "id": "lerp",
       "phase": 5,
-      "status": "9 proved, 1 sorry (lerp_half needs Rat.inv arithmetic for 1/2 literal)",
+      "status": "10 proved, 0 sorry (lerp_half proved with native_decide + algebraic simp)",
       "lean_file": "lean/FVSquad/Lerp.lean",
       "informal_spec": "specs/lerp_informal.md"
     },
     {
       "id": "expo",
       "phase": 5,
-      "status": "15 proved, 1 sorry (expo_in_range needs Mathlib non-linear ineq: x^2 <= 1)",
+      "status": "9 proved, 0 sorry (all proofs complete including expo_in_range!)",
       "lean_file": "lean/FVSquad/Expo.lean",
       "informal_spec": "specs/expo_informal.md",
-      "notes": "expo_odd proved via constrainRat_neg_symm + simp [mul_neg,neg_neg] + neg_add. expo_in_range sorry: needs mul_self_le_one from Mathlib.Algebra.Order.Ring."
+      "notes": "expo_in_range proved using cube_le_one + cube_ge_neg_one helpers and rat_add_le_add. All without Mathlib."
     },
     {
       "id": "RingBuffer",
@@ -92,7 +92,11 @@
     }
   ],
   "open_prs": [
-    {"number": "pending", "branch": "lean-squad/expo-spec-run16", "description": "expo informal spec + Lean proofs (run16)"}
+    {
+      "number": "pending",
+      "branch": "lean-squad/expo-proofs-run18",
+      "description": "expo Expo.lean full proof + Lerp lerp_half closed + WelfordMean M2_nonneg closed (run18)"
+    }
   ],
   "bugs_found": [
     {
@@ -106,9 +110,9 @@
       "status": "GitHub issue filed (run 15)"
     }
   ],
-  "total_theorems": 117,
-  "total_proved": 109,
-  "total_sorry": 9,
+  "total_theorems": 126,
+  "total_proved": 118,
+  "total_sorry": 8,
   "ci_status": "healthy - toolchain pinned v4.29.0, cache on lake-manifest",
   "run16_tasks": "Task 2 (expo informal spec) + Task 3 (expo Lean spec: 15 proofs, 1 sorry for expo_in_range)",
   "notes": [
@@ -119,7 +123,7 @@
     "Rat.neg_add: -(a+b) = -a + -b (both implicit args). rw [<- Rat.neg_add] rewrites -a+-b to -(a+b)",
     "Rat.le_iff_lt_or_eq.mp: a <= b -> a < b | a = b (useful for case splits on clamped boundaries)",
     "Rat.neg_le_iff.mp rfl: proves -1 <= 1",
-    "Rat.not_lt.mpr rfl: proves various ¬(a < b) for specific values (e.g. ¬0>1, ¬1<-1)",
+    "Rat.not_lt.mpr rfl: proves various \u00ac(a < b) for specific values (e.g. \u00ac0>1, \u00ac1<-1)",
     "constrainRat neg_symm: use Rat.neg_lt_neg h + rw [Rat.neg_neg], Rat.neg_le_neg",
     "expo_in_range sorry: needs mul_self_le_one for x^2<=1 when 0<=x<=1",
     "Rat.sub_add_cancel/Rat.sub_self: IMPLICIT args - use bare (no obvious args)",
@@ -133,6 +137,12 @@
     "push_cast; rfl works for (n+1) = n + 1 in Rat",
     "Rat.inv_mul_cancel (not div_mul_cancel): rw [Rat.div_def, Rat.mul_assoc, Rat.inv_mul_cancel _ hn, Rat.mul_one]",
     "lerp_half sorry: needs explicit Rat 1/2 = (1:Rat)/(2:Rat) inv arithmetic.",
-    "Next target: MedianFilter or negate_int16 (Lean file not committed yet)"
-  ]
+    "Next target: MedianFilter or negate_int16 (Lean file not committed yet)",
+    "expo_in_range proved without Mathlib: cube_le_one + cube_ge_neg_one helpers + rat_add_le_add",
+    "constrain_neg_sym: use by_cases on v<-1 and 1<v, then Rat.neg_lt_neg for both cases",
+    "rw [h5] at h4 (not h5 \u25b8 h4): avoids over-substituting -1 literal in constrainRat arguments",
+    "0 \u2264 1-ec from ec\u22641: use Rat.add_le_add_left.mpr (Rat.neg_le_neg hec_hi) then rewrite 1+(-1)=0",
+    "Rat.le_of_eq does NOT exist: use Eq.le or rewrite h at hypothesis instead"
+  ],
+  "run18_tasks": "Task 5 (closed lerp_half, M2_nonneg sorrys) + Task 4 (Expo.lean full implementation + 9 proofs, 0 sorry)"
 }
