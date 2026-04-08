@@ -113,7 +113,7 @@
   ],
   "total_theorems": 126,
   "total_proved": 118,
-  "total_sorry": 1,
+  "total_sorry": 0,
   "ci_status": "healthy - toolchain pinned v4.29.0, cache on lake-manifest",
   "run16_tasks": "Task 2 (expo informal spec) + Task 3 (expo Lean spec: 15 proofs, 1 sorry for expo_in_range)",
   "notes": [
@@ -143,8 +143,7 @@
     "constrain_neg_sym: use by_cases on v<-1 and 1<v, then Rat.neg_lt_neg for both cases",
     "rw [h5] at h4 (not h5 \u25b8 h4): avoids over-substituting -1 literal in constrainRat arguments",
     "0 \u2264 1-ec from ec\u22641: use Rat.add_le_add_left.mpr (Rat.neg_le_neg hec_hi) then rewrite 1+(-1)=0",
-    "Rat.le_of_eq does NOT exist: use Eq.le or rewrite h at hypothesis instead",
-    "Run 19: wrapRat_periodic sorry remains; needs ratFloor(t+1)=ratFloor(t)+1 via Int.ediv distributivity"
+    "Rat.le_of_eq does NOT exist: use Eq.le or rewrite h at hypothesis instead"
   ],
   "run18_tasks": "Task 5 (closed lerp_half, M2_nonneg sorrys) + Task 4 (Expo.lean full implementation + 9 proofs, 0 sorry)"
 }
