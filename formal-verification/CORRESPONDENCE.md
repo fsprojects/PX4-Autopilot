@@ -4,8 +4,8 @@
 
 ## Last Updated
 
-- **Date**: 2026-04-07 03:30 UTC
-- **Commit**: `2aae128f5d`
+- **Date**: 2026-04-09 17:30 UTC
+- **Commit**: `834e764731`
 
 This document describes how each Lean 4 definition in `formal-verification/lean/FVSquad/`
 corresponds to the original C++ source. It records the correspondence level, known
@@ -511,6 +511,148 @@ global involution. See **Known Mismatches** below.
 
 ---
 
+## `FVSquad/WrapAngle.lean`
+
+Source file: `formal-verification/lean/FVSquad/WrapAngle.lean`
+
+### `WrapAngle.wrapInt`
+
+| Lean name | C++ name | C++ location | Correspondence | Notes |
+|-----------|----------|--------------|----------------|-------|
+| `WrapAngle.wrapInt` | `matrix::wrap<Integer>` | [`src/lib/matrix/matrix/helper_functions.hpp#L74`](../src/lib/matrix/matrix/helper_functions.hpp#L74) | **exact** | Integer template; unbounded `Int`; all 8 theorems proved with `omega` |
+
+**Model**: The C++ integer `wrap` template implements the operation:
+1. While `x < low`: add `range * ((low - x) / range + 1)`
+2. Return `low + (x - low) % range`
+
+The Lean model uses `Int.emod` directly: `wrapInt x low high := low + (x - low) % (high - low)`.
+This is semantically equivalent to the C++ loop-based form for all integers.
+
+**Divergences**:
+- **Type overflow**: C++ `wrap<int16_t>` has undefined behaviour if `range = high - low`
+  overflows the integer type. The Lean `Int` type is unbounded; no overflow.
+- **`low ≥ high` precondition**: all theorems require `low < high`. The C++ has
+  division by zero (or UB) when `range = 0`; the Lean model does not evaluate for
+  this case due to the explicit precondition.
+
+**Impact on proofs**: All 8 theorems (`wrapInt_ge_low`, `wrapInt_lt_high`,
+`wrapInt_in_range`, `wrapInt_idempotent`, `wrapInt_periodic`, `wrapInt_periodic_k`,
+`wrapInt_congruent`, `wrapInt_zero`) are fully proved using `omega` and `Int.emod`
+lemmas. These establish the key contracts of the wrapping operation: output in `[low, high)`,
+idempotence for already-in-range values, and periodicity.
+
+---
+
+### `WrapAngle.wrapRat`
+
+| Lean name | C++ name | C++ location | Correspondence | Notes |
+|-----------|----------|--------------|----------------|-------|
+| `WrapAngle.wrapRat` | `matrix::wrap_floating<Floating>` | [`src/lib/matrix/matrix/helper_functions.hpp#L27`](../src/lib/matrix/matrix/helper_functions.hpp#L27) | **approximation** | Axiomatic definition; 6 theorems stated with `sorry` (require Mathlib floor) |
+
+**Model**: The C++ `wrap_floating` computes:
+```cpp
+const auto num_wraps = std::floor((x - low) * inv_range);
+return x - range * num_wraps;
+```
+The Lean model uses an axiomatic `noncomputable def` referencing `Int.floor` (available
+in Mathlib but not in Lean 4 stdlib):
+```lean
+noncomputable def wrapRat (x lo hi : Rat) (h : lo < hi) : Rat :=
+  let range := hi - lo
+  x - range * (⌊(x - lo) / range⌋ : Int)
+```
+
+**Divergences**:
+- **Axiomatic**: `wrapRat` is a `noncomputable def` and cannot be evaluated. It serves
+  as a specification, not a computable implementation.
+- **Mathlib dependency**: all 6 theorems (`wrapRat_ge_lo`, `wrapRat_lt_hi`,
+  `wrapRat_in_range`, `wrapRat_idempotent`, `wrapRat_periodic`, `wrapRat_congruent`,
+  `wrapRat_zero`) are guarded by `sorry` because proofs require
+  `Mathlib.Algebra.Order.Floor` lemmas (e.g., `Int.floor_intCast`,
+  `Int.self_sub_floor`). These are unavailable in the stdlib-only toolchain.
+- **Irrational π**: The C++ `wrap_pi(x)` uses `float M_PI` (a rational approximation).
+  The Lean model accepts any rational bounds; a caller must supply a rational
+  approximation of π or switch to Mathlib `Real.pi`.
+- **NaN / ±∞**: not modelled (rational model excludes non-finite inputs).
+
+**Impact on proofs**: The 6 `sorry`-guarded theorems are mathematically correct (the
+statements are true and the proofs would follow from Mathlib floor lemmas). They cannot
+be machine-verified in the current stdlib-only setup. When Mathlib is added to the lake
+project, all 6 sorries can be closed. The integer `wrapInt` proofs provide complete
+verified coverage for the discrete case.
+
+---
+
+## `FVSquad/Expo.lean`
+
+Source file: `formal-verification/lean/FVSquad/Expo.lean`
+
+### `constrainRat` (Expo.lean local helper)
+
+| Lean name | C++ name | C++ location | Correspondence | Notes |
+|-----------|----------|--------------|----------------|-------|
+| `constrainRat` | `math::constrain<float>` | [`src/lib/mathlib/math/Limits.hpp#L78`](../src/lib/mathlib/math/Limits.hpp#L78) | **abstraction** | Local copy scoped to Expo.lean; models the `[-1,1]` clamping; 3 helper lemmas proved |
+
+**Note**: `constrainRat` in `Expo.lean` duplicates the clamping logic of `MathFunctions.lean`
+`PX4.Math.constrain` but is scoped locally and operates on `Rat`. It is not imported from
+`MathFunctions.lean` to keep the Expo file self-contained. The divergences are the same
+as for `PX4.Math.constrain`: no NaN, no overflow, `Rat` instead of `float`.
+
+---
+
+### `expoRat`
+
+| Lean name | C++ name | C++ location | Correspondence | Notes |
+|-----------|----------|--------------|----------------|-------|
+| `expoRat` | `math::expo` | [`src/lib/mathlib/math/Functions.hpp#L237`](../src/lib/mathlib/math/Functions.hpp#L237) | **abstraction** | Exact rational lift of the blending formula; 9 theorems proved, 0 sorry |
+
+**Model**: The C++ `expo` function:
+```cpp
+inline float expo(float value, float e)
+{
+    float x = constrain(value, -1.f, 1.f);
+    return (1.f - e) * x + e * x * x * x;
+}
+```
+The Lean model:
+```lean
+def expoRat (v e : Rat) : Rat :=
+  let x := constrainRat v (-1) 1
+  let ec := constrainRat e 0 1
+  (1 - ec) * x + ec * x * x * x
+```
+This lifts the formula exactly to `Rat`, clamping both `v` and `e` to their respective
+ranges.
+
+**Divergences**:
+- **Type**: C++ uses `float`; Lean uses `Rat`. IEEE 754 rounding is not modelled.
+- **`e` clamping**: The C++ does **not** clamp `e` before use. The Lean model clamps `e`
+  to `[0, 1]` via `constrainRat e 0 1`. For C++ callers that pass `e` outside `[0, 1]`,
+  the C++ and Lean may differ. (The PX4 RC calibration system constrains `e` to `[0, 1]`
+  in practice, but this is not enforced in C++ at the function level.)
+- **NaN**: not modelled.
+
+**Impact on proofs**:
+
+| Theorem | Validity in C++ context | Notes |
+|---------|------------------------|-------|
+| `expo_at_zero` | Exact | `expo(0, e) = 0` always |
+| `expo_at_pos_one` | Exact | `expo(1, e) = 1` — RC max is a fixed point |
+| `expo_at_neg_one` | Exact | `expo(-1, e) = -1` — RC min is a fixed point |
+| `expo_linear` | Valid for `e ∈ [0, 1]` | `e = 0` gives identity (linear stick) |
+| `expo_cubic` | Valid for `e ∈ [0, 1]` | `e = 1` gives pure cubic |
+| `expo_odd` | Valid (if `v` and `-v` both in range) | Anti-symmetry: stick deflection sign preserved |
+| `expo_in_range` | Valid | Output stays in `[-1, 1]` for any input |
+| `expo_eq_linear_at_zero` | Valid for `0 < e ≤ 1` | Tangent slope at 0 is `(1-e)` |
+| `expo_endpoints_fixed` | Exact | `±1` are fixed points |
+
+The `expo_odd` anti-symmetry proof and `expo_in_range` range-containment proof are the
+highest-value theorems. The `e` clamping divergence is the main gap: theorems assume
+`e ∈ [0, 1]`; if a caller passes `e > 1` or `e < 0`, the C++ can extrapolate outside
+`[-1, 1]` while the Lean model still clamps.
+
+---
+
 ## Known Mismatches
 
 **`negate<int16_t>` involution failure** (severity: low–medium):
@@ -594,5 +736,8 @@ change the implementation to `return std::isfinite(val) ? ((T(0) <= val) ? 1 : -
 | `WelfordMean::update` | `WelfordMean.lean` | `WelfordMean.hpp` | abstraction | Kahan compensators, count overflow guard, non-finite inputs not modelled |
 | `math::lerp` | `Lerp.lean` | `Functions.hpp` | abstraction | IEEE 754 NaN/rounding; integer truncation not modelled |
 | `math::negate<int16_t>` | `Negate.lean` | `Functions.hpp` | exact | **Mismatch found**: not a global involution (see §Negate) |
+| `matrix::wrap<Integer>` | `WrapAngle.lean` | `helper_functions.hpp` | exact | Integer overflow (unbounded `Int` vs typed C++) |
+| `matrix::wrap_floating` / `wrap_pi` | `WrapAngle.lean` | `helper_functions.hpp` | approximation | 6 theorems `sorry`-guarded (need Mathlib floor); `e` not clamped in C++ |
+| `math::expo` | `Expo.lean` | `Functions.hpp` | abstraction | `e` not clamped in C++ but clamped in Lean model; float rounding not modelled |
 
 > 🔬 Generated by Lean Squad automated formal verification.
