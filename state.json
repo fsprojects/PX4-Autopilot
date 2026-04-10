@@ -1,6 +1,6 @@
 {
-  "last_run": "run24",
-  "run_id": "24236035396",
+  "last_run": "run25",
+  "run_id": "24254526991",
   "lean_version": "4.29.0",
   "lean_available": true,
   "ci_created": true,
@@ -92,16 +92,17 @@
     },
     {
       "id": "RingBuffer",
-      "phase": 2,
-      "status": "Informal spec written (specs/ringbuffer_informal.md) in run22. Key: index-mod invariants, FIFO, pop_first_older_than timestamp search.",
-      "informal_spec": "specs/ringbuffer_informal.md"
+      "phase": 5,
+      "status": "28 theorems + 9 concrete examples, 1 sorry (rbIdxPushN_fills). run25.",
+      "informal_spec": "specs/ringbuffer_informal.md",
+      "lean_file": "lean/FVSquad/RingBuffer.lean"
     }
   ],
   "open_prs": [
     {
       "number": "pending",
-      "branch": "lean-squad/medianfilter-proofs-run24-5814283",
-      "description": "MedianFilter Lean spec + proofs (run24): 12 theorems + 12 concrete, 0 sorry; CRITIQUE.md update; TARGETS.md advance MedianFilter phase 2->5"
+      "branch": "lean-squad/ringbuffer-spec-run25-13742",
+      "description": "RingBuffer Lean spec + 28 theorems, 1 sorry (rbIdxPushN_fills). Tasks 3+5. run25."
     }
   ],
   "bugs_found": [
@@ -116,15 +117,15 @@
       "status": "GitHub issue #21 filed"
     }
   ],
-  "total_theorems": 140,
+  "total_theorems": 144,
   "total_named_theorems": 128,
-  "total_proved": 134,
-  "total_sorry": 6,
+  "total_proved": 143,
+  "total_sorry": 7,
   "ci_status": "healthy - FVSquad.lean barrel includes all 12 modules including MedianFilter",
   "run24_tasks": "Task 5 (MedianFilter: Lean spec + 12 theorems + 12 concrete examples, 0 sorry) + Task 7 (CRITIQUE.md: add MedianFilter rows, update counts, update gaps)",
   "correspondence_coverage": "MathFunctions, AlphaFilter, SlewRate, Deadzone, Interpolate, WelfordMean, Lerp, Negate, WrapAngle, Expo",
-  "correspondence_missing": "MedianFilter (not yet in CORRESPONDENCE.md), RingBuffer (no Lean file yet)",
-  "next_targets": "RingBuffer: write Lean spec (Task 3). MedianFilter: add to CORRESPONDENCE.md (Task 6). WrapAngle wrapRat: add Mathlib.",
+  "correspondence_missing": "RingBuffer needs pop_first_older_than loop details; MedianFilter not yet in CORRESPONDENCE.md",
+  "next_targets": "rbIdxPushN_fills sorry (Task 5). MedianFilter CORRESPONDENCE.md (Task 6). WrapAngle Mathlib (Task 5 blocker).",
   "notes": [
     "set tactic NOT available in Lean 4 stdlib",
     "norm_num tactic NOT available in Lean 4 stdlib",
@@ -146,6 +147,10 @@
     "WrapAngle wrapRat sorrys: 6 remaining, all need Mathlib.Algebra.Order.Floor - not fixable without Mathlib",
     "RingBuffer: informal spec done in run22. Next step is Task 3 (write Lean spec). Use Fin n for index model, omega for modular arithmetic.",
     "Nat.lt_or_eq_of_le: useful for case splits in index bounds proofs",
-    "le_of_eq NOT available in Lean 4 stdlib; use Eq.le or omega instead"
+    "le_of_eq NOT available in Lean 4 stdlib; use Eq.le or omega instead",
+    "dif_pos/dif_neg for dependent if-then-else (if h : P), not if_pos/if_neg",
+    "split tactic needs if at top-level goal; use by_cases for nested if goals",
+    "rbIdxPushN_fills sorry needs min(k,n) induction helper - future work",
+    "RingBuffer _first_write eliminated via head=n-1 init; first push goes to slot 0"
   ]
 }
