@@ -1,6 +1,6 @@
 {
-  "last_run": "run26",
-  "run_id": "24273444492",
+  "last_run": "run27",
+  "run_id": "24279112168",
   "lean_version": "4.29.0",
   "lean_available": true,
   "ci_created": true,
@@ -15,38 +15,40 @@
     {"id": "AlphaFilter", "phase": 5, "status": "12 proved, 0 sorry", "lean_file": "lean/FVSquad/AlphaFilter.lean", "informal_spec": "specs/alphafilter_informal.md"},
     {"id": "wrap_pi", "phase": 5, "status": "wrapInt: 8 proved 0 sorry. wrapRat: 5 proved 0 sorry, 6 sorry (Mathlib floor needed).", "lean_file": "lean/FVSquad/WrapAngle.lean"},
     {"id": "WelfordMean", "phase": 5, "status": "all sorrys closed. welfordFold_mean proved, M2_nonneg proved.", "lean_file": "lean/FVSquad/WelfordMean.lean", "informal_spec": "specs/welfordmean_informal.md"},
-    {"id": "lerp", "phase": 5, "status": "10 proved, 0 sorry. lerp_half closed in run18.", "lean_file": "lean/FVSquad/Lerp.lean", "informal_spec": "specs/lerp_informal.md"},
+    {"id": "lerp", "phase": 5, "status": "10 proved, 0 sorry.", "lean_file": "lean/FVSquad/Lerp.lean", "informal_spec": "specs/lerp_informal.md"},
     {"id": "expo", "phase": 5, "status": "12 proved, 0 sorry.", "lean_file": "lean/FVSquad/Expo.lean", "informal_spec": "specs/expo_informal.md"},
     {"id": "negate", "phase": 5, "status": "13 proved, 0 sorry. BUG: INT16_MAX special case incorrect - issue #21 filed.", "lean_file": "lean/FVSquad/Negate.lean", "informal_spec": "specs/negate_informal.md"},
-    {"id": "RingBuffer", "phase": 5, "status": "18 proved, 0 sorry. FIFO invariants, fill/overflow, getNewest. run26.", "informal_spec": "specs/ringbuffer_informal.md", "lean_file": "lean/FVSquad/RingBuffer.lean"}
+    {"id": "RingBuffer", "phase": 5, "status": "18 proved, 0 sorry. FIFO invariants, fill/overflow, getNewest. run26.", "informal_spec": "specs/ringbuffer_informal.md", "lean_file": "lean/FVSquad/RingBuffer.lean"},
+    {"id": "MedianFilter", "phase": 5, "status": "15 named theorems + 14 native_decide, 0 sorry. run27. median_mem, median_const, sorted_getElem_le, range bounds, insert invariants, spike rejection.", "lean_file": "lean/FVSquad/MedianFilter.lean", "informal_spec": "specs/medianfilter_informal.md"}
   ],
   "open_prs": [
-    {"number": "pending", "branch": "lean-squad/ringbuffer-proofs-run26", "description": "RingBuffer Lean spec + 18 theorems, 0 sorry. CRITIQUE.md + CORRESPONDENCE.md + TARGETS.md updated. run26."}
+    {"number": "pending", "branch": "lean-squad/ringbuffer-proofs-run26-6156c4477e7bd4ac", "description": "RingBuffer Lean spec + 18 theorems, 0 sorry. CRITIQUE.md + CORRESPONDENCE.md + TARGETS.md updated. run26."},
+    {"number": "pending", "branch": "lean-squad/medianfilter-impl-run27-834e764731", "description": "MedianFilter Lean spec + 15 theorems + 14 native_decide, 0 sorry. CORRESPONDENCE/CRITIQUE/TARGETS updated. run27."}
   ],
   "bugs_found": [
     {"id": "signNoZero_nan", "description": "signNoZero<float> returns 0 for NaN, violates ne_zero.", "status": "GitHub issue #12 filed"},
     {"id": "negate_int16_not_involution", "description": "negate<int16_t> is not a global involution. negate(negate(-32767))=-32768. INT16_MAX special case wrong.", "status": "GitHub issue #21 filed"}
   ],
-  "total_theorems": 134,
-  "total_named_theorems": 128,
-  "total_proved": 134,
+  "total_theorems": 149,
+  "total_named_theorems": 135,
+  "total_proved": 143,
   "total_sorry": 6,
-  "ci_status": "healthy - FVSquad.lean barrel includes all 12 modules including RingBuffer",
-  "run26_tasks": "Task 4+5 (RingBuffer: 18 theorems 0 sorry) + Task 7 (CRITIQUE.md update with RingBuffer + CORRESPONDENCE.md)",
-  "correspondence_coverage": "MathFunctions, AlphaFilter, SlewRate, Deadzone, Interpolate, WelfordMean, Lerp, Negate, WrapAngle, Expo, RingBuffer",
-  "correspondence_missing": "MedianFilter not yet in CORRESPONDENCE.md (no lean file on main yet)",
-  "next_targets": "pop_first_older_than model for RingBuffer (Task 3 - complex loop). MedianFilter Lean spec (Task 3 - not yet on main). WrapAngle Mathlib (Task 5 blocker).",
+  "ci_status": "healthy - FVSquad.lean barrel includes all 13 modules including MedianFilter",
+  "run27_tasks": "Task 4 (MedianFilter: 15 named + 14 native_decide, 0 sorry) + Task 6 (CORRESPONDENCE.md: added MedianFilter section)",
+  "correspondence_coverage": "MathFunctions, AlphaFilter, SlewRate, Deadzone, Interpolate, WelfordMean, Lerp, Negate, WrapAngle, Expo, RingBuffer, MedianFilter",
+  "next_targets": "pop_first_older_than model for RingBuffer (Task 3 - complex loop). WrapAngle Mathlib (Task 5 blocker, 6 sorry).",
   "notes": [
     "set tactic NOT available in Lean 4 stdlib",
     "norm_num tactic NOT available in Lean 4 stdlib",
     "linarith NOT available, ring NOT available",
     "split_ifs NOT available in Lean 4 stdlib - use by_cases",
     "le_rfl NOT available - use Nat.le_refl _",
-    "simp only [rbPushN_succ, rbPush_size, ih] works for rbPushN_size succ case",
-    "for rbDataGetNewest_after_push: unfold + simp works (condition auto-reduces to True)",
-    "native_decide works for RBState field access on concrete values",
-    "simp [if_neg ...] does NOT work with if-then-else in Lean 4 stdlib; use by_cases hc + simp [hc]",
-    "if_pos / if_neg rewrites need explicit condition proof; after unfold, condition may auto-reduce to True/False",
+    "variable {w hw} at module level conflicts with explicit (w : Nat) (hw : 0 < w) in function signatures - always use explicit {w : Nat} {hw : 0 < w} in function headers instead",
+    "List.get_mem has signature: get l i ∈ l (not get_mem l i _)",
+    "List.mem_replicate: l.mem_replicate returns n≠0 ∧ a = x; extract with .2",
+    "median_const proof: use median_mem + List.mem_replicate to get = x",
+    "pairwise_mergeSort uses decide (a ≤ b) = true, not (a ≤ b) = true",
+    "MFState init with head = w-1 so first insert goes to slot 0 via Nat.sub_add_cancel + Nat.mod_self",
     "omega works for Nat.mod_lt and modular arithmetic in head/tail proofs"
   ]
 }
