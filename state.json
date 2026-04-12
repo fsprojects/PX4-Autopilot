@@ -1,46 +1,129 @@
 {
-  "last_run": "run30",
-  "run_id": "24303046331",
+  "last_run": "run31",
+  "run_id": "24311663501",
   "lean_version": "4.29.0",
   "lean_available": true,
   "ci_created": true,
   "ci_has_lake_update": true,
   "mathlib_available": false,
   "fv_targets": [
-    {"id": "constrain", "phase": 5, "status": "8 proved, 0 sorry", "lean_file": "lean/FVSquad/MathFunctions.lean"},
-    {"id": "signNoZero", "phase": 5, "status": "6 proved, 0 sorry. BUG: NaN returns 0 (violates ne_zero) - GitHub issue #12 filed", "lean_file": "lean/FVSquad/MathFunctions.lean"},
-    {"id": "countSetBits", "phase": 5, "status": "8 proved (6 in MathFunctions + 2 lemmas)", "lean_file": "lean/FVSquad/MathFunctions.lean"},
-    {"id": "SlewRate", "phase": 5, "status": "8 proved, 0 sorry", "lean_file": "lean/FVSquad/SlewRate.lean"},
-    {"id": "deadzone", "phase": 5, "status": "12 proved, 0 sorry", "lean_file": "lean/FVSquad/Deadzone.lean"},
-    {"id": "interpolate", "phase": 5, "status": "10 proved, 0 sorry", "lean_file": "lean/FVSquad/Interpolate.lean"},
-    {"id": "AlphaFilter", "phase": 5, "status": "12 proved, 0 sorry", "lean_file": "lean/FVSquad/AlphaFilter.lean", "informal_spec": "specs/alphafilter_informal.md"},
-    {"id": "wrap_pi", "phase": 5, "status": "wrapInt: 8 proved 0 sorry. wrapRat: 7 theorems 6 sorry (Mathlib floor needed).", "lean_file": "lean/FVSquad/WrapAngle.lean"},
-    {"id": "WelfordMean", "phase": 5, "status": "8 proved, 0 sorry", "lean_file": "lean/FVSquad/WelfordMean.lean", "informal_spec": "specs/welfordmean_informal.md"},
-    {"id": "lerp", "phase": 5, "status": "10 proved, 0 sorry", "lean_file": "lean/FVSquad/Lerp.lean", "informal_spec": "specs/lerp_informal.md"},
-    {"id": "expo", "phase": 5, "status": "12 proved, 0 sorry", "lean_file": "lean/FVSquad/Expo.lean", "informal_spec": "specs/expo_informal.md"},
-    {"id": "negate", "phase": 5, "status": "13 proved, 0 sorry. BUG: INT16_MAX special case incorrect - issue #21 filed.", "lean_file": "lean/FVSquad/Negate.lean", "informal_spec": "specs/negate_informal.md"},
-    {"id": "RingBuffer", "phase": 5, "status": "28 named theorems (18 push+data + 8 access + 12 pop model) + 17 examples, 0 sorry. run30.", "informal_spec": "specs/ringbuffer_informal.md", "lean_file": "lean/FVSquad/RingBuffer.lean"}
+    {
+      "id": "constrain",
+      "phase": 5,
+      "status": "8 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/MathFunctions.lean"
+    },
+    {
+      "id": "signNoZero",
+      "phase": 5,
+      "status": "6 proved, 0 sorry. BUG: NaN returns 0 (violates ne_zero) - GitHub issue #12 filed",
+      "lean_file": "lean/FVSquad/MathFunctions.lean"
+    },
+    {
+      "id": "countSetBits",
+      "phase": 5,
+      "status": "8 proved (6 in MathFunctions + 2 lemmas)",
+      "lean_file": "lean/FVSquad/MathFunctions.lean"
+    },
+    {
+      "id": "SlewRate",
+      "phase": 5,
+      "status": "8 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/SlewRate.lean"
+    },
+    {
+      "id": "deadzone",
+      "phase": 5,
+      "status": "12 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/Deadzone.lean"
+    },
+    {
+      "id": "interpolate",
+      "phase": 5,
+      "status": "10 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/Interpolate.lean"
+    },
+    {
+      "id": "AlphaFilter",
+      "phase": 5,
+      "status": "12 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/AlphaFilter.lean",
+      "informal_spec": "specs/alphafilter_informal.md"
+    },
+    {
+      "id": "wrap_pi",
+      "phase": 5,
+      "status": "wrapInt: 8 proved 0 sorry. wrapRat: 7 theorems 6 sorry (Mathlib floor needed).",
+      "lean_file": "lean/FVSquad/WrapAngle.lean"
+    },
+    {
+      "id": "WelfordMean",
+      "phase": 5,
+      "status": "8 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/WelfordMean.lean",
+      "informal_spec": "specs/welfordmean_informal.md"
+    },
+    {
+      "id": "lerp",
+      "phase": 5,
+      "status": "10 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/Lerp.lean",
+      "informal_spec": "specs/lerp_informal.md"
+    },
+    {
+      "id": "expo",
+      "phase": 5,
+      "status": "12 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/Expo.lean",
+      "informal_spec": "specs/expo_informal.md"
+    },
+    {
+      "id": "negate",
+      "phase": 5,
+      "status": "13 proved, 0 sorry. BUG: INT16_MAX special case incorrect - issue #21 filed.",
+      "lean_file": "lean/FVSquad/Negate.lean",
+      "informal_spec": "specs/negate_informal.md"
+    },
+    {
+      "id": "RingBuffer",
+      "phase": 5,
+      "status": "43 theorems+examples (18 push/get + 12 pop + 13 data/examples), 0 sorry. run30+31.",
+      "informal_spec": "specs/ringbuffer_informal.md",
+      "lean_file": "lean/FVSquad/RingBuffer.lean"
+    }
   ],
   "open_prs": [
     {
-      "branch": "lean-squad/report-ringbuffer-pop-run30-4f2b31985d",
-      "description": "REPORT.md (Task 10) + RingBuffer pop_first_older_than model (Task 4), 12 new theorems 0 sorry. run30."
+      "branch": "lean-squad/report-ringbuffer-pop-run30-4f2b31985d-5fc27ccc2450dc08",
+      "description": "REPORT.md (Task 10) + RingBuffer pop_first_older_than model (Task 4), 12 new theorems 0 sorry. run30. PR #28."
+    },
+    {
+      "branch": "lean-squad/correspondence-ci-run31-4f2b31985d",
+      "description": "CORRESPONDENCE.md updated for rbPop; CI lake update + action version upgrades. run31."
     }
   ],
   "bugs_found": [
-    {"id": "signNoZero_nan", "description": "signNoZero<float> returns 0 for NaN, violates ne_zero.", "status": "GitHub issue #12 filed"},
-    {"id": "negate_int16_not_involution", "description": "negate<int16_t> is not a global involution. negate(negate(-32767))=-32768. INT16_MAX special case wrong.", "status": "GitHub issue #21 filed"}
+    {
+      "id": "signNoZero_nan",
+      "description": "signNoZero<float> returns 0 for NaN, violates ne_zero.",
+      "status": "GitHub issue #12 filed"
+    },
+    {
+      "id": "negate_int16_not_involution",
+      "description": "negate<int16_t> is not a global involution. negate(negate(-32767))=-32768. INT16_MAX special case wrong.",
+      "status": "GitHub issue #21 filed"
+    }
   ],
   "total_theorems": 144,
-  "total_examples": 39,
-  "total_proved": 138,
+  "total_examples": 45,
+  "total_proved": 150,
   "total_sorry": 6,
   "linter_warnings": 4,
-  "ci_status": "healthy - lake update step added (run29), lean-ci.yml present",
+  "ci_status": "updated run31: lake update step added, actions upgraded to v6.0.2/v5.0.4/v7.0.1",
   "report_exists": true,
-  "run30_tasks": "Task 10 (REPORT.md: comprehensive project report with mermaid diagrams, 144 theorems, 2 bugs) + Task 4 (RingBuffer pop model: 12 new theorems 0 sorry + 6 native_decide examples)",
-  "correspondence_coverage": "MathFunctions, AlphaFilter, SlewRate, Deadzone, Interpolate, WelfordMean, Lerp, Negate, WrapAngle, Expo, RingBuffer",
-  "next_targets": "MedianFilter: spec exists (specs/medianfilter_informal.md) but Lean file missing from main - top priority. WrapAngle wrapRat: 6 sorry need Mathlib.",
+  "correspondence_coverage": "MathFunctions, AlphaFilter, SlewRate, Deadzone, Interpolate, WelfordMean, Lerp, Negate, WrapAngle, Expo, RingBuffer (push+pop)",
+  "run31_tasks": "Task 6 (Correspondence Review: rbPop section added, summary table updated) + Task 9 (CI: lake update step + action upgrades)",
+  "next_targets": "WrapAngle wrapRat: 6 sorry need Mathlib. MedianFilter: still not in main (PR #27 open but branch behind main - needs new PR with MedianFilter.lean). REPORT.md update (currently in open PR #28).",
   "notes": [
     "set tactic NOT available in Lean 4 stdlib",
     "norm_num tactic NOT available in Lean 4 stdlib",
@@ -57,6 +140,8 @@
     "For RBState where-block: omega cannot see struct parameter fields directly - use 'have h := field' to introduce into scope",
     "rbPop_tail_eq_head_when_newest: use 'simp [rbPop_tail_eq]' not 'simp only [rbPop_tail_eq]' to reduce if-then-else",
     "native_decide works for RBState with small concrete sizes (n=3)",
-    "hcnt in rbPop where-block needs: have h1 := s.hcnt; have h2 := _hi; omega"
+    "hcnt in rbPop where-block needs: have h1 := s.hcnt; have h2 := _hi; omega",
+    "MedianFilter.lean was added in a run20 PR but seems to not be in main branch - needs investigation",
+    "PR #27 (medianfilter-ci-run29): branch is behind main (base commit 0bce11deee), likely needs rebasing before merge"
   ]
 }
