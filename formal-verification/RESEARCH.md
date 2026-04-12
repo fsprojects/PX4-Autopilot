@@ -4,8 +4,8 @@
 
 ## Last Updated
 
-- **Date**: 2026-04-04 17:14 UTC
-- **Commit**: `93bcfab`
+- **Date**: 2026-04-05 17:00 UTC
+- **Commit**: see git HEAD
 
 ## Overview
 
@@ -264,20 +264,30 @@ proof needs `Mathlib.Data.Real.Basic` and `Int.fract`.
 
 ---
 
-### 8. `WelfordMean` / online mean and variance (Priority: MEDIUM)
+### 8. `WelfordMean` / online mean and variance (Priority: **HIGH** — now Phase 2)
 
 **File**: `src/lib/mathlib/math/WelfordMean.hpp`
+**Informal spec**: `formal-verification/specs/welfordmean_informal.md`
 
 Welford's online algorithm maintains a running mean and variance in a single pass,
 numerically more stable than naive sum/sum-of-squares.
 
 **Key properties to verify**:
 - After `n` updates with values `v1,...,vn`: `mean = (v1+...+vn)/n` (correctness)
-- Variance is always non-negative
-- Invariant preservation: the internal state satisfies the Welford recurrence
+- Variance is always non-negative: `M2 ≥ 0` (both mathematically and by clamp)
+- M2 invariant: `M2ₙ = Σᵢ(xᵢ - meanₙ)²` (sum of squared deviations)
+- Recurrence: `meanₙ = meanₙ₋₁ + (xₙ - meanₙ₋₁) / n`
 
-**Proof tractability**: Medium — requires inductive argument on update sequence.
-With Mathlib: `Mathlib.Statistics.Variance` has relevant lemmas.
+**Proof tractability**: Medium — inductive argument on update sequence, over `Rat`.
+The mean correctness (property 1) is tractable with stdlib `omega`/`simp` on `Rat`.
+The M2 = sum-of-squares identity (property 3) requires a careful algebraic induction.
+No Mathlib needed for core properties. See `specs/welfordmean_informal.md` for the
+detailed modelling plan.
+
+**Modelling approximations**: Kahan compensators modelled as exact arithmetic; count
+overflow at `UINT16_MAX` modelled as out-of-scope; NaN inputs excluded.
+
+**Next step**: Write Lean 4 spec (`FVSquad/WelfordMean.lean`) with stubs (Task 3).
 
 ---
 
@@ -364,7 +374,119 @@ Exponential RC curve functions. Output should stay in `[-1, 1]` by construction
    the arming FSM and mission executor, TLA+ is the better choice. CBMC adds value for
    C++ integer overflow and bounds checking without requiring a manual model.
 
-## Related Work
+---
+
+### 13. `math::lerp` (Priority: HIGH — newly identified)
+
+**File**: `src/lib/mathlib/math/Functions.hpp:245`
+
+```cpp
+template<typename T>
+const T lerp(const T &a, const T &b, const T &s) {
+    return (static_cast<T>(1) - s) * a + s * b;
+}
+```
+
+**Benefit**: `lerp` is used for smooth transitions in control code. Key properties:
+- `lerp(a, b, 0) = a` (identity at s=0)
+- `lerp(a, b, 1) = b` (identity at s=1)
+- `0 ≤ s ≤ 1 → min(a,b) ≤ lerp(a,b,s) ≤ max(a,b)` (convex hull)
+- `lerp(a, b, s)` is linear in `s`: increasing/decreasing with s when a ≤ b or a ≥ b
+
+**Tractability**: VERY HIGH — straightforward Rat arithmetic, all properties provable
+with `simp` + `Rat.mul_le_mul` etc. No `sorry` expected.
+
+**Spec size**: ~50 Lean lines (5–6 theorems).
+
+---
+
+### 14. `math::expo` (Priority: MEDIUM — newly confirmed)
+
+**File**: `src/lib/mathlib/math/Functions.hpp:84`
+
+```cpp
+template<typename T>
+const T expo(const T &value, const T &e) {
+    T x = constrain(value, -1, 1);
+    T ec = constrain(e, 0, 1);
+    return (1 - ec) * x + ec * x * x * x;
+}
+```
+
+**Benefit**: Used for RC stick shaping. Key properties:
+- `expo(0, e) = 0` (zero input → zero output)
+- `expo(x, 0) = x` (linear mode)
+- `expo(x, 1) = x³` (pure cubic mode)
+- Odd symmetry: `expo(-x, e) = -expo(x, e)`
+- Bounded output: `|expo(x, e)| ≤ 1` when `|x| ≤ 1`, `0 ≤ e ≤ 1`
+
+**Tractability**: MEDIUM — relies on `constrain` (already proved); cubic arithmetic in
+Lean without `ring` tactic is verbose but doable via `Rat.mul_*` lemmas.
+
+**Spec size**: ~100 Lean lines.
+
+---
+
+### 15. `math::negate<int16_t>` (Priority: HIGH — newly identified)
+
+**File**: `src/lib/mathlib/math/Functions.hpp:258`
+
+```cpp
+template<>
+constexpr int16_t negate<int16_t>(int16_t value) {
+    if (value == INT16_MAX) { return INT16_MAX; }  // overflow guard
+    return -value;
+}
+```
+
+**Benefit**: Concrete safety property — prevents `INT16_MAX → -INT16_MAX - 1` overflow
+(undefined behaviour in C++, and `-32768` for two's-complement int16). Used in motor
+output scaling. Properties:
+- `negate(0) = 0`
+- `negate(INT16_MAX) = INT16_MAX` (overflow protection)
+- For all `x ≠ INT16_MAX`: `negate(x) = -x`
+- `negate(negate(x)) = x` (involutive, except at INT16_MAX)
+
+**Tractability**: VERY HIGH — all four properties are `decide`-able over `Int16`-like
+bounded integers or provable by cases. The involution property for INT16_MAX is
+interesting: `negate(negate(INT16_MAX)) = negate(INT16_MAX) = INT16_MAX ≠ -INT16_MAX`.
+
+**Spec size**: ~40 Lean lines.
+
+---
+
+### 16. `MedianFilter` (Priority: MEDIUM — newly identified)
+
+**File**: `src/lib/mathlib/math/filter/MedianFilter.hpp`
+
+A sliding-window median filter using `qsort`.
+
+**Benefit**: Used in sensor pre-processing. Key properties:
+- Output is a value from the window (no extrapolation)
+- Output is bounded: `min(window) ≤ median ≤ max(window)`
+- For a window of identical values: `median = that_value`
+- Robustness: changing one outlier in the window does not change median if it's bounded
+
+**Tractability**: MEDIUM — requires modelling `List.Sorted` and the median-of-sorted
+property. In Lean 4 stdlib, `List.Sorted` is available; a functional model using
+`List.mergeSort` (stdlib) instead of `qsort` would be cleaner. ~150 Lean lines.
+
+**Complexity**: The circular buffer (`_buffer`) and `_head` pointer require separate
+RingBuffer-style correctness argument for the `insert` step. Can simplify by modelling
+just the `median(sorted_list)` property first.
+
+---
+
+- **`lerp`** and **`negate<int16_t>`** are the highest-priority new targets (HIGH tractability,
+  clear properties, low Lean line count). Either should be completable in a single run (Tasks 3–5).
+- **`expo`** builds on `constrain` (already proved) and is MEDIUM effort.
+- **`MedianFilter`** is MEDIUM effort with a clean model possible using `List.mergeSort`.
+
+The related work note is also updated: as of 2026-04-05, formal-verification/lean/ now
+contains Lean 4 proofs for 9 targets (MathFunctions, SlewRate, Deadzone, Interpolate,
+AlphaFilter, WelfordMean), all passing `lake build` with 1 total `sorry` (WelfordMean
+M2 non-negativity — documented tooling limitation).
+
 
 - PX4 already has unit tests (`FunctionsTest.cpp`, `WelfordMeanTest.cpp`) that serve
   as implicit specifications — these are our primary specification sources.

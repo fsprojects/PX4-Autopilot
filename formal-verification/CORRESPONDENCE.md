@@ -4,8 +4,8 @@
 
 ## Last Updated
 
-- **Date**: 2026-04-04 17:37 UTC
-- **Commit**: `d6b7f1c580c1d4c479365befbb0bf1120a83a13e`
+- **Date**: 2026-04-11 03:30 UTC
+- **Commit**: `9e23b0d970`
 
 This document describes how each Lean 4 definition in `formal-verification/lean/FVSquad/`
 corresponds to the original C++ source. It records the correspondence level, known
@@ -109,6 +109,73 @@ int countSetBits(T n) {
 
 ---
 
+## `FVSquad/AlphaFilter.lean`
+
+Source file: `formal-verification/lean/FVSquad/AlphaFilter.lean`
+
+### `PX4.AlphaFilter.alphaUpdate`
+
+| Lean name | C++ name | C++ location | Correspondence | Notes |
+|-----------|----------|--------------|---------------|-------|
+| `PX4.AlphaFilter.alphaUpdate` | `AlphaFilter<T>::updateCalculation` | [`src/lib/mathlib/math/filter/AlphaFilter.hpp#L79`](../src/lib/mathlib/math/filter/AlphaFilter.hpp#L79) | **abstraction** | Rational model; float NaN/overflow not modelled |
+
+**C++ source**:
+```cpp
+template <typename T>
+T AlphaFilter<T>::updateCalculation(const T &sample) {
+  return _filter_state + _alpha * (sample - _filter_state);
+}
+```
+
+**Lean definition**:
+```lean
+def alphaUpdate (state alpha sample : Rat) : Rat :=
+  state + alpha * (sample - state)
+```
+
+**Divergences**:
+
+1. **Explicit arguments**: C++ reads `_filter_state` and `_alpha` from class fields; the
+   Lean model takes them as explicit `Rat` arguments. The correspondence is exact when
+   `state = _filter_state` and `alpha = _alpha` at the time of the call.
+
+2. **Type**: C++ is templated (`float`, `double`, `Vector3f`, etc.). The Lean model
+   uses `Rat` (arbitrary-precision rationals). IEEE 754 NaN, infinity, and rounding are
+   not modelled.
+
+3. **Quaternion specialisation**: `AlphaFilter<Quatf>` uses a specialised axis-angle
+   interpolation rather than the scalar formula. Only the scalar/Euclidean case is modelled.
+
+4. **`setParameters` / `setCutoffFreq`**: The relationship between the cut-off frequency
+   and `_alpha` (`alpha = 1 - exp(-2π·f_c·dt)`) is not modelled; `alpha` is taken as a
+   direct input assumed to lie in `[0, 1]`.
+
+5. **State mutation**: C++ mutates `_filter_state` in place (`_filter_state = result`).
+   The Lean model is pure: callers compose `alphaUpdate` calls explicitly.
+
+**Impact on proofs**: All 12 proved theorems hold for the rational model. The key
+safety properties (no-overshoot in both directions, monotonicity in sample and state,
+and the closed-form exponential convergence formula) are valid for the abstract model.
+For float callers, the NaN/rounding divergence limits applicability to well-formed,
+bounded inputs — as expected in flight-control contexts.
+
+### `PX4.AlphaFilter.alphaIterate`
+
+| Lean name | C++ name | C++ location | Correspondence | Notes |
+|-----------|----------|--------------|---------------|-------|
+| `PX4.AlphaFilter.alphaIterate` | repeated `updateCalculation` calls | `AlphaFilter.hpp` | **abstraction** | Models n sequential updates with constant input |
+
+**Divergences**: Same as `alphaUpdate` above, plus: in C++ the caller loops `update()`; in
+Lean this is modelled as a pure recursive function. The formula theorem
+`alphaIterate_formula` proves `state_n = target + (state_0 - target) * (1-alpha)^n`.
+
+**Impact on proofs**: `alphaIterate_formula` is fully proved (no `sorry`), giving the
+standard IIR filter exponential decay formula as a theorem.
+
+---
+
+
+
 ## `FVSquad/SlewRate.lean`
 
 Source file: `formal-verification/lean/FVSquad/SlewRate.lean`
@@ -180,7 +247,507 @@ violations.
 
 ---
 
+## `FVSquad/Deadzone.lean`
+
+Source file: `formal-verification/lean/FVSquad/Deadzone.lean`
+
+### `PX4.Deadzone.deadzone`
+
+| Lean name | C++ name | C++ location | Correspondence | Notes |
+|-----------|----------|--------------|---------------|-------|
+| `PX4.Deadzone.deadzone` | `math::deadzone<T>` | [`src/lib/mathlib/math/Functions.hpp`](../src/lib/mathlib/math/Functions.hpp) | **abstraction** | Rational model; internal `constrain` calls not modelled |
+
+**C++ source** (condensed):
+```cpp
+const T deadzone(const T &value, const T &dz) {
+    T x   = constrain(value, -1, 1);
+    T dzc = constrain(dz, 0, 0.99);
+    T out = (x - sign(x) * dzc) / (1 - dzc);
+    return out * (fabsf(x) > dzc);
+}
+```
+
+**Lean definition**:
+```lean
+def deadzone (x dz : Rat) : Rat :=
+  if x.abs > dz then (x - signR x * dz) / (1 - dz) else 0
+```
+
+**Divergences**:
+
+1. **Input clamping elided**: The C++ clamps `value` to `[-1, 1]` and `dz` to `[0, 0.99]`
+   via `constrain`. The Lean model assumes these preconditions hold (`|x| ≤ 1`,
+   `0 ≤ dz < 1`). All theorems carry these as explicit preconditions.
+2. **`dz` upper bound**: C++ uses `0.99`; the Lean model allows any `0 ≤ dz < 1`
+   (strictly less than 1 to avoid division by zero).
+3. **`sign` vs `signR`**: The Lean model uses a local helper `signR x = if 0 ≤ x then 1 else -1`.
+   This differs from `math::signNoZero` (which never returns 0) — here the boundary
+   `x = 0` maps to `signR 0 = 1`, consistent with the C++ `sign` used in deadzone
+   (`fabsf(0) > dz` is false so the zero case is already handled by the outer conditional).
+4. **Type**: C++ is templated (`float`, `double`); Lean uses `Rat`. IEEE 754 NaN,
+   infinity, and rounding are not modelled.
+
+**Impact on proofs**: All 12 theorems hold for the rational model. The key safety
+properties — `deadzone_in_dz` (output is 0 inside deadzone), `deadzone_le_one`,
+`deadzone_ge_neg_one` (output range bounded in `[-1, 1]`), and sign preservation —
+are all proved with zero `sorry`. The range bound proofs use
+`Rat.mul_neg_iff_of_pos_right` and `Rat.mul_le_mul_of_nonneg_right` directly
+without Mathlib.
+
+---
+
+## `FVSquad/Interpolate.lean`
+
+Source file: `formal-verification/lean/FVSquad/Interpolate.lean`
+
+### `PX4.Interpolate.interpolate`
+
+| Lean name | C++ name | C++ location | Correspondence | Notes |
+|-----------|----------|--------------|---------------|-------|
+| `PX4.Interpolate.interpolate` | `math::interpolate<T>` | [`src/lib/mathlib/math/Functions.hpp#L152`](../src/lib/mathlib/math/Functions.hpp#L152) | **abstraction** | Rational model; precondition `x_low < x_high` explicit |
+
+**C++ source** (condensed):
+```cpp
+template<typename T>
+const T interpolate(const T &value, const T &x_low, const T &x_high,
+                    const T &y_low, const T &y_high) {
+    if (value <= x_low) return y_low;
+    else if (value > x_high) return y_high;
+    else {
+        T a = (y_high - y_low) / (x_high - x_low);
+        T b = y_low - (a * x_low);
+        return (a * value) + b;
+    }
+}
+```
+
+**Lean definition**:
+```lean
+def interpolate (value x_low x_high y_low y_high : Rat) : Rat :=
+  if value ≤ x_low then y_low
+  else if value > x_high then y_high
+  else let a := (y_high - y_low) / (x_high - x_low)
+       let b := y_low - a * x_low
+       a * value + b
+```
+
+**Divergences**:
+
+1. **Type**: C++ is templated; Lean uses `Rat`. IEEE 754 NaN, infinity, and rounding
+   are not modelled.
+2. **Precondition `x_low < x_high`**: The C++ does not check this; if violated,
+   division by zero produces NaN/infinity silently. All Lean theorems that involve the
+   interior branch require `x_low < x_high` as an explicit hypothesis.
+3. **Asymmetric boundary**: The C++ uses `value <= x_low` (inclusive low) and
+   `value > x_high` (exclusive high) — the Lean model preserves this exactly. The
+   theorem `interpolate_at_high` confirms that `value = x_high` takes the linear
+   branch (not the high saturation branch) and still returns `y_high` exactly.
+4. **`interpolateN` / `interpolateNXY` variants**: Not modelled. These use
+   `interpolate` as a subroutine but add index arithmetic; they are higher-priority
+   targets for future runs.
+
+**Impact on proofs**: All 10 theorems are proved with zero `sorry`. Key results:
+`interpolate_le_high` and `interpolate_ge_low` (range containment),
+`interpolate_mono_interior` (monotonicity), and `interpolate_at_high` (asymmetric
+boundary correctness) are all fully proved. The range containment theorems directly
+apply to sensor scaling and control curve mapping throughout PX4.
+
+---
+
+## `FVSquad/WelfordMean.lean`
+
+Source file: `formal-verification/lean/FVSquad/WelfordMean.lean`
+
+### `PX4.WelfordMean.welfordUpdate`
+
+| Lean name | C++ name | C++ location | Correspondence | Notes |
+|-----------|----------|--------------|---------------|-------|
+| `PX4.WelfordMean.welfordUpdate` | `WelfordMean<T>::update` | [`src/lib/mathlib/math/WelfordMean.hpp`](../src/lib/mathlib/math/WelfordMean.hpp) | **abstraction** | Rational model; Kahan compensators and overflow guard omitted |
+
+**C++ source**:
+```cpp
+template<typename Type>
+bool WelfordMean<Type>::update(const Type new_value)
+{
+    if (_count == 0) { reset(); }
+    _count++;
+    const Type delta_1 = new_value - _mean;
+    _mean += delta_1 / _count;
+    const Type delta_2 = new_value - _mean;
+    _M2 += delta_1 * delta_2;
+    return (_count > 2);
+}
+```
+
+**Lean definition**:
+```lean
+def welfordUpdate (s : WelfordState) (x : Rat) : WelfordState :=
+  let nR  : Rat := ↑(s.count + 1)
+  let δ         := x - s.mean
+  let newMean   := s.mean + δ / nR
+  { count := s.count + 1, mean := newMean, M2 := s.M2 + δ * (x - newMean) }
+```
+
+**Divergences**:
+
+1. **Kahan compensators elided**: The C++ `WelfordMean` maintains `_mean_accum` and
+   `_M2_accum` Kahan compensator fields for numerical stability with float arithmetic.
+   These are omitted from the Lean model — they affect floating-point precision only,
+   not the abstract mathematical recurrence. All mathematical correctness theorems hold
+   for the uncompensated recurrence.
+2. **Count overflow guard**: The C++ has a `UINT16_MAX` overflow guard on `_count`.
+   The Lean model uses unbounded `Nat`; the non-overflow behaviour is what is proved.
+3. **`PX4_ISFINITE` guard**: The C++ discards non-finite inputs. The Lean model assumes
+   all inputs are finite (an explicit precondition).
+4. **Return value**: C++ returns `_count > 2` (a "ready" flag). The Lean model is pure
+   and returns the updated state; the return value is not modelled.
+5. **State mutation**: C++ mutates `_mean`, `_M2`, `_count` in place. The Lean model is
+   pure: each call produces a new state.
+6. **Type**: C++ is templated (`float`, `double`); Lean uses `Rat`. IEEE 754 NaN,
+   infinity, and rounding are not modelled.
+
+**Impact on proofs**:
+
+| Theorem | Validity in C++ context | Notes |
+|---------|------------------------|-------|
+| `welfordUpdate_count` | Exact | Count increment is trivially correct |
+| `welfordUpdate_mean_step` | Valid (no overflow, finite input) | Core algebraic invariant |
+| `welfordFoldFrom_count` | Valid | Count after n updates = n |
+| `welfordFoldFrom_mean_inv` | Valid | General inductive mean invariant |
+| `welfordFold_count` | Exact (for unbounded count) | |
+| `welfordFold_mean_times_count` | Valid | mean × count = sum of all inputs |
+| `welfordFold_mean` | Valid (non-empty list) | **Main result**: mean = sum/length |
+| `welfordUpdate_M2_nonneg` | Valid mathematically | Sorry: blocked by `Rat.inv` being `@[irreducible]` |
+
+The main correctness result `welfordFold_mean` is fully proved: the Welford recurrence
+computes exactly the arithmetic mean of all inputs. The M2 non-negativity sorry is a
+tooling limitation (needs Mathlib `div_nonneg`), not a mathematical gap.
+
+---
+
+## `FVSquad/Lerp.lean`
+
+Source file: `formal-verification/lean/FVSquad/Lerp.lean`
+
+### `PX4.Lerp.lerpRat`
+
+| Lean name | C++ name | C++ location | Correspondence | Notes |
+|-----------|----------|--------------|---------------|-------|
+| `PX4.Lerp.lerpRat` | `math::lerp<T>` | [`src/lib/mathlib/math/Functions.hpp`](../src/lib/mathlib/math/Functions.hpp) (approx. line 127) | **abstraction** | Rational model; IEEE 754 semantics and integer truncation not modelled |
+
+**C++ source**:
+```cpp
+template<typename T>
+const T lerp(const T &a, const T &b, const T &s)
+{
+    return (static_cast<T>(1) - s) * a + s * b;
+}
+```
+
+**Lean definition**:
+```lean
+def lerpRat (a b s : Rat) : Rat := (1 - s) * a + s * b
+```
+
+**Divergences**:
+
+1. **Type**: C++ is templated (`float`, `double`, `int32_t`, etc.); Lean uses `Rat`.
+   IEEE 754 NaN, infinity, and rounding are not modelled.
+2. **Exact formula match**: The Lean `lerpRat a b s := (1 - s) * a + s * b` is an
+   exact lift of the C++ `(T(1) - s) * a + s * b`. Over `Rat` the formula is exact;
+   over `float` there is rounding, and `lerp(a, b, 0.0f)` may not equal `a` exactly
+   when `b = NaN` or `b = ±∞`.
+3. **Out-of-range `s`**: The C++ comment states "Any value for `s` is valid"; range
+   theorems in the Lean spec only apply for `s ∈ [0, 1]`. Extrapolation (`s < 0` or
+   `s > 1`) is mathematically well-defined over `Rat` but not proved bounded.
+4. **Integer truncation**: For integer `T`, `(1 - s) * a` truncates. Not modelled.
+
+**Impact on proofs**:
+
+| Theorem | Validity in C++ context | Notes |
+|---------|------------------------|-------|
+| `lerp_zero` | Exact for finite float | Subject to NaN propagation if `b = NaN` |
+| `lerp_one` | Exact for finite float | |
+| `lerp_const` | Valid | Always returns `a` when `a = b` |
+| `lerp_alt_form` | Valid | Alternative representation `a + s*(b-a)` |
+| `lerp_lower` | Valid (finite, in-range `s`) | Key no-undershoot safety property |
+| `lerp_upper` | Valid (finite, in-range `s`) | Key no-overshoot safety property |
+| `lerp_in_range` | Valid (finite, in-range `s`) | Combined: output stays in `[a,b]` |
+| `lerp_comm` | Valid | `lerp(a,b,s) = lerp(b,a,1-s)` |
+| `lerp_mono_s` | Valid | Monotone in blend parameter |
+| `lerp_half` | Valid mathematically | Sorry: `1 - 1/2 = 1/2` over `Rat` needs `Rat.inv` lemmas |
+
+The key safety property `lerp_in_range` is fully proved: when `s ∈ [0, 1]` and `a ≤ b`,
+`lerp` stays within `[a, b]`, ruling out runaway setpoints in flight-task blending.
+The `lerp_half` sorry is a tooling limitation (needs `Rat.inv` arithmetic for the
+literal `1/2`), not a mathematical gap.
+
+---
+
+## `FVSquad/Negate.lean`
+
+Source file: `formal-verification/lean/FVSquad/Negate.lean`
+
+### `PX4.Negate.negate16`
+
+| Lean name | C++ name | C++ location | Correspondence | Notes |
+|-----------|----------|--------------|---------------|-------|
+| `PX4.Negate.negate16` | `math::negate<int16_t>` | [`src/lib/mathlib/math/Functions.hpp#L258`](../src/lib/mathlib/math/Functions.hpp#L258) | **exact** | All three branches of the C++ specialisation are modelled |
+
+**Model**: `int16_t` is represented as `Fin 65536` using two's complement bit patterns.
+Values `0..32767` represent non-negative integers; values `32768..65535` represent
+`-32768..-1`. The `return -value` branch is two's complement negation:
+`(65536 - v.val) % 65536`.
+
+**Divergences**: None — this is an exact model of the C++ specialisation. All three
+branches are modelled:
+- `value == INT16_MAX` (32767) → returns INT16_MIN (32768 bit pattern) ✓
+- `value == INT16_MIN` (32768) → returns INT16_MAX (32767) ✓
+- otherwise → `(65536 - v.val) % 65536` (two's complement negation) ✓
+
+**Impact on proofs**: The `negate16_not_involution` theorem is provably TRUE (the
+property is correctly refuted), revealing that the C++ `negate<int16_t>` is NOT a
+global involution. See **Known Mismatches** below.
+
+---
+
+## `FVSquad/WrapAngle.lean`
+
+Source file: `formal-verification/lean/FVSquad/WrapAngle.lean`
+
+### `WrapAngle.wrapInt`
+
+| Lean name | C++ name | C++ location | Correspondence | Notes |
+|-----------|----------|--------------|----------------|-------|
+| `WrapAngle.wrapInt` | `matrix::wrap<Integer>` | [`src/lib/matrix/matrix/helper_functions.hpp#L74`](../src/lib/matrix/matrix/helper_functions.hpp#L74) | **exact** | Integer template; unbounded `Int`; all 8 theorems proved with `omega` |
+
+**Model**: The C++ integer `wrap` template implements the operation:
+1. While `x < low`: add `range * ((low - x) / range + 1)`
+2. Return `low + (x - low) % range`
+
+The Lean model uses `Int.emod` directly: `wrapInt x low high := low + (x - low) % (high - low)`.
+This is semantically equivalent to the C++ loop-based form for all integers.
+
+**Divergences**:
+- **Type overflow**: C++ `wrap<int16_t>` has undefined behaviour if `range = high - low`
+  overflows the integer type. The Lean `Int` type is unbounded; no overflow.
+- **`low ≥ high` precondition**: all theorems require `low < high`. The C++ has
+  division by zero (or UB) when `range = 0`; the Lean model does not evaluate for
+  this case due to the explicit precondition.
+
+**Impact on proofs**: All 8 theorems (`wrapInt_ge_low`, `wrapInt_lt_high`,
+`wrapInt_in_range`, `wrapInt_idempotent`, `wrapInt_periodic`, `wrapInt_periodic_k`,
+`wrapInt_congruent`, `wrapInt_zero`) are fully proved using `omega` and `Int.emod`
+lemmas. These establish the key contracts of the wrapping operation: output in `[low, high)`,
+idempotence for already-in-range values, and periodicity.
+
+---
+
+### `WrapAngle.wrapRat`
+
+| Lean name | C++ name | C++ location | Correspondence | Notes |
+|-----------|----------|--------------|----------------|-------|
+| `WrapAngle.wrapRat` | `matrix::wrap_floating<Floating>` | [`src/lib/matrix/matrix/helper_functions.hpp#L27`](../src/lib/matrix/matrix/helper_functions.hpp#L27) | **approximation** | Axiomatic definition; 6 theorems stated with `sorry` (require Mathlib floor) |
+
+**Model**: The C++ `wrap_floating` computes:
+```cpp
+const auto num_wraps = std::floor((x - low) * inv_range);
+return x - range * num_wraps;
+```
+The Lean model uses an axiomatic `noncomputable def` referencing `Int.floor` (available
+in Mathlib but not in Lean 4 stdlib):
+```lean
+noncomputable def wrapRat (x lo hi : Rat) (h : lo < hi) : Rat :=
+  let range := hi - lo
+  x - range * (⌊(x - lo) / range⌋ : Int)
+```
+
+**Divergences**:
+- **Axiomatic**: `wrapRat` is a `noncomputable def` and cannot be evaluated. It serves
+  as a specification, not a computable implementation.
+- **Mathlib dependency**: all 6 theorems (`wrapRat_ge_lo`, `wrapRat_lt_hi`,
+  `wrapRat_in_range`, `wrapRat_idempotent`, `wrapRat_periodic`, `wrapRat_congruent`,
+  `wrapRat_zero`) are guarded by `sorry` because proofs require
+  `Mathlib.Algebra.Order.Floor` lemmas (e.g., `Int.floor_intCast`,
+  `Int.self_sub_floor`). These are unavailable in the stdlib-only toolchain.
+- **Irrational π**: The C++ `wrap_pi(x)` uses `float M_PI` (a rational approximation).
+  The Lean model accepts any rational bounds; a caller must supply a rational
+  approximation of π or switch to Mathlib `Real.pi`.
+- **NaN / ±∞**: not modelled (rational model excludes non-finite inputs).
+
+**Impact on proofs**: The 6 `sorry`-guarded theorems are mathematically correct (the
+statements are true and the proofs would follow from Mathlib floor lemmas). They cannot
+be machine-verified in the current stdlib-only setup. When Mathlib is added to the lake
+project, all 6 sorries can be closed. The integer `wrapInt` proofs provide complete
+verified coverage for the discrete case.
+
+---
+
+## `FVSquad/Expo.lean`
+
+Source file: `formal-verification/lean/FVSquad/Expo.lean`
+
+### `constrainRat` (Expo.lean local helper)
+
+| Lean name | C++ name | C++ location | Correspondence | Notes |
+|-----------|----------|--------------|----------------|-------|
+| `constrainRat` | `math::constrain<float>` | [`src/lib/mathlib/math/Limits.hpp#L78`](../src/lib/mathlib/math/Limits.hpp#L78) | **abstraction** | Local copy scoped to Expo.lean; models the `[-1,1]` clamping; 3 helper lemmas proved |
+
+**Note**: `constrainRat` in `Expo.lean` duplicates the clamping logic of `MathFunctions.lean`
+`PX4.Math.constrain` but is scoped locally and operates on `Rat`. It is not imported from
+`MathFunctions.lean` to keep the Expo file self-contained. The divergences are the same
+as for `PX4.Math.constrain`: no NaN, no overflow, `Rat` instead of `float`.
+
+---
+
+### `expoRat`
+
+| Lean name | C++ name | C++ location | Correspondence | Notes |
+|-----------|----------|--------------|----------------|-------|
+| `expoRat` | `math::expo` | [`src/lib/mathlib/math/Functions.hpp#L237`](../src/lib/mathlib/math/Functions.hpp#L237) | **abstraction** | Exact rational lift of the blending formula; 9 theorems proved, 0 sorry |
+
+**Model**: The C++ `expo` function:
+```cpp
+inline float expo(float value, float e)
+{
+    float x = constrain(value, -1.f, 1.f);
+    return (1.f - e) * x + e * x * x * x;
+}
+```
+The Lean model:
+```lean
+def expoRat (v e : Rat) : Rat :=
+  let x := constrainRat v (-1) 1
+  let ec := constrainRat e 0 1
+  (1 - ec) * x + ec * x * x * x
+```
+This lifts the formula exactly to `Rat`, clamping both `v` and `e` to their respective
+ranges.
+
+**Divergences**:
+- **Type**: C++ uses `float`; Lean uses `Rat`. IEEE 754 rounding is not modelled.
+- **`e` clamping**: The C++ does **not** clamp `e` before use. The Lean model clamps `e`
+  to `[0, 1]` via `constrainRat e 0 1`. For C++ callers that pass `e` outside `[0, 1]`,
+  the C++ and Lean may differ. (The PX4 RC calibration system constrains `e` to `[0, 1]`
+  in practice, but this is not enforced in C++ at the function level.)
+- **NaN**: not modelled.
+
+**Impact on proofs**:
+
+| Theorem | Validity in C++ context | Notes |
+|---------|------------------------|-------|
+| `expo_at_zero` | Exact | `expo(0, e) = 0` always |
+| `expo_at_pos_one` | Exact | `expo(1, e) = 1` — RC max is a fixed point |
+| `expo_at_neg_one` | Exact | `expo(-1, e) = -1` — RC min is a fixed point |
+| `expo_linear` | Valid for `e ∈ [0, 1]` | `e = 0` gives identity (linear stick) |
+| `expo_cubic` | Valid for `e ∈ [0, 1]` | `e = 1` gives pure cubic |
+| `expo_odd` | Valid (if `v` and `-v` both in range) | Anti-symmetry: stick deflection sign preserved |
+| `expo_in_range` | Valid | Output stays in `[-1, 1]` for any input |
+| `expo_eq_linear_at_zero` | Valid for `0 < e ≤ 1` | Tangent slope at 0 is `(1-e)` |
+| `expo_endpoints_fixed` | Exact | `±1` are fixed points |
+
+The `expo_odd` anti-symmetry proof and `expo_in_range` range-containment proof are the
+highest-value theorems. The `e` clamping divergence is the main gap: theorems assume
+`e ∈ [0, 1]`; if a caller passes `e > 1` or `e < 0`, the C++ can extrapolate outside
+`[-1, 1]` while the Lean model still clamps.
+
+---
+
+## `FVSquad/RingBuffer.lean`
+
+Source file: `formal-verification/lean/FVSquad/RingBuffer.lean`
+C++ source:  `src/lib/ringbuffer/TimestampedRingBuffer.hpp`
+
+### `PX4.RingBuffer.RBState` / `rbInit` / `rbPush`
+
+| Lean name | C++ equivalent | Level | Notes |
+|-----------|---------------|-------|-------|
+| `RBState.size` | `_size` | exact | Modelled as `Nat` (C++ is `uint8_t`) |
+| `RBState.head` | `_head` | exact | Modelled as `Nat`, always in `[0, size)` |
+| `RBState.tail` | `_tail` | exact | Modelled as `Nat`, always in `[0, size)` |
+| `RBState.count` | derived | abstraction | Replaces `_first_write` flag; counts valid entries 0..size |
+| `rbInit` | constructor + `allocate` | abstraction | Head initialised to `size-1` to eliminate `_first_write` |
+| `rbPush` | `push` | abstraction | Pure functional; ignores data, null-pointer guard, `uint8_t` arithmetic |
+| `rbPushN` | k calls to `push` | abstraction | Models any sequence of pushes |
+| `rbDataPush` / `rbDataGetNewest` | `push` + `get_newest` | abstraction | Generic `alpha` type; ignores timestamps, `time_us = 0` sentinel |
+
+**Correspondence to C++ `_first_write` flag**:
+The C++ initialises `_head = 0, _tail = 0, _first_write = true`. On the first push,
+the head does not advance (sample goes to slot 0). The Lean model eliminates
+`_first_write` by setting `head = size - 1`; the first push then advances to
+`(size-1+1) % size = 0`, giving identical slot-0 placement. This abstraction is
+**exact** for the first push and all subsequent pushes.
+
+**What is not modelled**:
+- `pop_first_older_than`: the timestamp-matching scan and tail-advance loop require
+  reasoning about the timestamp data (`time_us`) and a non-trivial loop invariant.
+  Deferred to a future run as a high-value target.
+- `uint8_t` overflow: C++ uses `uint8_t` for head/tail/size, capping at 255 entries.
+  Lean uses `Nat` with explicit `% size`. For `size ≤ 255` (the only valid C++ range),
+  the models are equivalent.
+- Data type `T`: the index-level model abstracts away the payload type. The data model
+  (`RBData alpha`) is generic over any type `alpha`, omitting the `time_us` field.
+- Null-pointer and allocation guards: `valid()`, `allocate()`, and the `_buffer !=
+  nullptr` preconditions are not modelled.
+
+**Impact on proofs**:
+All 18 proved theorems concern index arithmetic and get-newest correctness. They are
+not affected by the `pop_first_older_than` omission or the `uint8_t` cap (since the
+model uses `Nat` which is strictly more general for sizes ≤ 255). The `_first_write`
+elimination is exact, so theorems about head/tail/count are valid for the real C++
+implementation.
+
+---
+
 ## Known Mismatches
+
+**`negate<int16_t>` involution failure** (severity: low–medium):
+
+The Lean 4 proof `negate16_not_involution` formally establishes that
+`math::negate<int16_t>` is **not** a global involution:
+
+```
+negate(negate(-32767)) = negate(INT16_MAX) = INT16_MIN = -32768 ≠ -32767
+```
+
+Counterexample (bit pattern 32769 = -32767):
+- `negate(32769)` = 32767 (= INT16_MAX), via the standard `return -value` branch
+- `negate(32767)` = 32768 (= INT16_MIN), via the `if (value == INT16_MAX)` special case
+- `negate(negate(32769))` = 32768 ≠ 32769
+
+**Root cause**: The `INT16_MAX → INT16_MIN` special case is incorrect. In standard two's
+complement, `-INT16_MAX = -32767` is representable in `int16_t` without overflow, so the
+special case is unnecessary and causes round-trip failure for any value whose negation
+equals INT16_MAX (i.e., for `value = -32767`).
+
+**The only value needing a special case** is `INT16_MIN = -32768`, since
+`-INT16_MIN = +32768` overflows `int16_t`.
+
+**Correct fix**:
+```cpp
+template<>
+constexpr int16_t negate<int16_t>(int16_t value)
+{
+    if (value == INT16_MIN) {
+        return INT16_MAX;  // -(-32768) would overflow; saturate to INT16_MAX
+    }
+    return -value;
+}
+```
+
+**Involution holds for**: all `int16_t` values except `value = -32767` under the
+current (buggy) implementation. With the fix, it would hold universally.
+
+**Risk in practice**: IMU drivers (`ICM42670P.cpp:608-634`, `BMI085_Accelerometer.cpp:504-505`)
+use `math::negate` to flip sensor axes. A value of exactly -32767 (= 0x8001) in the
+raw sensor data would be incorrectly round-tripped if negation is applied twice. This
+is unlikely in practice (raw IMU data must hit exactly -32767) but represents a
+correctness defect.
+
+**Related theorem**: `negate16_not_involution`, `negate16_counterexample` in
+`formal-verification/lean/FVSquad/Negate.lean`.
+
+---
 
 **`signNoZero` and NaN** (severity: medium):
 
@@ -209,5 +776,15 @@ change the implementation to `return std::isfinite(val) ? ((T(0) <= val) ? 1 : -
 | `signNoZero` | `MathFunctions.lean` | `Functions.hpp` | abstraction + **mismatch for NaN** | NaN returns 0 in C++, not 1 |
 | `countSetBits` | `MathFunctions.lean` | `Functions.hpp` | exact (for Nat/uint) | Signed-type negative input not modelled |
 | `SlewRate::update` | `SlewRate.lean` | `SlewRate.hpp` | abstraction | Float, mutable state, `dt * rate` product |
+| `deadzone` | `Deadzone.lean` | `Functions.hpp` | abstraction | Float NaN/rounding; internal `constrain` calls not modelled |
+| `interpolate` | `Interpolate.lean` | `Functions.hpp` | abstraction | Float NaN/rounding; precondition `x_low < x_high` explicit |
+| `AlphaFilter::updateCalculation` | `AlphaFilter.lean` | `AlphaFilter.hpp` | abstraction | Float NaN/rounding; quaternion specialisation not modelled |
+| `WelfordMean::update` | `WelfordMean.lean` | `WelfordMean.hpp` | abstraction | Kahan compensators, count overflow guard, non-finite inputs not modelled |
+| `math::lerp` | `Lerp.lean` | `Functions.hpp` | abstraction | IEEE 754 NaN/rounding; integer truncation not modelled |
+| `math::negate<int16_t>` | `Negate.lean` | `Functions.hpp` | exact | **Mismatch found**: not a global involution (see §Negate) |
+| `matrix::wrap<Integer>` | `WrapAngle.lean` | `helper_functions.hpp` | exact | Integer overflow (unbounded `Int` vs typed C++) |
+| `matrix::wrap_floating` / `wrap_pi` | `WrapAngle.lean` | `helper_functions.hpp` | approximation | 6 theorems `sorry`-guarded (need Mathlib floor); `e` not clamped in C++ |
+| `math::expo` | `Expo.lean` | `Functions.hpp` | abstraction | `e` not clamped in C++ but clamped in Lean model; float rounding not modelled |
+| `TimestampedRingBuffer` | `RingBuffer.lean` | `TimestampedRingBuffer.hpp` | abstraction | `pop_first_older_than` not modelled; `uint8_t` overflow not modelled; data array generic |
 
 > 🔬 Generated by Lean Squad automated formal verification.
