@@ -11,3 +11,4 @@ import FVSquad.Expo
 import FVSquad.Negate
 import FVSquad.RingBuffer
 import FVSquad.MedianFilter
+import FVSquad.SuperExpo
