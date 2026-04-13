@@ -26,6 +26,8 @@ rationale. Phase legend: 1=Research, 2=Informal Spec, 3=Lean Spec, 4=Implementat
 | 13 | `math::negate<int16_t>` | `src/lib/mathlib/math/Functions.hpp` | 5 | ✅ Proofs — 🐛 Bug found | `lean/FVSquad/Negate.lean` | Overflow-safe negation; 13 theorems proved; non-involution bug found |
 | 14 | `MedianFilter` | `src/lib/mathlib/math/filter/MedianFilter.hpp` | 5 | ✅ Proved | `lean/FVSquad/MedianFilter.lean` | 6 theorems + 6 concrete examples; spike rejection, range containment, head invariant |
 
+| 14 | `math::superexpo` | `src/lib/mathlib/math/Functions.hpp` | 5 | ✅ Proved | `lean/FVSquad/SuperExpo.lean` | RC superrate curve; 8 theorems, 0 sorry (denom_pos, zero, ±1 fixed points, odd symmetry, range ⊆ [-1,1], g=0 reduces to expo) |
+
 ## Non-Lean Targets (other tools recommended)
 
 | # | Name | Tool | Status | Notes |
