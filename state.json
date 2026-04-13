@@ -1,6 +1,6 @@
 {
-  "last_run": "run32",
-  "run_id": "24324775390",
+  "last_run": "run33",
+  "run_id": "24337592265",
   "lean_version": "4.29.0",
   "lean_available": true,
   "ci_created": true,
@@ -94,9 +94,10 @@
     {
       "id": "superexpo",
       "phase": 5,
-      "status": "8 proved, 0 sorry. Theorems: denom_pos, zero, one, neg_one, endpoints_fixed, odd, g_zero, in_range.",
+      "status": "8 proved, 0 sorry. Theorems: denom_pos, zero, one, neg_one, odd, in_range, g_zero, endpoints_fixed.",
       "lean_file": "lean/FVSquad/SuperExpo.lean",
-      "open_pr": "lean-squad/superexpo-run32 (pending push - MCP server issue)"
+      "open_pr": "lean-squad/superexpo-run32 (pending push - MCP server issue)",
+      "informal_spec": "specs/superexpo_informal.md"
     }
   ],
   "open_prs": [
