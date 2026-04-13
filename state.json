@@ -1,6 +1,6 @@
 {
-  "last_run": "run31",
-  "run_id": "24311663501",
+  "last_run": "run32",
+  "run_id": "24324775390",
   "lean_version": "4.29.0",
   "lean_available": true,
   "ci_created": true,
@@ -90,6 +90,13 @@
       "status": "43 theorems+examples (18 push/get + 12 pop + 13 data/examples), 0 sorry. run30+31.",
       "informal_spec": "specs/ringbuffer_informal.md",
       "lean_file": "lean/FVSquad/RingBuffer.lean"
+    },
+    {
+      "id": "superexpo",
+      "phase": 5,
+      "status": "8 proved, 0 sorry. Theorems: denom_pos, zero, one, neg_one, endpoints_fixed, odd, g_zero, in_range.",
+      "lean_file": "lean/FVSquad/SuperExpo.lean",
+      "open_pr": "lean-squad/superexpo-run32 (pending push - MCP server issue)"
     }
   ],
   "open_prs": [
@@ -114,7 +121,7 @@
       "status": "GitHub issue #21 filed"
     }
   ],
-  "total_theorems": 144,
+  "total_theorems": 142,
   "total_examples": 45,
   "total_proved": 150,
   "total_sorry": 6,
@@ -143,5 +150,7 @@
     "hcnt in rbPop where-block needs: have h1 := s.hcnt; have h2 := _hi; omega",
     "MedianFilter.lean was added in a run20 PR but seems to not be in main branch - needs investigation",
     "PR #27 (medianfilter-ci-run29): branch is behind main (base commit 0bce11deee), likely needs rebasing before merge"
-  ]
+  ],
+  "proved_theorems": 136,
+  "sorry_count": 6
 }
