@@ -1,5 +1,5 @@
 {
-  "last_run": "2026-04-14T03:39Z",
+  "last_run": "run36",
   "run_id": "24379657450",
   "lean_version": "4.29.0",
   "lean_available": true,
@@ -103,6 +103,16 @@
       "status": "Proved",
       "lean_file": "lean/FVSquad/ExpoDeadzone.lean",
       "notes": "8 theorems, 0 sorry (run35)"
+    },
+    {
+      "name": "interpolateNXY",
+      "file": "src/lib/mathlib/math/Functions.hpp",
+      "lean_file": "lean/FVSquad/InterpolateNXY.lean",
+      "phase": 5,
+      "status": "proved",
+      "theorem_count": 9,
+      "sorry_count": 0,
+      "notes": "3-pt model; clamps, endpoints, continuity, range, monotonicity; all proved"
     }
   ],
   "open_prs": [],
@@ -118,9 +128,9 @@
       "status": "GitHub issue #21 filed"
     }
   ],
-  "total_theorems": 172,
+  "total_theorems": 183,
   "total_sorry": 6,
-  "proved_theorems": 166,
+  "proved_theorems": 177,
   "sorry_count": 6,
   "run34_tasks": "Task 3 (ExpoDeadzone: 8 theorems, 0 sorry) + Task 10 (REPORT.md: 144->162 theorems, 11->14 files)",
   "report_exists": true,
