@@ -34,6 +34,7 @@ float expo_deadzone(float value, float e, float dz) {
 | `expodz_e0`         | ✅ | e=0: reduces to pure deadzone (linear) |
 | `expodz_cubic`      | ✅ | e=1: deadzone output cubed |
 | `expodz_no_dz`      | ✅ | dz=0: reduces to pure expo |
+| `expodz_odd`        | ✅ | Odd symmetry: `expodz(-v, e, dz) = -expodz(v, e, dz)` |
 
 ## Modelling Notes
 
@@ -162,5 +163,24 @@ theorem expodz_no_dz (v e : Rat) : expodz v e 0 = expoRat v e := by
       -- Goal: (v + 0) / (1 - 0) = v
       rw [Rat.add_zero, Rat.sub_eq_add_neg, Rat.neg_zero, Rat.add_zero,
           Rat.div_def, Rat.inv_eq_of_mul_eq_one (Rat.mul_one 1), Rat.mul_one]
+
+/-!
+## Odd symmetry
+-/
+
+/-- **Odd symmetry**: the expo-deadzone pipeline is an odd function for `dz ≥ 0`.
+
+    `expodz (-v) e dz = -(expodz v e dz)` — negating the stick input negates the output.
+    This follows from:
+    1. `deadzone_odd`: `deadzone (-v) dz = -(deadzone v dz)`
+    2. `expo_odd`: `expoRat (-w) e = -(expoRat w e)`
+    Together: `expodz (-v) e dz = expoRat(deadzone(-v) dz) e`
+                                  `= expoRat(-(deadzone v dz)) e`
+                                  `= -(expoRat(deadzone v dz) e)`
+                                  `= -(expodz v e dz)`. -/
+theorem expodz_odd (v e dz : Rat) (hdz : 0 ≤ dz) :
+    expodz (-v) e dz = -(expodz v e dz) := by
+  simp only [expodz]
+  rw [deadzone_odd v dz hdz, expo_odd (deadzone v dz) e]
 
 end PX4.ExpoDeadzone
