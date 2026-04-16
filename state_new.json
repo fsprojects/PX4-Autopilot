@@ -1,0 +1,175 @@
+{
+  "last_run": "run42",
+  "run_id": "24503463029",
+  "lean_version": "4.29.0",
+  "lean_available": true,
+  "ci_created": true,
+  "ci_has_lake_update": true,
+  "mathlib_available": false,
+  "mathlib_note": "Mathlib cache proxy blocks with 403 (CONNECT tunnel). lake update resolves manifest but lake build would need to compile from source (hours). Use stdlib-only proofs.",
+  "fv_targets": [
+    {
+      "id": "constrain",
+      "phase": 5,
+      "status": "8 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/MathFunctions.lean"
+    },
+    {
+      "id": "signNoZero",
+      "phase": 5,
+      "status": "6 proved, 0 sorry. BUG: NaN returns 0 - issue #12",
+      "lean_file": "lean/FVSquad/MathFunctions.lean"
+    },
+    {
+      "id": "countSetBits",
+      "phase": 5,
+      "status": "2 theorems + 9 concrete examples",
+      "lean_file": "lean/FVSquad/MathFunctions.lean"
+    },
+    {
+      "id": "SlewRate",
+      "phase": 5,
+      "status": "9 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/SlewRate.lean"
+    },
+    {
+      "id": "deadzone",
+      "phase": 5,
+      "status": "13 proved (incl. deadzone_odd), 0 sorry",
+      "lean_file": "lean/FVSquad/Deadzone.lean"
+    },
+    {
+      "id": "MedianFilter",
+      "phase": 5,
+      "status": "10 proved, 0 sorry + 6 examples",
+      "lean_file": "lean/FVSquad/MedianFilter.lean"
+    },
+    {
+      "id": "interpolate",
+      "phase": 5,
+      "status": "10 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/Interpolate.lean"
+    },
+    {
+      "id": "AlphaFilter",
+      "phase": 5,
+      "status": "13 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/AlphaFilter.lean"
+    },
+    {
+      "id": "wrap_pi",
+      "phase": 3,
+      "status": "wrapInt: 9 proved 0 sorry. wrapRat: 6 theorems, 6 sorry (Mathlib floor needed).",
+      "lean_file": "lean/FVSquad/WrapAngle.lean"
+    },
+    {
+      "id": "WelfordMean",
+      "phase": 5,
+      "status": "11 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/WelfordMean.lean"
+    },
+    {
+      "id": "lerp",
+      "phase": 5,
+      "status": "10 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/Lerp.lean"
+    },
+    {
+      "id": "expo",
+      "phase": 5,
+      "status": "17 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/Expo.lean"
+    },
+    {
+      "id": "superexpo",
+      "phase": 5,
+      "status": "17 proved, 0 sorry",
+      "lean_file": "lean/FVSquad/SuperExpo.lean"
+    },
+    {
+      "id": "negate",
+      "phase": 5,
+      "status": "13 proved, 0 sorry. BUG: INT16_MAX special case wrong - issue #21.",
+      "lean_file": "lean/FVSquad/Negate.lean"
+    },
+    {
+      "id": "RingBuffer",
+      "phase": 5,
+      "status": "24 theorems + 19 examples, 0 sorry",
+      "lean_file": "lean/FVSquad/RingBuffer.lean"
+    },
+    {
+      "id": "ExpoDeadzone",
+      "phase": 5,
+      "status": "9 proved (incl. expoDeadzone_odd), 0 sorry",
+      "lean_file": "lean/FVSquad/ExpoDeadzone.lean"
+    },
+    {
+      "id": "InterpolateNXY",
+      "phase": 5,
+      "status": "9 proved (incl. interp3_in_range, interp3_mono_seg0/seg1), 0 sorry",
+      "lean_file": "lean/FVSquad/InterpolateNXY.lean"
+    },
+    {
+      "id": "InterpolateN",
+      "phase": 5,
+      "status": "18 proved (5 for N=2, 9 for N=3 incl. continuity, mono, in_range), 0 sorry",
+      "lean_file": "lean/FVSquad/InterpolateN.lean"
+    },
+    {
+      "id": "Hysteresis",
+      "phase": 2,
+      "status": "Informal spec written. Lean spec next.",
+      "lean_file": null,
+      "spec_file": "specs/hysteresis_informal.md"
+    }
+  ],
+  "open_prs": [],
+  "bugs_found": [
+    {
+      "id": "signNoZero_nan",
+      "description": "signNoZero<float> returns 0 for NaN, violates ne_zero.",
+      "status": "GitHub issue #12 filed"
+    },
+    {
+      "id": "negate_int16_not_involution",
+      "description": "negate<int16_t> not a global involution. negate(negate(-32767))=-32768.",
+      "status": "GitHub issue #21 filed"
+    }
+  ],
+  "total_theorems": 214,
+  "total_sorry": 6,
+  "proved_theorems": 208,
+  "sorry_count": 6,
+  "total_examples": 106,
+  "run42_tasks": "Task 6 (CORRESPONDENCE.md: added ExpoDeadzone/InterpolateNXY/InterpolateN sections, all 17 Lean files now covered, 20 C++ targets); Task 10 (REPORT.md: Last Updated, timeline, footer note updated)",
+  "report_exists": true,
+  "correspondence_coverage": "ALL 17 LEAN FILES: MathFunctions, AlphaFilter, SlewRate, Deadzone, Interpolate, WelfordMean, Lerp, Negate, WrapAngle, Expo, RingBuffer, MedianFilter, SuperExpo, ExpoDeadzone, InterpolateNXY, InterpolateN (20 C++ targets total)",
+  "lean_files": 17,
+  "notes": [
+    "set tactic NOT available in Lean 4 stdlib",
+    "norm_num tactic NOT available in Lean 4 stdlib",
+    "linarith NOT available, ring NOT available",
+    "split_ifs NOT available in Lean 4 stdlib - use by_cases",
+    "Expo.lean is at ROOT namespace (no namespace wrapper) - constrainRat, expoRat, expo_* are all root-level names. open PX4.Expo does NOT work.",
+    "Deadzone.lean is in namespace PX4.Deadzone - use open PX4.Deadzone or fully-qualified PX4.Deadzone.X",
+    "Rat.lt_of_lt_of_le does NOT exist - use Std.lt_of_lt_of_le",
+    "Rat.le_of_lt works for le from lt",
+    "neg/div: Rat.neg_div does not exist. Use Rat.div_def + Rat.neg_mul + simp [Rat.sub_eq_add_neg, Rat.neg_add, Rat.neg_neg]",
+    "omega works for Nat.mod_lt and modular arithmetic",
+    "Unused theorem parameters: prefix with _ to suppress linter warning",
+    "RingBuffer actual theorem count is 24 (not 28 as previously reported in REPORT.md)",
+    "CI lean-ci.yml is healthy: lake update + caching + failure artifacts + GITHUB_STEP_SUMMARY",
+    "InterpolateNXY.lean uses namespace PX4.InterpolateNXY, imports FVSquad.Interpolate, opens PX4.Interpolate",
+    "ExpoDeadzone.lean uses expoDeadzone_* naming (NOT expodz_* from run35)",
+    "lemma keyword NOT available in Lean 4 stdlib (only in Mathlib). Use theorem instead.",
+    "decide does NOT work for Rat comparisons involving 1/2 literal - use native_decide",
+    "private theorem works but private lemma does not (lemma unavailable without Mathlib)",
+    "Rat.lt_of_le_of_lt does NOT exist - use Std.lt_of_le_of_lt",
+    "InterpolateN.lean uses namespace PX4.InterpolateN, imports FVSquad.Interpolate, opens PX4.Interpolate",
+    "half: Rat = (1:Rat)/(2:Rat) as a private def - use native_decide to prove facts about it",
+    "Mathlib cache proxy blocks with 403; lake update works but lake build from source would take hours",
+    "Hysteresis informal spec complete (run41): time-delayed boolean FSM, 6 invariants, Lean model approach documented",
+    "CORRESPONDENCE.md now covers all 17 Lean files (20 C++ targets) - complete as of run42"
+  ]
+}
