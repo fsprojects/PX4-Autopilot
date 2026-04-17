@@ -1,6 +1,6 @@
 {
-  "last_run": "run43",
-  "run_id": "24524969147",
+  "last_run": "run44",
+  "run_id": "24546444930",
   "lean_version": "4.29.1",
   "lean_available": true,
   "ci_created": true,
@@ -26,9 +26,14 @@
     {"id": "ExpoDeadzone", "phase": 5, "status": "9 proved (incl. expoDeadzone_odd), 0 sorry", "lean_file": "lean/FVSquad/ExpoDeadzone.lean"},
     {"id": "InterpolateNXY", "phase": 5, "status": "9 proved (incl. interp3_in_range, interp3_mono_seg0/seg1), 0 sorry", "lean_file": "lean/FVSquad/InterpolateNXY.lean"},
     {"id": "InterpolateN", "phase": 5, "status": "18 proved (5 for N=2, 9 for N=3 incl. continuity, mono, in_range), 0 sorry", "lean_file": "lean/FVSquad/InterpolateN.lean"},
-    {"id": "Hysteresis", "phase": 5, "status": "20 proved (dwell_lb, commits, stays, zero_delay, cancel, constructor, setHysteresisTimeFrom) + 6 examples, 0 sorry", "lean_file": "lean/FVSquad/Hysteresis.lean", "spec_file": "specs/hysteresis_informal.md"}
+    {"id": "Hysteresis", "phase": 5, "status": "20 proved (dwell_lb, commits, stays, zero_delay, cancel, constructor, setHysteresisTimeFrom) + 6 examples, 0 sorry", "lean_file": "lean/FVSquad/Hysteresis.lean", "spec_file": "specs/hysteresis_informal.md"},
+    {"id": "signFromBool", "phase": 1, "status": "Research - new in run44. ~5 decide theorems. bool->+-1 conversion.", "lean_file": null},
+    {"id": "sq", "phase": 1, "status": "Research - new in run44. ~5 theorems. non-neg, even, monotone.", "lean_file": null},
+    {"id": "crc16_fold", "phase": 1, "status": "Research - new in run44. fold/split property via List.foldl_append.", "lean_file": null},
+    {"id": "atmosphere_density", "phase": 1, "status": "Research - new in run44. ISA ideal gas law sign+monotonicity in Rat.", "lean_file": null},
+    {"id": "commander_arming_fsm", "phase": 1, "status": "Research - new in run44. Safety-critical temporal props using Hysteresis.lean as sub-component.", "lean_file": null}
   ],
-  "open_prs": [],
+  "open_prs": [42],
   "bugs_found": [
     {"id": "signNoZero_nan", "description": "signNoZero<float> returns 0 for NaN, violates ne_zero.", "status": "GitHub issue #12 filed"},
     {"id": "negate_int16_not_involution", "description": "negate<int16_t> not a global involution. negate(negate(-32767))=-32768.", "status": "GitHub issue #21 filed"}
@@ -38,7 +43,7 @@
   "proved_theorems": 228,
   "sorry_count": 6,
   "total_examples": 112,
-  "run43_tasks": "Task 3+4 (Hysteresis.lean: 20 theorems 6 examples 0 sorry, time-delayed bool FSM); Task 10 (REPORT.md updated to 234 theorems, 18 files, Layer 6 added)",
+  "run44_tasks": "Task 1 (Research: 5 new targets - signFromBool, sq, crc16 fold, atmosphere ISA, Commander arming FSM); Task 10 (REPORT.md: Lean version fix 4.29.0->4.29.1, footer fix 17->18 files 20->21 targets, timeline extended)",
   "report_exists": true,
   "correspondence_coverage": "ALL 18 LEAN FILES: MathFunctions, AlphaFilter, SlewRate, Deadzone, Interpolate, WelfordMean, Lerp, Negate, WrapAngle, Expo, RingBuffer, MedianFilter, SuperExpo, ExpoDeadzone, InterpolateNXY, InterpolateN, Hysteresis (21 C++ targets total)",
   "lean_files": 18,
@@ -72,6 +77,10 @@
     "Hysteresis.lean: use Classical.byContradiction + Nat.lt_of_not_le for delay_lb proofs",
     "Hysteresis.lean: simp [hysteresisUpdate, setStateAndUpdate] handles cancel proofs directly",
     "Bool case split: rcases Bool.eq_false_or_eq_true b with hb | hb, then simp [hb]",
-    "simp [hst, hrq] (full simp not simp only) handles Bool BEq/And computations after field substitution"
+    "simp [hst, hrq] (full simp not simp only) handles Bool BEq/And computations after field substitution",
+    "signFromBool target: Bool->+-1, all theorems decide-able, use rcases Bool.eq_false_or_eq_true",
+    "sq target: mul_self_nonneg for Rat non-negativity; omega for Int version",
+    "crc16 fold: List.foldl_append is the key stdlib lemma; fold/split proof is trivial once model set up",
+    "atmosphere density: Rat model; precondition temperature_celsius > -273.15; use Rat.div_pos"
   ]
 }
