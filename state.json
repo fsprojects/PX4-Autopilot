@@ -1,12 +1,14 @@
 {
-  "last_run": "run45",
-  "run_id": "24561595675",
+  "last_run": "run46",
+  "run_id": "24575719908",
   "lean_version": "4.29.1",
   "lean_available": true,
   "ci_created": true,
   "ci_has_lake_update": true,
   "mathlib_available": false,
   "mathlib_note": "Mathlib cache proxy blocks with 403 (CONNECT tunnel). lake update resolves manifest but lake build would need to compile from source (hours). Use stdlib-only proofs.",
+  "paper_exists": true,
+  "paper_note": "paper.tex + paper.bib in formal-verification/paper/ (run46). PDF not compiled (no LaTeX/sudo in CI). ACM sigconf format, ~11 pages.",
   "fv_targets": [
     {
       "id": "constrain",
@@ -125,15 +127,17 @@
     },
     {
       "id": "signFromBool",
-      "phase": 1,
-      "status": "Research - new in run44. ~5 decide theorems. bool->+-1 conversion.",
-      "lean_file": null
+      "phase": 2,
+      "status": "Informal spec written (run46). ~5 decide theorems. bool->+-1 conversion.",
+      "lean_file": null,
+      "spec_file": "specs/sign_from_bool_informal.md"
     },
     {
       "id": "sq",
-      "phase": 1,
-      "status": "Research - new in run44. ~5 theorems. non-neg, even, monotone.",
-      "lean_file": null
+      "phase": 2,
+      "status": "Informal spec written (run46). ~7 theorems. non-neg, even, monotone.",
+      "lean_file": null,
+      "spec_file": "specs/sq_informal.md"
     },
     {
       "id": "crc16_fold",
@@ -154,9 +158,7 @@
       "lean_file": null
     }
   ],
-  "open_prs": [
-    42
-  ],
+  "open_prs": [],
   "bugs_found": [
     {
       "id": "signNoZero_nan",
@@ -174,7 +176,7 @@
   "proved_theorems": 228,
   "sorry_count": 6,
   "total_examples": 112,
-  "run44_tasks": "Task 1 (Research: 5 new targets - signFromBool, sq, crc16 fold, atmosphere ISA, Commander arming FSM); Task 10 (REPORT.md: Lean version fix 4.29.0->4.29.1, footer fix 17->18 files 20->21 targets, timeline extended)",
+  "run46_tasks": "Task 11 (Conference Paper: paper.tex + paper.bib in formal-verification/paper/, ACM sigconf, ~11pp, no PDF - no LaTeX in CI); Task 1 (Research: signFromBool+sq informal specs, Phase 1->2)",
   "report_exists": true,
   "correspondence_coverage": "ALL 18 LEAN FILES: MathFunctions, AlphaFilter, SlewRate, Deadzone, Interpolate, WelfordMean, Lerp, Negate, WrapAngle, Expo, RingBuffer, MedianFilter, SuperExpo, ExpoDeadzone, InterpolateNXY, InterpolateN, Hysteresis (21 C++ targets total)",
   "lean_files": 18,
@@ -204,17 +206,13 @@
     "half: Rat = (1:Rat)/(2:Rat) as a private def - use native_decide to prove facts about it",
     "Mathlib cache proxy blocks with 403; lake update works but lake build from source would take hours",
     "CORRESPONDENCE.md now covers all 18 Lean files (21 C++ targets) - complete as of run43",
-    "Hysteresis.lean: use simp [hysteresisUpdate, hst, hrq, Nat.not_le.mpr hlt] for no-change goals",
-    "Hysteresis.lean: use Classical.byContradiction + Nat.lt_of_not_le for delay_lb proofs",
-    "Hysteresis.lean: simp [hysteresisUpdate, setStateAndUpdate] handles cancel proofs directly",
-    "Bool case split: rcases Bool.eq_false_or_eq_true b with hb | hb, then simp [hb]",
-    "simp [hst, hrq] (full simp not simp only) handles Bool BEq/And computations after field substitution",
+    "LaTeX/pdflatex not available in CI (no sudo) - paper.tex written but PDF not compiled",
+    "Paper in formal-verification/paper/ uses ACM sigconf format (acmart.cls). Use latexmk locally.",
     "signFromBool target: Bool->+-1, all theorems decide-able, use rcases Bool.eq_false_or_eq_true",
     "sq target: mul_self_nonneg for Rat non-negativity; omega for Int version",
     "crc16 fold: List.foldl_append is the key stdlib lemma; fold/split proof is trivial once model set up",
     "atmosphere density: Rat model; precondition temperature_celsius > -273.15; use Rat.div_pos",
     "CRITIQUE.md fully current as of run45 (234 theorems, 21 targets, 18 Lean files)",
-    "Task 11 (Conference Paper) is highest priority next run (weight 8, has_paper=false)"
-  ],
-  "run45_tasks": "Task 7 (CRITIQUE.md: 172->234 theorems, 15->21 targets, +Hysteresis/InterpolateN/NXY rows, gap#5 DONE, 5 new research target gaps, +Task11 recommendation); Task 10 (REPORT.md: timestamp + run45 timeline)"
+    "Next priorities: (1) signFromBool.lean Phase 3 (trivial decide proofs); (2) sq.lean Phase 3; (3) crc16 fold Phase 2 informal spec; (4) compile PDF when LaTeX available"
+  ]
 }
