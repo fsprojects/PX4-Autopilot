@@ -112,8 +112,8 @@ production embedded codebase without network access to the Mathlib cache.
 by \textbf{Lean Squad}, an automated formal verification agent for the
 \texttt{fsprojects/PX4-Autopilot} repository.
 All Lean proofs are mechanically verified by \texttt{lake build}.
-Workflow run:
-\url{https://github.com/fsprojects/PX4-Autopilot/actions/runs/24575719908}}
+Latest workflow run:
+\url{https://github.com/fsprojects/PX4-Autopilot/actions/runs/24593089826}}
 \end{tcolorbox}
 
 \section{Introduction}
@@ -133,8 +133,9 @@ language with a growing library ecosystem~\cite{mathlib}.
 
 Our contributions are:
 \begin{itemize}
-  \item A formal verification campaign covering \textbf{21~C++ targets} in 18~Lean
-        modules, yielding \textbf{228~proved theorems} plus 112~concrete examples.
+  \item A formal verification campaign covering \textbf{21~C++ targets with Lean proofs}
+        in 18~Lean modules (23~targets identified overall), yielding \textbf{228~proved
+        theorems} plus 112~concrete examples.
   \item Discovery of \textbf{two genuine implementation bugs} through proof failure,
         with counterexamples mechanically verified by Lean.
   \item A \textbf{correspondence discipline} documenting modelling approximations and
@@ -204,8 +205,8 @@ We identified FV-amenable targets by reading the codebase and applying these cri
 \texttt{omega}, \texttt{simp}, or \texttt{decide}.
 
 We proceeded in priority order, adding more complex targets (state machines, multi-step
-pipelines) as confidence in the toolchain grew. The final set of 21~targets spans six
-categories: (i)~mathematical utilities (\texttt{constrain}, \texttt{signNoZero},
+pipelines) as confidence in the toolchain grew. The final set of 23~identified targets
+spans six categories: (i)~mathematical utilities (\texttt{constrain}, \texttt{signNoZero},
 \texttt{countSetBits}, \texttt{lerp}, \texttt{interpolate}, \texttt{expo},
 \texttt{superexpo}, \texttt{deadzone}, \texttt{negate}, \texttt{signFromBool},
 \texttt{sq}); (ii)~filters (\texttt{AlphaFilter}, \texttt{MedianFilter},
@@ -213,6 +214,8 @@ categories: (i)~mathematical utilities (\texttt{constrain}, \texttt{signNoZero},
 (\texttt{TimestampedRingBuffer}); (v)~multi-component pipelines
 (\texttt{ExpoDeadzone}, \texttt{InterpolateNXY}, \texttt{InterpolateN},
 \texttt{wrap\_pi}); and (vi)~a state machine (\texttt{Hysteresis}).
+Of these, 21~targets have Lean proofs (18~modules); \texttt{signFromBool} and
+\texttt{sq} have informal specifications written and are ready for Lean formalisation.
 
 \subsection{Two-Phase Specification}
 
@@ -503,6 +506,14 @@ Across 18~files, roughly 50\% of theorems were proved by \texttt{decide} or
 \texttt{native\_decide}; 30\% by \texttt{simp}/\texttt{omega}; and 20\%
 required multi-step tactic proofs with auxiliary lemmas.
 
+All proofs are continuously checked by a GitHub Actions workflow
+(\texttt{lean-ci.yml}) on every pull request and push to \texttt{main}. The
+workflow installs the pinned Lean toolchain, runs \texttt{lake update}, caches
+the build artefacts keyed on \texttt{lake-manifest.json}, and calls
+\texttt{lake build}, failing the check if any file does not type-check. This
+provides automated regression protection: a proof that was correct in one run
+cannot silently break in a later run.
+
 \subsection{Lessons Learned}
 
 \begin{itemize}
@@ -547,9 +558,11 @@ production embedded C++ at the library level, even under significant toolchain
 constraints.
 
 Future work includes: resolving the 6~remaining sorrys in \texttt{WrapAngle.lean}
-once Mathlib becomes available; advancing five research-stage targets
-(\texttt{signFromBool}, \texttt{sq}, CRC16 fold property, atmospheric density model,
-and Commander arming FSM); and extending formal correspondence proofs from the Lean
+once Mathlib becomes available; advancing two phase-2 targets (\texttt{signFromBool}
+and \texttt{sq}, both with complete informal specifications) to full Lean proofs in
+the next run; and extending the pipeline to three phase-1 targets
+(\texttt{crc16\_fold} fold property, atmospheric density model,
+and Commander arming FSM); and exploring formal correspondence proofs from the Lean
 model to the C++ source using Aeneas~\cite{aeneas} extraction once the toolchain
 is available for C++.
 
