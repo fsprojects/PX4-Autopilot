@@ -4,15 +4,16 @@
 
 ## Last Updated
 
-- **Date**: 2026-04-17 11:01 UTC
-- **Commit**: `3bb7aab285`
+- **Date**: 2026-04-18 00:57 UTC
+- **Commit**: `a6db17ea7f`
 
 ---
 
 ## Overall Assessment
 
-Twenty-one targets from PX4's mathlib, control library, and sensor-fusion stack have
-been identified; 18 have Lean files with verified theorems. The library now covers
+Twenty-three targets from PX4's mathlib, control library, and sensor-fusion stack have
+been identified; 18 have Lean files with verified theorems, and 2 more have complete
+informal specifications ready for Lean formalisation. The library now covers
 **234 theorem statements, 228 fully proved, 6 `sorry`-guarded** (Lean 4 v4.29.1,
 standard library only) across `constrain`, `signNoZero`, `countSetBits`,
 `SlewRate::update`, `deadzone`, `interpolate`, `AlphaFilter::updateCalculation`,
@@ -28,7 +29,8 @@ dwell time lower bounds, commit/stay/cancel semantics, zero-delay, constructor, 
 The 6 remaining sorrys are all in `WrapAngle.lean` and require
 `Mathlib.Algebra.Order.Floor`. Two confirmed bugs remain open: `signNoZero<float>`
 returns 0 for NaN, and `negate<int16_t>` has an incorrect INT16_MAX special case.
-Five new research targets (run44) are at phase 1: `signFromBool`, `sq`, `crc16_fold`,
+`signFromBool` and `sq` have been promoted to phase 2 (informal specs written, run46)
+and are ready for Lean formalisation. Three targets remain at phase 1: `crc16_fold`,
 `atmosphere_density`, and `commander_arming_fsm`.
 
 ---
@@ -178,15 +180,19 @@ Five new research targets (run44) are at phase 1: `signFromBool`, `sq`, `crc16_f
    directly reusable sub-components. **Recommendation**: prioritise this as the next
    phase-3/4/5 target; write informal spec first.
 
-7. **`signFromBool` — bool → ±1 conversion** (phase 1 research): Fully decidable (all
-   theorems can be closed by `decide`). Very tractable. Spec: `signFromBool(false) = -1`,
-   `signFromBool(true) = +1`, and optionally `signFromBool(b) * signFromBool(b) = 1`.
-   **Recommendation**: quick Task 3/4/5 run; serves as a confidence exercise.
+7. **`signFromBool` — bool → ±1 conversion** (phase 2, informal spec written): Fully
+   decidable (all theorems can be closed by `decide`). Very tractable. Spec:
+   `signFromBool(false) = -1`, `signFromBool(true) = +1`, and
+   `signFromBool(b) * signFromBool(b) = 1`. Informal spec written in run46 and is
+   comprehensive.
+   **Recommendation**: immediate Task 3/4/5 run; all ~5 theorems should be 0-sorry by
+   `by cases b <;> decide`.
 
-8. **`sq` — x² non-negativity and monotonicity** (phase 1 research): Simple algebraic
-   properties: `sq(x) ≥ 0`, `sq(-x) = sq(x)`, `sq(0) = 0`. For `Int`, these follow by
-   `omega`; for `Rat`, by `Rat.mul_self_nonneg`. **Recommendation**: straightforward
-   Task 3/4/5 run.
+8. **`sq` — x² non-negativity and monotonicity** (phase 2, informal spec written):
+   Simple algebraic properties: `sq(x) ≥ 0`, `sq(-x) = sq(x)`, `sq(0) = 0`. For
+   `Int`, these follow by `omega`; for `Rat`, by `Rat.mul_self_nonneg`. Informal spec
+   written in run46 covering 7 properties including multiplicativity.
+   **Recommendation**: immediate Task 3/4/5 run; all ~7 theorems should be 0-sorry.
 
 9. **`crc16_fold` — CRC fold/split property** (phase 1 research): The key property is
    `crc16(a ++ b) = crc16_append(crc16(a), b)` using `List.foldl_append`. This is a
@@ -392,3 +398,81 @@ not mathematical gaps):
 All other targets (17 files, 228 theorems) are at zero sorry. All files added since
 run38 (`InterpolateNXY.lean`, `InterpolateN.lean`, `Hysteresis.lean`) were delivered
 with zero sorry. `ExpoDeadzone.lean` added `expodz_odd` with zero sorry.
+
+---
+
+## Paper Review
+
+The conference paper `formal-verification/paper/paper.tex` (ACM sigconf format, ~11 pages,
+run46) was reviewed as part of this run47 critique. The paper covers the campaign's
+methodology, results, bugs found, and lessons learned.
+
+### Accuracy
+
+The paper's claims are well-supported by the Lean artifacts:
+
+- The abstract and introduction state "228 proved theorems" and "6 sorry-guarded" — this
+  matches the current theorem count exactly.
+- Both bugs (signNoZero NaN and negate16 not-involution) are described with mechanically
+  verified counterexamples. The description of the `signNoZero` infinite-loop impact
+  (rtl_direct_mission_land.cpp line 73) is accurate.
+- The theorem inventory table (Table 1) is correct for all 18 files.
+- The tactic inventory and proof strategy section accurately describes the stdlib-only
+  constraint and the absence of `linarith`/`ring`.
+
+**One minor inaccuracy to address**: The introduction mentions "21 C++ targets" but 23
+targets are now identified (signFromBool and sq now have informal specs at phase 2). The
+paper should say "21 C++ targets with Lean proofs" or update to note the pipeline extends
+to 23 identified targets. This is a minor update — both framings are accurate.
+
+### Completeness
+
+- The paper covers all 18 Lean files and both confirmed bugs.
+- The Future Work paragraph mentions signFromBool, sq, CRC16, atmosphere density, and
+  Commander arming FSM by name — accurate.
+- **Recommendation**: The paper could briefly mention that signFromBool and sq have
+  advanced to phase 2 (informal specs written) in the same run, strengthening the
+  evidence that the pipeline is actively progressing.
+
+### Intellectual Honesty
+
+The paper is appropriately honest about its limitations:
+
+- The float-vs-rational abstraction gap is clearly described in §4.3.
+- The signNoZero bug discovery methodology (correspondence document → gap found → bug
+  filed) is well-explained.
+- The 6 sorry-guarded theorems are disclosed in both abstract and results.
+- The stdlib-only constraint and its impact on proof effort are documented in §4.4.
+
+**No overclaims were found.** The paper does not state that the full C++ implementation
+is verified — it consistently frames the work as verifying abstract models.
+
+### Clarity
+
+- Structure is clear: Background → Methodology → Results → Discussion → Conclusion.
+- The two code listings (Welford step and SlewRate theorem) are well-chosen examples.
+- The Hysteresis dwell theorem is highlighted as the most complex — appropriate given
+  it is the most safety-critical.
+- **Minor suggestion**: The paper could include a mermaid-style proof dependency diagram
+  in the supplementary materials (the REPORT.md already has this). A figure in the paper
+  itself would strengthen the Methodology section.
+
+### Missing Content
+
+1. **signFromBool and sq progress**: Two new phase-2 targets (informal specs written in
+   same run) are not mentioned in the results narrative, only in the Future Work paragraph.
+   This could be moved to a brief "in progress" mention in the results.
+2. **CI setup**: The paper does not mention the `lean-ci.yml` workflow that automatically
+   checks all proofs on every PR. This is a methodological strength worth noting.
+3. **Run history**: The paper was written in run46 but the disclosure box still shows the
+   run46 workflow URL. This should be updated to run47 (24593089826) in the next revision.
+
+### Actionable Recommendations
+
+1. Update the workflow run URL in the AI disclosure box to the current run.
+2. Change "21 C++ targets" to "21 C++ targets with mechanically-verified Lean proofs (23
+   targets identified)" in the introduction.
+3. Add one sentence to Future Work noting signFromBool and sq have informal specs and are
+   the next pipeline targets.
+4. Consider adding a CI mention in §4 (Methodology) or §5 (Discussion): "All proofs are
+   continuously checked by a GitHub Actions workflow (`lean-ci.yml`) on every PR."
