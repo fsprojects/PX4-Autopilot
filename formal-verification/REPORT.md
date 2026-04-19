@@ -6,8 +6,8 @@
 
 ## Last Updated
 
-- **Date**: 2026-04-18 16:30 UTC
-- **Commit**: `d47f5a1929`
+- **Date**: 2026-04-19 00:02 UTC
+- **Commit**: `fe5a32de83`
 
 ---
 
@@ -409,6 +409,9 @@ timeline
         SignFromBoolSq : signFromBool (7 thms, 0 sorry) + sq (10 thms, 0 sorry) — 251 total
         CRC16 spec     : buffer_crc16 fold property informal spec written (phase 2)
         Paper          : updated to 251 theorems, 19 files, 23 targets
+    section Run 50
+        Correspondence : full audit run50 — all 19 files × 23 targets re-verified vs C++ source
+        Report         : REPORT.md refreshed with run50 timestamp and timeline entry
 ```
 
 ---
@@ -439,4 +442,5 @@ timeline
 > *`lake build` verified with Lean 4.29.1. 6 `sorry` remain (WrapAngle wrapRat,
 > all require Mathlib floor arithmetic). 251 theorems across 19 files.*
 > *CORRESPONDENCE.md covers all 19 Lean files (23 C++ targets).*
-> *Run 49: SignFromBoolSq.lean added (17 theorems, 0 sorry); crc16_fold informal spec written.*
+> *Run 50: correspondence audit confirmed all documented correspondences still accurate;
+> no C++ source changes in target modules since run 49.*
