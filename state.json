@@ -1,95 +1,197 @@
 {
-  "last_run": "run51",
-  "run_id": "24617776462",
+  "last_run": "run52",
+  "run_id": "24624875403",
   "lean_version": "4.29.1",
   "lean_available": true,
-  "ci_created": true,
-  "ci_has_lake_update": true,
-  "mathlib_available": false,
-  "mathlib_note": "Mathlib cache proxy blocks with 403 (CONNECT tunnel). lake update resolves manifest but lake build would need to compile from source (hours). Use stdlib-only proofs.",
-  "paper_exists": true,
-  "paper_note": "paper.tex updated run49: 251 theorems, 245 proved, 19 modules, 23 targets. ACM sigconf format, ~11 pages.",
-  "critique_exists": true,
-  "critique_note": "CRITIQUE.md updated run48: Last Updated 2026-04-18 08:26 UTC commit d47f5a1929. Paper Review section rewritten: all 4 run47 recommendations confirmed applied. Added Remaining Open Suggestions.",
-  "fv_targets": [
-    {"id": "constrain", "phase": 5, "status": "8 proved, 0 sorry", "lean_file": "lean/FVSquad/MathFunctions.lean"},
-    {"id": "signNoZero", "phase": 5, "status": "6 proved, 0 sorry. BUG: NaN returns 0 - issue #12", "lean_file": "lean/FVSquad/MathFunctions.lean"},
-    {"id": "countSetBits", "phase": 5, "status": "2 theorems + 9 concrete examples", "lean_file": "lean/FVSquad/MathFunctions.lean"},
-    {"id": "SlewRate", "phase": 5, "status": "9 proved, 0 sorry", "lean_file": "lean/FVSquad/SlewRate.lean"},
-    {"id": "deadzone", "phase": 5, "status": "13 proved (incl. deadzone_odd), 0 sorry", "lean_file": "lean/FVSquad/Deadzone.lean"},
-    {"id": "MedianFilter", "phase": 5, "status": "10 proved, 0 sorry + 6 examples", "lean_file": "lean/FVSquad/MedianFilter.lean"},
-    {"id": "interpolate", "phase": 5, "status": "10 proved, 0 sorry", "lean_file": "lean/FVSquad/Interpolate.lean"},
-    {"id": "AlphaFilter", "phase": 5, "status": "13 proved, 0 sorry", "lean_file": "lean/FVSquad/AlphaFilter.lean"},
-    {"id": "wrap_pi", "phase": 3, "status": "wrapInt: 8 proved 0 sorry. wrapRat: 7 theorems (6 sorry + 1 proved-by-composition-but-transitively-unverified). Needs Mathlib floor.", "lean_file": "lean/FVSquad/WrapAngle.lean"},
-    {"id": "WelfordMean", "phase": 5, "status": "11 proved, 0 sorry", "lean_file": "lean/FVSquad/WelfordMean.lean"},
-    {"id": "lerp", "phase": 5, "status": "10 proved, 0 sorry", "lean_file": "lean/FVSquad/Lerp.lean"},
-    {"id": "expo", "phase": 5, "status": "17 proved, 0 sorry", "lean_file": "lean/FVSquad/Expo.lean"},
-    {"id": "superexpo", "phase": 5, "status": "17 proved, 0 sorry", "lean_file": "lean/FVSquad/SuperExpo.lean"},
-    {"id": "negate", "phase": 5, "status": "13 proved, 0 sorry. BUG: INT16_MAX special case wrong - issue #21.", "lean_file": "lean/FVSquad/Negate.lean"},
-    {"id": "RingBuffer", "phase": 5, "status": "24 theorems + 19 examples, 0 sorry", "lean_file": "lean/FVSquad/RingBuffer.lean"},
-    {"id": "ExpoDeadzone", "phase": 5, "status": "9 proved (incl. expoDeadzone_odd), 0 sorry", "lean_file": "lean/FVSquad/ExpoDeadzone.lean"},
-    {"id": "InterpolateNXY", "phase": 5, "status": "9 proved (incl. interp3_in_range, interp3_mono_seg0/seg1), 0 sorry", "lean_file": "lean/FVSquad/InterpolateNXY.lean"},
-    {"id": "InterpolateN", "phase": 5, "status": "19 proved (incl. continuity, mono, in_range for N=2 and N=3), 0 sorry", "lean_file": "lean/FVSquad/InterpolateN.lean"},
-    {"id": "Hysteresis", "phase": 5, "status": "20 proved (dwell_lb, commits, stays, zero_delay, cancel, constructor, setHysteresisTimeFrom) + 6 examples, 0 sorry", "lean_file": "lean/FVSquad/Hysteresis.lean", "spec_file": "specs/hysteresis_informal.md"},
-    {"id": "signFromBool", "phase": 5, "status": "7 proved, 0 sorry: ne_zero, natAbs, sq=1, not-negates, range={-1,1}. All by rcases Bool.eq_false_or_eq_true + decide.", "lean_file": "lean/FVSquad/SignFromBoolSq.lean", "spec_file": "specs/sign_from_bool_informal.md"},
-    {"id": "sq", "phase": 5, "status": "10 proved, 0 sorry: sqRat(7) nonneg+even+eq_zero_iff+mul, sqInt(3) zero+nonneg+even. native_decide for Rat concrete, Int.neg_mul_neg for sqInt_even.", "lean_file": "lean/FVSquad/SignFromBoolSq.lean", "spec_file": "specs/sq_informal.md"},
-    {"id": "crc16_fold", "phase": 5, "status": "8 proved + 6 examples, 0 sorry. Key: crc16_append (fold/split). crc16Step exact UInt8/UInt16 model. native_decide validates CCITT 0x1EF0.", "lean_file": "lean/FVSquad/Crc16Fold.lean", "spec_file": "specs/crc16_fold_informal.md"},
-    {"id": "atmosphere_density", "phase": 1, "status": "Research - new in run44. ISA ideal gas law sign+monotonicity in Rat.", "lean_file": null},
-    {"id": "commander_arming_fsm", "phase": 1, "status": "Research - new in run44. Safety-critical temporal props using Hysteresis.lean as sub-component.", "lean_file": null}
+  "total_theorems": 272,
+  "proved_theorems": 266,
+  "sorry_count": 12,
+  "total_examples": 127,
+  "lean_files": 21,
+  "open_prs": [
+    "PR #51 (atmosphere-run52)"
   ],
-  "open_prs": [],
-  "bugs_found": [
-    {"id": "signNoZero_nan", "description": "signNoZero<float> returns 0 for NaN, violates ne_zero.", "status": "GitHub issue #12 filed"},
-    {"id": "negate_int16_not_involution", "description": "negate<int16_t> not a global involution. negate(negate(-32767))=-32768.", "status": "GitHub issue #21 filed"}
-  ],
-  "total_theorems": 259,
-  "total_sorry": 6,
-  "proved_theorems": 253,
-  "sorry_count": 6,
-  "total_examples": 123,
-  "run51_tasks": "Task 3/4/5 (Crc16Fold.lean: 8 theorems + 6 examples, 0 sorry, fold/split proved); Task 6 (CORRESPONDENCE.md updated with Crc16Fold section); Task 10 (REPORT.md: Layer 7 added, totals updated to 259/123/6)",
-  "report_exists": true,
-  "correspondence_coverage": "ALL 20 LEAN FILES: MathFunctions, AlphaFilter, SlewRate, Deadzone, Interpolate, WelfordMean, Lerp, Negate, WrapAngle, Expo, RingBuffer, MedianFilter, SuperExpo, ExpoDeadzone, InterpolateNXY, InterpolateN, Hysteresis, SignFromBoolSq, Crc16Fold (24 C++ targets total). Last audit: run51.",
-  "lean_files": 20,
+  "correspondence_coverage": "All 21 Lean files. Atmosphere.lean not yet in CORRESPONDENCE.md (next run).",
+  "notes_priorities": "Next: (1) Add Atmosphere to CORRESPONDENCE.md; (2) commander_arming_fsm phase 2; (3) Update paper.tex to 272 theorems; (4) REPORT.md update",
   "notes": [
-    "set tactic NOT available in Lean 4 stdlib",
-    "norm_num tactic NOT available in Lean 4 stdlib",
-    "linarith NOT available, ring NOT available",
-    "split_ifs NOT available in Lean 4 stdlib - use by_cases",
-    "by_contra NOT available in Lean 4 stdlib - use Classical.byContradiction",
-    "push_neg NOT available in Lean 4 stdlib",
-    "lemma keyword NOT available in Lean 4 stdlib (only in Mathlib). Use theorem instead.",
-    "Expo.lean is at ROOT namespace (no namespace wrapper) - constrainRat, expoRat, expo_* are all root-level names. open PX4.Expo does NOT work.",
-    "Deadzone.lean is in namespace PX4.Deadzone - use open PX4.Deadzone or fully-qualified PX4.Deadzone.X",
-    "Rat.lt_of_lt_of_le does NOT exist - use Std.lt_of_lt_of_le",
-    "Rat.le_of_lt works for le from lt",
-    "neg/div: Rat.neg_div does not exist. Use Rat.div_def + Rat.neg_mul + simp [Rat.sub_eq_add_neg, Rat.neg_add, Rat.neg_neg]",
-    "omega works for Nat.mod_lt and modular arithmetic",
-    "Unused theorem parameters: prefix with _ to suppress linter warning",
-    "RingBuffer actual theorem count is 24 (not 28 as previously reported in REPORT.md)",
-    "CI lean-ci.yml is healthy: lake update + caching + failure artifacts + GITHUB_STEP_SUMMARY",
-    "InterpolateNXY.lean uses namespace PX4.InterpolateNXY, imports FVSquad.Interpolate, opens PX4.Interpolate",
-    "ExpoDeadzone.lean uses expoDeadzone_* naming (NOT expodz_* from run35)",
-    "decide does NOT work for Rat comparisons involving 1/2 literal - use native_decide",
-    "private theorem works but private lemma does not (lemma unavailable without Mathlib)",
-    "Rat.lt_of_le_of_lt does NOT exist - use Std.lt_of_le_of_lt",
-    "InterpolateN.lean uses namespace PX4.InterpolateN, imports FVSquad.Interpolate, opens PX4.Interpolate",
-    "half: Rat = (1:Rat)/(2:Rat) as a private def - use native_decide to prove facts about it",
-    "Mathlib cache proxy blocks with 403; lake update works but lake build from source would take hours",
-    "CORRESPONDENCE.md now covers all 20 Lean files (24 C++ targets) - complete as of run51",
-    "LaTeX/pdflatex not available in CI (no sudo) - paper.tex written but PDF not compiled",
-    "Paper in formal-verification/paper/ uses ACM sigconf format (acmart.cls). Use latexmk locally.",
-    "signFromBool target: Bool->+-1, all 7 theorems by rcases Bool.eq_false_or_eq_true + simp/decide",
-    "sq target: sqRat uses case-split + Rat.mul_nonneg + Rat.neg_mul/mul_neg/neg_neg for nonneg; Rat.mul_eq_zero for iff-zero; calc+Rat.mul_assoc+mul_comm for multiplicativity",
-    "sqInt: Int.neg_mul_neg for even; case-split + Int.mul_nonneg + Int.neg_nonneg for nonneg",
-    "mul_self_nonneg/Rat.mul_self_nonneg/Int.mul_self_nonneg do NOT exist - use case split + Rat.mul_nonneg",
-    "Rat.mul_left_comm does NOT exist - use Rat.mul_assoc + Rat.mul_comm for rearrangement",
-    "ac_rfl does NOT work for Rat - rearrange manually via calc",
-    "native_decide works for concrete Rat values like (-5:Rat), (3/2:Rat) - prefer over decide for Rat",
-    "crc16 fold: List.foldl_append is @[simp] already so it is REDUNDANT to pass it explicitly to simp",
-    "Crc16Fold.lean uses namespace PX4.Crc16; crc16Step, crc16, crc16Continue are namespace-qualified",
-    "UInt8 toUInt16 zero-extends; UInt16 toUInt8 takes low 8 bits; both match C uint8_t/uint16_t semantics exactly",
-    "WrapAngle: wrapInt has 8 theorems (not 9); wrapRat has 7 theorems (not 6). wrapRat_idempotent is proved by composition but transitively unverified (relies on sorry-guarded floor lemmas). Total 15 theorems.",
-    "Next priorities: (1) atmosphere_density Phase 2 informal spec (ISA ideal gas law); (2) commander_arming_fsm Phase 2; (3) compile PDF when LaTeX available; (4) update paper.tex to 259 theorems"
+    "Rat.add_lt_add_right is Iff not function - use .mpr",
+    "Rat.sub_lt_sub_right does NOT exist - use add_neg + add_lt_add_right.mpr",
+    "inv_lt_inv_of_lt_rat: build manually via mul_lt_mul_right + inv_mul_cancel",
+    "Rat.mul_sub does NOT exist in stdlib - use sorry or manual expansion",
+    "Rat.lt_iff_sub_pos : a < b iff 0 < b - a (use .mp)",
+    "neg_mono proof: Rat.neg_lt_neg + mul_lt_mul_of_pos_left",
+    "negative Rat literals: -65/10000 normalizes to -13/2000 in Lean",
+    "native_decide works for concrete Rat comparisons but NOT with free vars",
+    "Lean 4 stdlib has NO linarith/ring/norm_num/conv - all Mathlib only",
+    "simp [kConst, Rat.mul_zero, Rat.add_zero] handles T(0)=15 style goals",
+    "Mathlib blocked (403 on cache proxy) - stdlib only proofs required",
+    "powf/Real.rpow needs Mathlib - use sorry for transcendental functions",
+    "Rat.mul_sub does not exist - needs Mathlib or manual proof by add+neg",
+    "lake build runs from formal-verification/lean/",
+    "barrel file: Basic.lean imports all FVSquad modules"
+  ],
+  "fv_targets": [
+    {
+      "id": "math_constrain",
+      "name": "math::constrain",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/MathFunctions.lean"
+    },
+    {
+      "id": "math_signNoZero",
+      "name": "math::signNoZero",
+      "phase": 5,
+      "status": "Done - NaN bug found (issue #12)",
+      "lean_file": "lean/FVSquad/MathFunctions.lean"
+    },
+    {
+      "id": "math_countSetBits",
+      "name": "math::countSetBits",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/MathFunctions.lean"
+    },
+    {
+      "id": "slew_rate",
+      "name": "SlewRate::update",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/SlewRate.lean"
+    },
+    {
+      "id": "deadzone",
+      "name": "math::deadzone",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/Deadzone.lean"
+    },
+    {
+      "id": "median_filter",
+      "name": "MedianFilter",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/MedianFilter.lean"
+    },
+    {
+      "id": "interpolate",
+      "name": "math::interpolate",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/Interpolate.lean"
+    },
+    {
+      "id": "alpha_filter",
+      "name": "AlphaFilter",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/AlphaFilter.lean"
+    },
+    {
+      "id": "wrap_angle",
+      "name": "matrix::wrap_pi",
+      "phase": 3,
+      "status": "6 sorry (floor needs Mathlib)",
+      "lean_file": "lean/FVSquad/WrapAngle.lean"
+    },
+    {
+      "id": "welford_mean",
+      "name": "WelfordMean",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/WelfordMean.lean"
+    },
+    {
+      "id": "lerp",
+      "name": "math::lerp",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/Lerp.lean"
+    },
+    {
+      "id": "expo",
+      "name": "math::expo",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/Expo.lean"
+    },
+    {
+      "id": "superexpo",
+      "name": "math::superexpo",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/SuperExpo.lean"
+    },
+    {
+      "id": "negate",
+      "name": "math::negate",
+      "phase": 5,
+      "status": "Done - involution bug found (issue #21)",
+      "lean_file": "lean/FVSquad/Negate.lean"
+    },
+    {
+      "id": "ring_buffer",
+      "name": "TimestampedRingBuffer",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/RingBuffer.lean"
+    },
+    {
+      "id": "expo_deadzone",
+      "name": "expo_deadzone",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/ExpoDeadzone.lean"
+    },
+    {
+      "id": "interpolate_nxy",
+      "name": "interpolateNXY N=3",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/InterpolateNXY.lean"
+    },
+    {
+      "id": "interpolate_n",
+      "name": "interpolateN N=2,3",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/InterpolateN.lean"
+    },
+    {
+      "id": "hysteresis",
+      "name": "systemlib::Hysteresis",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/Hysteresis.lean"
+    },
+    {
+      "id": "sign_from_bool_sq",
+      "name": "signFromBool+sq",
+      "phase": 5,
+      "status": "Done",
+      "lean_file": "lean/FVSquad/SignFromBoolSq.lean"
+    },
+    {
+      "id": "crc16",
+      "name": "septentrio::crc16",
+      "phase": 5,
+      "status": "Done - 8 theorems 0 sorry",
+      "lean_file": "lean/FVSquad/Crc16Fold.lean"
+    },
+    {
+      "id": "atmosphere_density",
+      "name": "atmosphere ISA model",
+      "phase": 5,
+      "status": "13 proved + 4 examples + 6 sorry (powf needs Mathlib)",
+      "lean_file": "lean/FVSquad/Atmosphere.lean",
+      "spec_file": "specs/atmosphere_informal.md"
+    },
+    {
+      "id": "commander_arming_fsm",
+      "name": "Commander arming FSM",
+      "phase": 1,
+      "status": "Not started",
+      "lean_file": null
+    }
   ]
 }
