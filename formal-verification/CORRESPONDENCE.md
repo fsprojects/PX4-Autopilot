@@ -4,8 +4,25 @@
 
 ## Last Updated
 
-- **Date**: 2026-04-19 01:05 UTC
+- **Date**: 2026-04-19 00:02 UTC
 - **Commit**: `fe5a32de83`
+
+### Run 50 Review Notes
+
+Run 50 conducted a thorough correspondence audit: all 19 Lean files (23 C++ targets) were
+verified against the current C++ source (`git log --since=2026-04-17` for relevant libs
+returned no changes). All documented correspondences remain accurate.
+
+**`wrapRat_idempotent` — proved by composition**: `WrapAngle.lean` now proves
+`wrapRat_idempotent` by composition (`exact wrapRat_in_range … (wrapRat_ge_lo …)
+(wrapRat_lt_hi …)`), so it carries no `sorry` in its own body. However, it depends
+transitively on the three `sorry`-guarded floor-arithmetic lemmas; Lean 4 marks all
+their dependents as unverified. The 6 `sorry`-guarded theorems in `WrapAngle.lean`
+therefore remain effectively unverified pending Mathlib.
+
+**New in run 49**: `SignFromBoolSq.lean` added — `signFromBool` (**exact** correspondence,
+finite domain) and `sq` (**abstraction**, float NaN and fixed-width overflow omitted).
+Coverage extended to 19 Lean files and 23 C++ targets.
 
 This document describes how each Lean 4 definition in `formal-verification/lean/FVSquad/`
 corresponds to the original C++ source. It records the correspondence level, known
