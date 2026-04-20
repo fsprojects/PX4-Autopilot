@@ -6,8 +6,8 @@
 
 ## Last Updated
 
-- **Date**: 2026-04-19 00:02 UTC
-- **Commit**: `fe5a32de83`
+- **Date**: 2026-04-20 01:04 UTC
+- **Commit**: `3886e5fcbc`
 
 ---
 
@@ -446,6 +446,9 @@ timeline
         Crc16Fold      : buffer_crc16 fold/split formally proved (8 thms + 6 examples, 0 sorry)
         Layer 7        : Protocol Utilities layer added to proof architecture
         Total          : 259 theorems, 20 files, 0 new sorry
+    section Run 54
+        Paper          : conference paper updated — 259 theorems, 20 modules, 24 targets, Crc16Fold in table
+        Report         : REPORT.md timestamp refreshed; InterpolateN count corrected (18→19)
 ```
 
 ---
@@ -476,4 +479,4 @@ timeline
 > *`lake build` verified with Lean 4.29.1. 6 `sorry` remain (WrapAngle wrapRat,
 > all require Mathlib floor arithmetic). 259 theorems across 20 files.*
 > *CORRESPONDENCE.md covers all 20 Lean files (24 C++ targets).*
-> *Run 51: Crc16Fold.lean added (8 theorems + 6 examples, 0 sorry); fold/split property proved for CCITT CRC-16.*
+> *Run 54: Conference paper updated — 259 theorems, 20 modules, 24 targets (Crc16Fold added to table, InterpolateN count corrected).*

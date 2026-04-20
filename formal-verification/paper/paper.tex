@@ -8,6 +8,7 @@
 \usepackage{microtype}
 \usepackage{balance}
 \usepackage{graphicx}
+\usepackage{tcolorbox}
 
 %% ACM metadata suppression for draft
 \setcopyright{none}
@@ -51,7 +52,7 @@
 }
 
 \title{Formal Verification of a UAV Flight Controller's Core Libraries with Lean~4:\\
-       251 Theorems, Two Bugs, Zero Sorry in 19 Modules}
+       259 Theorems, Two Bugs, 6 Sorry in 20 Modules}
 
 \author{Lean Squad}
 \affiliation{
@@ -63,18 +64,20 @@
 \begin{abstract}
 We report a formal verification campaign applied to PX4-Autopilot, an open-source
 UAV flight controller written in C++. Using Lean~4 with its standard library only
-(no Mathlib), we verified 245 theorems across 19 Lean modules covering 23~C++
-targets including signal-processing filters, rate-limiting, piecewise-linear
-interpolation, online statistics, ring buffers, a time-delayed boolean
-state machine, and fundamental arithmetic utilities. All proofs were mechanically checked by \texttt{lake build}. The
-project discovered two genuine implementation bugs through failed proof attempts:
-(1)~\texttt{signNoZero<float>} silently returns~0 for NaN inputs, violating a
-non-zero safety contract, and (2)~\texttt{negate<int16\_t>} is not a global
-involution due to an incorrect \texttt{INT16\_MAX} special case. Six theorems
-in one file remain \texttt{sorry}-guarded, pending floor-arithmetic support
-from Mathlib. We describe the modelling strategy, proof tactics, correspondence
-discipline, and lessons learned in applying interactive theorem proving to a
-production embedded codebase without network access to the Mathlib cache.
+(no Mathlib), we verified 253 theorems fully (6~\texttt{sorry}-guarded) across
+20~Lean modules covering 24~C++ targets including signal-processing filters,
+rate-limiting, piecewise-linear interpolation, online statistics, ring buffers,
+a time-delayed boolean state machine, fundamental arithmetic utilities, and a
+protocol CRC-16 streaming correctness property. All proofs were mechanically
+checked by \texttt{lake build}. The project discovered two genuine implementation
+bugs through failed proof attempts: (1)~\texttt{signNoZero<float>} silently
+returns~0 for NaN inputs, violating a non-zero safety contract, and
+(2)~\texttt{negate<int16\_t>} is not a global involution due to an incorrect
+\texttt{INT16\_MAX} special case. Six theorems in one file remain
+\texttt{sorry}-guarded, pending floor-arithmetic support from Mathlib.
+We describe the modelling strategy, proof tactics, correspondence discipline,
+and lessons learned in applying interactive theorem proving to a production
+embedded codebase without network access to the Mathlib cache.
 \end{abstract}
 
 \begin{CCSXML}
@@ -113,7 +116,7 @@ by \textbf{Lean Squad}, an automated formal verification agent for the
 \texttt{fsprojects/PX4-Autopilot} repository.
 All Lean proofs are mechanically verified by \texttt{lake build}.
 Latest workflow run:
-\url{https://github.com/fsprojects/PX4-Autopilot/actions/runs/24600733577}}
+\url{https://github.com/fsprojects/PX4-Autopilot/actions/runs/24643642717}}
 \end{tcolorbox}
 
 \section{Introduction}
@@ -133,13 +136,13 @@ language with a growing library ecosystem~\cite{mathlib}.
 
 Our contributions are:
 \begin{itemize}
-  \item A formal verification campaign covering \textbf{23~C++ targets with Lean proofs}
-        in 19~Lean modules (24~targets identified overall), yielding \textbf{245~proved
-        theorems} plus 117~concrete examples.
+  \item A formal verification campaign covering \textbf{24~C++ targets with Lean proofs}
+        in 20~Lean modules, yielding \textbf{253~fully proved theorems} (259~stated;
+        6~\texttt{sorry}-guarded in one file) plus 129~concrete examples.
   \item Discovery of \textbf{two genuine implementation bugs} through proof failure,
         with counterexamples mechanically verified by Lean.
   \item A \textbf{correspondence discipline} documenting modelling approximations and
-        their impact on proof validity for all 19 Lean files.
+        their impact on proof validity for all 20 Lean files.
   \item Practical experience with Lean~4 proof automation on embedded C++ in a
         \emph{stdlib-only} setting (no Mathlib, no network access to the package cache).
 \end{itemize}
@@ -205,18 +208,17 @@ We identified FV-amenable targets by reading the codebase and applying these cri
 \texttt{omega}, \texttt{simp}, or \texttt{decide}.
 
 We proceeded in priority order, adding more complex targets (state machines, multi-step
-pipelines) as confidence in the toolchain grew. The final set of 23~identified targets
-spans six categories: (i)~mathematical utilities (\texttt{constrain}, \texttt{signNoZero},
-\texttt{countSetBits}, \texttt{lerp}, \texttt{interpolate}, \texttt{expo},
-\texttt{superexpo}, \texttt{deadzone}, \texttt{negate}, \texttt{signFromBool},
-\texttt{sq}); (ii)~filters (\texttt{AlphaFilter}, \texttt{MedianFilter},
-\texttt{SlewRate}); (iii)~statistics (\texttt{WelfordMean}); (iv)~data structures
-(\texttt{TimestampedRingBuffer}); (v)~multi-component pipelines
+pipelines, protocol algorithms) as confidence in the toolchain grew. The final set of
+24~identified targets spans seven categories: (i)~mathematical utilities (\texttt{constrain},
+\texttt{signNoZero}, \texttt{countSetBits}, \texttt{lerp}, \texttt{interpolate},
+\texttt{expo}, \texttt{superexpo}, \texttt{deadzone}, \texttt{negate},
+\texttt{signFromBool}, \texttt{sq}); (ii)~filters (\texttt{AlphaFilter},
+\texttt{MedianFilter}, \texttt{SlewRate}); (iii)~statistics (\texttt{WelfordMean});
+(iv)~data structures (\texttt{TimestampedRingBuffer}); (v)~multi-component pipelines
 (\texttt{ExpoDeadzone}, \texttt{InterpolateNXY}, \texttt{InterpolateN},
-\texttt{wrap\_pi}); and (vi)~a state machine (\texttt{Hysteresis}).
-All 23~targets now have Lean proofs (19~modules). One additional target
-(\texttt{septentrio::buffer\_crc16} fold property) has an informal specification written
-and is ready for Lean formalisation.
+\texttt{wrap\_pi}); (vi)~a state machine (\texttt{Hysteresis}); and (vii)~a
+protocol utility (\texttt{septentrio::buffer\_crc16}).
+All 24~targets now have Lean proofs (20~modules).
 
 \subsection{Two-Phase Specification}
 
@@ -298,15 +300,15 @@ We applied proof tactics in order of increasing effort:
 
 \subsection{Proof Inventory}
 
-Table~\ref{tab:theorems} summarises the 19~Lean files (23~C++ targets). In total,
-\textbf{251~theorem statements} were made, of which \textbf{245~are fully proved}
+Table~\ref{tab:theorems} summarises the 20~Lean files (24~C++ targets). In total,
+\textbf{259~theorem statements} were made, of which \textbf{253~are fully proved}
 and \textbf{6~remain \texttt{sorry}-guarded} (all in \texttt{WrapAngle.lean},
-requiring Mathlib's \texttt{Int.fract}). Additionally, \textbf{117~concrete
+requiring Mathlib's floor-division lemmas). Additionally, \textbf{129~concrete
 \texttt{example}/\texttt{\#eval} checks} serve as property-based regression tests.
 
 \begin{table}[t]
 \centering
-\caption{Lean 4 verification summary by file (19 files, 23 C++ targets).
+\caption{Lean 4 verification summary by file (20 files, 24 C++ targets).
          ✅~=~all proved; 🔄~=~partial (\texttt{sorry} remain).}
 \label{tab:theorems}
 \small
@@ -320,7 +322,7 @@ Lean file & C++ target & Thms & Sorry & Key properties \\
 \texttt{AlphaFilter}   & \texttt{AlphaFilter::updateCalc.}  & 13 & 0 & No-overshoot, closed form ✅ \\
 \texttt{Interpolate}   & \texttt{interpolate}               & 10 & 0 & Monotone, range ✅ \\
 \texttt{WelfordMean}   & \texttt{WelfordMean::update}       & 11 & 0 & Mean invariant, M2~$\geq0$ ✅ \\
-\texttt{WrapAngle}     & \texttt{wrap\_pi} (int)            & 15 & 6 & Range, idempotent, period 🔄 \\
+\texttt{WrapAngle}     & \texttt{wrap\_pi} (int+rat)        & 15 & 6 & Range, idempotent, period 🔄 \\
 \texttt{Lerp}          & \texttt{lerp}                      & 10 & 0 & Endpoints, range, monotone ✅ \\
 \texttt{Negate}        & \texttt{negate<int16\_t>}          & 13 & 0 & 🐛 Not involution ✅ \\
 \texttt{Expo}          & \texttt{expo}                      & 17 & 0 & Odd, range, fixed pts ✅ \\
@@ -329,11 +331,12 @@ Lean file & C++ target & Thms & Sorry & Key properties \\
 \texttt{SuperExpo}     & \texttt{superexpo}                 & 17 & 0 & Odd, denom~$>0$, range ✅ \\
 \texttt{ExpoDeadzone}  & \texttt{expo+deadzone}             &  9 & 0 & Odd, range, fixed pts ✅ \\
 \texttt{InterpolateNXY}& \texttt{interpolateNXY} (3-pt)     &  9 & 0 & Clamp, continuity, mono ✅ \\
-\texttt{InterpolateN}  & \texttt{interpolateN} (N=2,3)      & 18 & 0 & Node exact, range, mono ✅ \\
+\texttt{InterpolateN}  & \texttt{interpolateN} (N=2,3)      & 19 & 0 & Node exact, range, mono ✅ \\
 \texttt{Hysteresis}    & \texttt{Hysteresis}                & 20 & 0 & Dwell, commit, cancel ✅ \\
 \texttt{SignFromBoolSq}& \texttt{signFromBool}, \texttt{sq} & 17 & 0 & Range $\{-1,1\}$, non-neg, even ✅ \\
+\texttt{Crc16Fold}     & \texttt{buffer\_crc16}             &  8 & 0 & Fold/split, streaming CRC ✅ \\
 \hline
-\textbf{Total}         &                                    & \textbf{251} & \textbf{6} & \\
+\textbf{Total}         &                                    & \textbf{259} & \textbf{6} & \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -392,6 +395,20 @@ theorem hysteresis_dwell_lb (h : HysteresisState) (t : Nat)
 \end{lstlisting}
 This is the strongest property proved in the campaign, involving case analysis over
 Boolean state transitions and natural-number arithmetic about time differences.
+
+\paragraph{CRC-16 fold/split theorem.}
+The \texttt{septentrio::buffer\_crc16} function computes a CCITT-16 checksum over
+a byte buffer. A key property for streaming protocols is that the CRC of a
+concatenated buffer equals the incremental continuation from the CRC of the prefix:
+\begin{lstlisting}[caption=CRC-16 fold/split property]
+theorem crc16_append (a b : List UInt8) :
+    crc16 (a ++ b) = crc16Continue (crc16 a) b := by
+  simp [crc16, crc16Continue, List.foldl_append]
+\end{lstlisting}
+This one-line proof (by definitional unfolding and \texttt{List.foldl\_append})
+confirms that \texttt{crc16Continue} is exactly the right interface for packet
+reassembly. The proof also validates the CCITT polynomial (0x1021) at a concrete
+byte value: \texttt{crc16 [0xFF] = 0x1EF0} is confirmed by \texttt{native\_decide}.
 
 \subsection{Bugs Found}
 \label{sec:bugs}
@@ -551,21 +568,18 @@ cannot silently break in a later run.
 \label{sec:conclusion}
 
 We have presented a formal verification campaign for PX4-Autopilot's core utility
-libraries using Lean~4. Across 19~Lean modules and 23~C++ targets, we proved
-245~theorems covering rate limiting, interpolation, filtering, statistics, data
-structures, and a time-delayed state machine. The campaign discovered two genuine
-implementation bugs, both verified by mechanically-checked counterexamples. The
-project demonstrates that interactive theorem proving can be usefully applied to
-production embedded C++ at the library level, even under significant toolchain
-constraints.
+libraries using Lean~4. Across 20~Lean modules and 24~C++ targets, we proved
+253~theorems covering rate limiting, interpolation, filtering, statistics, data
+structures, a time-delayed state machine, and a protocol CRC streaming property.
+The campaign discovered two genuine implementation bugs, both verified by
+mechanically-checked counterexamples. The project demonstrates that interactive
+theorem proving can be usefully applied to production embedded C++ at the library
+level, even under significant toolchain constraints.
 
 Future work includes: resolving the 6~remaining sorrys in \texttt{WrapAngle.lean}
-once Mathlib becomes available; formalising the \texttt{septentrio::buffer\_crc16}
-fold property (informal spec complete), whose key theorem follows trivially from
-\texttt{List.foldl\_append}; and extending the pipeline to phase-1 targets
-(atmospheric density model, Commander arming FSM); and exploring formal correspondence
-proofs from the Lean model to the C++ source using Aeneas~\cite{aeneas} extraction
-once the toolchain is available for C++.
+once Mathlib becomes available; verifying the atmospheric density model
+(\texttt{src/lib/atmosphere/}); and formalising the Commander arming finite-state
+machine (\texttt{src/modules/commander/}) — the most complex remaining target.
 
 \begin{acks}
 This work was carried out by the \emph{Lean Squad} automated formal verification
