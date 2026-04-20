@@ -1,6 +1,6 @@
 {
-  "run": 54,
-  "last_updated": "2026-04-20T01:04:00Z",
+  "run": 55,
+  "last_updated": "2026-04-20T09:00:00Z",
   "lean_version": "leanprover/lean4:v4.29.0",
   "lake_build_status": "passed",
   "totals": {
@@ -16,27 +16,136 @@
     "notes": "WrapAngle: 6 rational wrap theorems need Mathlib floor arithmetic (Int.fract, Int.floor_nonneg). All other 19 files are sorry-free."
   },
   "open_prs": [],
-  "merged_prs": [49, 50],
+  "merged_prs": [
+    49,
+    50
+  ],
   "bugs_found": [
-    {"target": "SignNoZero", "issue": 12, "description": "NaN safety violation in signNoZero<float> — returns 0 for NaN, violating ne_zero contract"},
-    {"target": "Negate", "issue": 21, "description": "negate<int16_t> involution error — INT16_MAX special case incorrect, negate(negate(-32767))=-32768"}
+    {
+      "target": "SignNoZero",
+      "issue": 12,
+      "description": "NaN safety violation in signNoZero<float> \u2014 returns 0 for NaN, violating ne_zero contract"
+    },
+    {
+      "target": "Negate",
+      "issue": 21,
+      "description": "negate<int16_t> involution error \u2014 INT16_MAX special case incorrect, negate(negate(-32767))=-32768"
+    }
   ],
   "targets": [
-    {"id": 1, "name": "SquaredError", "file": "lean/FVSquad/SquaredError.lean", "phase": 5, "status": "proved", "note": "contained in MathFunctions.lean"},
-    {"id": 2, "name": "Expo", "file": "lean/FVSquad/Expo.lean", "phase": 5, "status": "proved"},
-    {"id": 3, "name": "MathUtilClip", "file": "lean/FVSquad/MathFunctions.lean", "phase": 5, "status": "proved"},
-    {"id": 4, "name": "MathUtilSign", "file": "lean/FVSquad/MathFunctions.lean", "phase": 5, "status": "proved", "bug_found": true},
-    {"id": 5, "name": "Negate", "file": "lean/FVSquad/Negate.lean", "phase": 5, "status": "proved", "bug_found": true},
-    {"id": 6, "name": "WrapAngle", "file": "lean/FVSquad/WrapAngle.lean", "phase": 5, "status": "partial", "sorry": 6},
-    {"id": 7, "name": "LowPassFilter", "file": "lean/FVSquad/AlphaFilter.lean", "phase": 5, "status": "proved"},
-    {"id": 8, "name": "AlphaFilter", "file": "lean/FVSquad/AlphaFilter.lean", "phase": 5, "status": "proved"},
-    {"id": 9, "name": "RingBuffer", "file": "lean/FVSquad/RingBuffer.lean", "phase": 5, "status": "proved"},
-    {"id": 10, "name": "Hysteresis", "file": "lean/FVSquad/Hysteresis.lean", "phase": 5, "status": "proved"},
-    {"id": 11, "name": "EKF2RingBuffer", "file": "lean/FVSquad/EKF2RingBuffer.lean", "phase": 5, "status": "proved"},
-    {"id": 12, "name": "Crc16Fold", "file": "lean/FVSquad/Crc16Fold.lean", "phase": 5, "status": "proved", "notes": "buffer_crc16 fold/split property. crc16_append: streaming CRC correctness proved via List.foldl_append."},
-    {"id": 13, "name": "SignFromBoolSq", "file": "lean/FVSquad/SignFromBoolSq.lean", "phase": 5, "status": "proved"},
-    {"id": 23, "name": "Atmosphere", "file": null, "phase": 2, "status": "informal_spec_planned", "notes": "ISA standard atmosphere model. density_mono_temp: needs inv_lt_inv from Mathlib. Planned but not yet started formally."},
-    {"id": 24, "name": "CommanderArmingFSM", "file": null, "phase": 2, "status": "informal_spec_written", "notes": "Binary DISARMED/ARMED FSM. arm()/disarm() quasi-pure. 10 target theorems planned. FV approach: ArmState inductive, boolean condition abstraction, proofs by decide/cases. Next: write Lean spec (Task 3)."}
+    {
+      "id": 1,
+      "name": "SquaredError",
+      "file": "lean/FVSquad/SquaredError.lean",
+      "phase": 5,
+      "status": "proved",
+      "note": "contained in MathFunctions.lean"
+    },
+    {
+      "id": 2,
+      "name": "Expo",
+      "file": "lean/FVSquad/Expo.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 3,
+      "name": "MathUtilClip",
+      "file": "lean/FVSquad/MathFunctions.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 4,
+      "name": "MathUtilSign",
+      "file": "lean/FVSquad/MathFunctions.lean",
+      "phase": 5,
+      "status": "proved",
+      "bug_found": true
+    },
+    {
+      "id": 5,
+      "name": "Negate",
+      "file": "lean/FVSquad/Negate.lean",
+      "phase": 5,
+      "status": "proved",
+      "bug_found": true
+    },
+    {
+      "id": 6,
+      "name": "WrapAngle",
+      "file": "lean/FVSquad/WrapAngle.lean",
+      "phase": 5,
+      "status": "partial",
+      "sorry": 6
+    },
+    {
+      "id": 7,
+      "name": "LowPassFilter",
+      "file": "lean/FVSquad/AlphaFilter.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 8,
+      "name": "AlphaFilter",
+      "file": "lean/FVSquad/AlphaFilter.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 9,
+      "name": "RingBuffer",
+      "file": "lean/FVSquad/RingBuffer.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 10,
+      "name": "Hysteresis",
+      "file": "lean/FVSquad/Hysteresis.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 11,
+      "name": "EKF2RingBuffer",
+      "file": "lean/FVSquad/EKF2RingBuffer.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 12,
+      "name": "Crc16Fold",
+      "file": "lean/FVSquad/Crc16Fold.lean",
+      "phase": 5,
+      "status": "proved",
+      "notes": "buffer_crc16 fold/split property. crc16_append: streaming CRC correctness proved via List.foldl_append."
+    },
+    {
+      "id": 13,
+      "name": "SignFromBoolSq",
+      "file": "lean/FVSquad/SignFromBoolSq.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 23,
+      "name": "Atmosphere",
+      "file": null,
+      "phase": 2,
+      "status": "informal_spec_written",
+      "notes": "ISA standard atmosphere model. density_mono_temp: needs inv_lt_inv from Mathlib. Planned but not yet started formally.",
+      "note": "atmosphere_informal.md written: getDensityFromPressureAndTemp (ideal gas), getStandardTemperatureAtAltitude (ISA lapse), getPressureFromAltitude and getAltitudeFromPressure (deferred, need Mathlib rpow)"
+    },
+    {
+      "id": 24,
+      "name": "CommanderArmingFSM",
+      "file": null,
+      "phase": 2,
+      "status": "informal_spec_written",
+      "notes": "Binary DISARMED/ARMED FSM. arm()/disarm() quasi-pure. 10 target theorems planned. FV approach: ArmState inductive, boolean condition abstraction, proofs by decide/cases. Next: write Lean spec (Task 3)."
+    }
   ],
   "discoveries": [
     "density_mono_temp sorry: Rat.inv_lt_inv_of_lt does not exist in stdlib v4.29.0; needs Mathlib.Algebra.Order.Field.Basic",
@@ -45,7 +154,7 @@
     "Rat.add_lt_add_right adds on right; for left-add use calc with Rat.add_comm",
     "Rat.neg_mul exists; bare neg_mul does not in root namespace",
     "Commander FSM uses Hysteresis for auto-disarm; Hysteresis.lean already covers this sub-component",
-    "Sea-level density from ISA: ~1.2249 kg/m3 (Lean exact) vs 1.225f (C++ constant) — minor rounding discrepancy in source code itself",
+    "Sea-level density from ISA: ~1.2249 kg/m3 (Lean exact) vs 1.225f (C++ constant) \u2014 minor rounding discrepancy in source code itself",
     "crc16_append proof: List.foldl_append + simp/simp only closes all goals in one step",
     "WrapAngle sorry: 6 theorem bodies use sorry (rational wrap, floor-dependent); integer wrap (wrapInt) is fully proved"
   ],
@@ -66,5 +175,16 @@
     "files": 20
   },
   "mathlib_status": "blocked_403_cache_proxy",
-  "notes": "Run 54: Tasks 10+11 selected. Updated paper.tex (Crc16Fold in table, 259 theorems, 20 modules, title fix 'Zero Sorry'→'6 Sorry', new CRC paragraph, tcolorbox package) and REPORT.md (run54 timeline entry). No new Lean files added. Next targets: CommanderArmingFSM (Task 3) and Atmosphere.lean (Task 3/4). Both need Lean spec work. WrapAngle sorry still blocked on Mathlib floor."
+  "notes": "Run 54: Tasks 10+11 selected. Updated paper.tex (Crc16Fold in table, 259 theorems, 20 modules, title fix 'Zero Sorry'\u2192'6 Sorry', new CRC paragraph, tcolorbox package) and REPORT.md (run54 timeline entry). No new Lean files added. Next targets: CommanderArmingFSM (Task 3) and Atmosphere.lean (Task 3/4). Both need Lean spec work. WrapAngle sorry still blocked on Mathlib floor.",
+  "correspondence_runs": [
+    {
+      "run": 55,
+      "added_sections": [
+        "Hysteresis.lean"
+      ],
+      "files_audited": 20,
+      "targets_covered": 26,
+      "drift_detected": false
+    }
+  ]
 }
