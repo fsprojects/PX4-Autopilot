@@ -1,49 +1,156 @@
 {
-  "run": 57,
-  "last_updated": "2026-04-21T01:00:00Z",
+  "run": 58,
+  "last_updated": "2026-04-21T09:00:00Z",
   "lean_version": "leanprover/lean4:v4.29.0",
   "lake_build_status": "passed",
   "totals": {
-    "theorems_proved": 267,
-    "theorems_total": 273,
+    "theorems_proved": 279,
+    "theorems_total": 288,
     "examples": 129,
-    "sorry_count": 6,
-    "lean_files": 21,
+    "sorry_count": 9,
+    "lean_files": 22,
     "targets": 24
   },
   "sorry_locations": {
     "WrapAngle.lean": 6,
-    "notes": "WrapAngle: 6 rational wrap theorems need Mathlib floor arithmetic. All other 20 files are sorry-free."
+    "notes": "WrapAngle: 6 rational wrap theorems need Mathlib floor arithmetic. Atmosphere: 3 sorry (densityRat_anti_mono_temp, tempAtAlt_lapse_rate, tempAtAlt_strict_anti) need mul_lt_mul_of_neg_left / ring. All other 21 files are sorry-free.",
+    "Atmosphere.lean": 3
   },
-  "open_prs": [55],
-  "merged_prs": [49, 50, 52, 53, 54],
+  "open_prs": [
+    55
+  ],
+  "merged_prs": [
+    49,
+    50,
+    52,
+    53,
+    54
+  ],
   "bugs_found": [
     {
       "target": "SignNoZero",
       "issue": 12,
-      "description": "NaN safety violation in signNoZero<float> — returns 0 for NaN, violating ne_zero contract"
+      "description": "NaN safety violation in signNoZero<float> \u2014 returns 0 for NaN, violating ne_zero contract"
     },
     {
       "target": "Negate",
       "issue": 21,
-      "description": "negate<int16_t> involution error — INT16_MAX special case incorrect, negate(negate(-32767))=-32768"
+      "description": "negate<int16_t> involution error \u2014 INT16_MAX special case incorrect, negate(negate(-32767))=-32768"
     }
   ],
   "targets": [
-    {"id": 1, "name": "SquaredError", "file": "lean/FVSquad/MathFunctions.lean", "phase": 5, "status": "proved"},
-    {"id": 2, "name": "Expo", "file": "lean/FVSquad/Expo.lean", "phase": 5, "status": "proved"},
-    {"id": 3, "name": "MathUtilClip", "file": "lean/FVSquad/MathFunctions.lean", "phase": 5, "status": "proved"},
-    {"id": 4, "name": "MathUtilSign", "file": "lean/FVSquad/MathFunctions.lean", "phase": 5, "status": "proved", "bug_found": true},
-    {"id": 5, "name": "Negate", "file": "lean/FVSquad/Negate.lean", "phase": 5, "status": "proved", "bug_found": true},
-    {"id": 6, "name": "WrapAngle", "file": "lean/FVSquad/WrapAngle.lean", "phase": 5, "status": "partial", "sorry": 6},
-    {"id": 7, "name": "LowPassFilter", "file": "lean/FVSquad/AlphaFilter.lean", "phase": 5, "status": "proved"},
-    {"id": 8, "name": "AlphaFilter", "file": "lean/FVSquad/AlphaFilter.lean", "phase": 5, "status": "proved"},
-    {"id": 9, "name": "RingBuffer", "file": "lean/FVSquad/RingBuffer.lean", "phase": 5, "status": "proved"},
-    {"id": 10, "name": "Hysteresis", "file": "lean/FVSquad/Hysteresis.lean", "phase": 5, "status": "proved"},
-    {"id": 12, "name": "Crc16Fold", "file": "lean/FVSquad/Crc16Fold.lean", "phase": 5, "status": "proved", "notes": "buffer_crc16 fold/split property. crc16_append: streaming CRC correctness proved via List.foldl_append."},
-    {"id": 13, "name": "SignFromBoolSq", "file": "lean/FVSquad/SignFromBoolSq.lean", "phase": 5, "status": "proved"},
-    {"id": 23, "name": "Atmosphere", "file": null, "phase": 2, "status": "informal_spec_written", "notes": "ISA standard atmosphere model. atmosphere_informal.md written (run55). getDensityFromPressureAndTemp + getStandardTemperatureAtAltitude ready for Lean. getPressureFromAltitude deferred (needs rpow)."},
-    {"id": 24, "name": "CommanderArmingFSM", "file": "formal-verification/lean/FVSquad/CommanderArming.lean", "phase": 5, "status": "proved", "notes": "20 theorems, 0 sorry. armFSM/disarmFSM pure model. 9-bool ArmConditions. arm_denied_when_calibrating, forced_disarm_always_succeeds, trichotomy, sequential. Correspondence: abstraction. CORRESPONDENCE.md updated run57.", "theorems_proved": 20, "sorry": 0}
+    {
+      "id": 1,
+      "name": "SquaredError",
+      "file": "lean/FVSquad/MathFunctions.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 2,
+      "name": "Expo",
+      "file": "lean/FVSquad/Expo.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 3,
+      "name": "MathUtilClip",
+      "file": "lean/FVSquad/MathFunctions.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 4,
+      "name": "MathUtilSign",
+      "file": "lean/FVSquad/MathFunctions.lean",
+      "phase": 5,
+      "status": "proved",
+      "bug_found": true
+    },
+    {
+      "id": 5,
+      "name": "Negate",
+      "file": "lean/FVSquad/Negate.lean",
+      "phase": 5,
+      "status": "proved",
+      "bug_found": true
+    },
+    {
+      "id": 6,
+      "name": "WrapAngle",
+      "file": "lean/FVSquad/WrapAngle.lean",
+      "phase": 5,
+      "status": "partial",
+      "sorry": 6
+    },
+    {
+      "id": 7,
+      "name": "LowPassFilter",
+      "file": "lean/FVSquad/AlphaFilter.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 8,
+      "name": "AlphaFilter",
+      "file": "lean/FVSquad/AlphaFilter.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 9,
+      "name": "RingBuffer",
+      "file": "lean/FVSquad/RingBuffer.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 10,
+      "name": "Hysteresis",
+      "file": "lean/FVSquad/Hysteresis.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 12,
+      "name": "Crc16Fold",
+      "file": "lean/FVSquad/Crc16Fold.lean",
+      "phase": 5,
+      "status": "proved",
+      "notes": "buffer_crc16 fold/split property. crc16_append: streaming CRC correctness proved via List.foldl_append."
+    },
+    {
+      "id": 13,
+      "name": "SignFromBoolSq",
+      "file": "lean/FVSquad/SignFromBoolSq.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 23,
+      "name": "Atmosphere",
+      "file": "lean/FVSquad/Atmosphere.lean",
+      "phase": 3,
+      "status": "lean_spec",
+      "notes": "densityRat (ideal gas law), tempAtAltRat (ISA lapse rate). 3 sorry: anti-monotonicity in temp, lapse rate equality, strict anti-monotonicity. Exact rational model confirmed by correspondence tests.",
+      "theorems": {
+        "proved": 12,
+        "sorry": 3
+      },
+      "correspondence_tests": "tests/atmosphere/ (26/26 pass, max_rel_err=1.9e-16)",
+      "open_pr": "run58"
+    },
+    {
+      "id": 24,
+      "name": "CommanderArmingFSM",
+      "file": "formal-verification/lean/FVSquad/CommanderArming.lean",
+      "phase": 5,
+      "status": "proved",
+      "notes": "20 theorems, 0 sorry. armFSM/disarmFSM pure model. 9-bool ArmConditions. arm_denied_when_calibrating, forced_disarm_always_succeeds, trichotomy, sequential. Correspondence: abstraction. CORRESPONDENCE.md updated run57.",
+      "theorems_proved": 20,
+      "sorry": 0
+    }
   ],
   "discoveries": [
     "density_mono_temp sorry: Rat.inv_lt_inv_of_lt does not exist in stdlib v4.29.0; needs Mathlib",
@@ -58,7 +165,13 @@
     "theorems_at_last_update": 259,
     "current_theorems": 273,
     "stale_since": "run49",
-    "stale_items": ["SignFromBoolSq (17 theorems)", "Crc16Fold (8 theorems)", "CommanderArming (20 theorems)", "theorem count in abstract", "target count"],
+    "stale_items": [
+      "SignFromBoolSq (17 theorems)",
+      "Crc16Fold (8 theorems)",
+      "CommanderArming (20 theorems)",
+      "theorem count in abstract",
+      "target count"
+    ],
     "pdf_compiled": false,
     "pdf_note": "LaTeX unavailable (sudo blocked). paper.tex is correct source."
   },
@@ -72,15 +185,54 @@
   "mathlib_status": "blocked_403_cache_proxy",
   "notes": "Run 57: Tasks 7+6. Updated CRITIQUE.md (Overall Assessment: 21 files/273 theorems, added SignFromBoolSq/Crc16Fold/CommanderArming rows to theorem table, marked completed recommendations, new positive findings 16-18, updated paper review). Updated CORRESPONDENCE.md (fixed duplicate headers, added full CommanderArming section, updated summary to 21 files/27 targets). Next: Task 10 (REPORT.md update) or Task 11 (paper update) are high priority. Atmosphere (Task 3/4/5) is next new target.",
   "correspondence_runs": [
-    {"run": 55, "added_sections": ["Hysteresis.lean"], "files_audited": 20, "targets_covered": 26, "drift_detected": false},
-    {"run": 57, "added_sections": ["CommanderArming.lean"], "files_audited": 21, "targets_covered": 27, "drift_detected": false}
+    {
+      "run": 55,
+      "added_sections": [
+        "Hysteresis.lean"
+      ],
+      "files_audited": 20,
+      "targets_covered": 26,
+      "drift_detected": false
+    },
+    {
+      "run": 57,
+      "added_sections": [
+        "CommanderArming.lean"
+      ],
+      "files_audited": 21,
+      "targets_covered": 27,
+      "drift_detected": false
+    }
   ],
   "run_history": [
-    {"run": 57, "date": "2026-04-21", "task": "Tasks 7+6: CRITIQUE.md + CORRESPONDENCE.md updates for run49-56 additions", "new_theorems": 0, "new_files": [], "sorry_added": 0, "pr_branch": "lean-squad/critique-correspondence-run57-24698475184"},
-    {"run": 56, "date": "2026-04-20", "task": "Tasks 3+4+5: CommanderArming Lean spec+impl+proofs", "new_theorems": 20, "new_files": ["CommanderArming.lean"], "sorry_added": 0}
+    {
+      "run": 57,
+      "date": "2026-04-21",
+      "task": "Tasks 7+6: CRITIQUE.md + CORRESPONDENCE.md updates for run49-56 additions",
+      "new_theorems": 0,
+      "new_files": [],
+      "sorry_added": 0,
+      "pr_branch": "lean-squad/critique-correspondence-run57-24698475184"
+    },
+    {
+      "run": 56,
+      "date": "2026-04-20",
+      "task": "Tasks 3+4+5: CommanderArming Lean spec+impl+proofs",
+      "new_theorems": 20,
+      "new_files": [
+        "CommanderArming.lean"
+      ],
+      "sorry_added": 0
+    }
   ],
   "technical_notes": [
-    {"run": 57, "note": "CRITIQUE.md: proved theorems table now has rows for SignFromBoolSq, Crc16Fold, CommanderArming. Recommendations 6-9 marked done."},
-    {"run": 56, "note": "split at h FAILS for Prod.snd projections wrapping if-then-else. Use rcases Bool.eq_false_or_eq_true on each Bool field to generate concrete hypotheses, then simp_all closes trivially."}
+    {
+      "run": 57,
+      "note": "CRITIQUE.md: proved theorems table now has rows for SignFromBoolSq, Crc16Fold, CommanderArming. Recommendations 6-9 marked done."
+    },
+    {
+      "run": 56,
+      "note": "split at h FAILS for Prod.snd projections wrapping if-then-else. Use rcases Bool.eq_false_or_eq_true on each Bool field to generate concrete hypotheses, then simp_all closes trivially."
+    }
   ]
 }
