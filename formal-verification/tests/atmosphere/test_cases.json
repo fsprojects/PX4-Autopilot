@@ -1,0 +1,30 @@
+{
+  "description": "Test cases for PX4 atmosphere library correspondence validation",
+  "source": "src/lib/atmosphere/atmosphere.{h,cpp}",
+  "lean_model": "formal-verification/lean/FVSquad/Atmosphere.lean",
+  "density_cases": [
+    {"pressure_pa": 101325.0, "temperature_celsius": 15.0,  "note": "ISA sea-level standard"},
+    {"pressure_pa": 101325.0, "temperature_celsius":  0.0,  "note": "0 celsius SL"},
+    {"pressure_pa": 101325.0, "temperature_celsius": 30.0,  "note": "hot day"},
+    {"pressure_pa":  89875.0, "temperature_celsius":  8.5,  "note": "~1000 m ISA"},
+    {"pressure_pa":  54048.0, "temperature_celsius": -17.5, "note": "~5000 m ISA"},
+    {"pressure_pa":  22632.0, "temperature_celsius": -56.5, "note": "~11000 m ISA (tropopause)"},
+    {"pressure_pa": 120000.0, "temperature_celsius": 40.0,  "note": "extreme hot/high-pressure"},
+    {"pressure_pa":  10000.0, "temperature_celsius": -60.0, "note": "stratosphere approx"},
+    {"pressure_pa":    500.0, "temperature_celsius": -20.0, "note": "low pressure, cold"},
+    {"pressure_pa": 101325.0, "temperature_celsius": -50.0, "note": "very cold at SL pressure"},
+    {"pressure_pa":  50000.0, "temperature_celsius":  25.0, "note": "half pressure, warm"}
+  ],
+  "temperature_cases": [
+    {"altitude_m":     0.0, "note": "sea level"},
+    {"altitude_m":  1000.0, "note": "1 km"},
+    {"altitude_m":  2000.0, "note": "2 km"},
+    {"altitude_m":  5000.0, "note": "5 km"},
+    {"altitude_m":  8000.0, "note": "8 km"},
+    {"altitude_m": 10000.0, "note": "10 km"},
+    {"altitude_m": 11000.0, "note": "tropopause (11 km)"},
+    {"altitude_m":  -420.0, "note": "Dead Sea (negative altitude)"},
+    {"altitude_m": 15000.0, "note": "stratosphere extrapolation (outside ISA validity)"},
+    {"altitude_m":   500.0, "note": "500 m"}
+  ]
+}
