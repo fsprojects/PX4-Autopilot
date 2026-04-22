@@ -1,312 +1,142 @@
 {
-  "run": 60,
-  "last_updated": "2026-04-22T01:00:00Z",
+  "run": 62,
+  "last_updated": "2026-04-22T16:45:00Z",
   "lean_version": "leanprover/lean4:v4.29.0",
   "lake_build_status": "passed",
   "totals": {
-    "theorems_proved": 314,
-    "theorems_total": 323,
+    "theorems_proved": 326,
+    "theorems_total": 338,
     "examples": 141,
-    "sorry_count": 9,
-    "lean_files": 23,
+    "sorry_count": 12,
+    "lean_files": 24,
     "targets": 27
   },
   "sorry_locations": {
     "WrapAngle.lean": 6,
-    "notes": "WrapAngle: 6 rational wrap theorems need Mathlib floor arithmetic. Atmosphere: 3 sorry (densityRat_anti_mono_temp, tempAtAlt_lapse_rate, tempAtAlt_strict_anti) need mul_lt_mul_of_neg_left / ring. All other 21 files are sorry-free.",
-    "Atmosphere.lean": 3
+    "Atmosphere.lean": 3,
+    "SqrtLinear.lean": 3,
+    "notes": "WrapAngle: 6 rational wrap theorems need Mathlib floor arithmetic. Atmosphere: 3 sorry (densityRat_anti_mono_temp, tempAtAlt_lapse_rate, tempAtAlt_strict_anti). SqrtLinear: 3 sorry (sqrtLinear_zero, sqrtLinear_sqrt_nonneg, sqrtLinear_sqrt_lt_one) need Real.sqrt from Mathlib. All other 21 files are sorry-free."
   },
   "open_prs": [
-    "lean-squad/research-correspondence-run60-24754498980"
+    "lean-squad/sqrtlinear-spec-impl-run62-24790320420"
   ],
-  "merged_prs": [
-    49,
-    50,
-    52,
-    53,
-    54,
-    55,
-    56,
-    57,
-    58,
-    59
-  ],
+  "merged_prs": [49, 50, 52, 53, 54, 55, 56, 57, 58, 59],
   "bugs_found": [
     {
       "target": "SignNoZero",
       "issue": 12,
-      "description": "NaN safety violation in signNoZero<float> \u2014 returns 0 for NaN, violating ne_zero contract"
+      "description": "NaN safety violation in signNoZero<float> — returns 0 for NaN, violating ne_zero contract"
     },
     {
       "target": "Negate",
       "issue": 21,
-      "description": "negate<int16_t> involution error \u2014 INT16_MAX special case incorrect, negate(negate(-32767))=-32768"
+      "description": "negate<int16_t> involution error — INT16_MAX special case incorrect, negate(negate(-32767))=-32768"
     },
     {
       "target": "ObstacleMath::wrap_bin",
       "issue": null,
-      "description": "LATENT BUG (unconfirmed by FV): wrap_bin(bin, n) returns negative for bin <= -n; (bin + bin_count) still negative, C++ % yields negative result; callers use result as array index => UB"
+      "description": "LATENT BUG (confirmed by FV): wrap_bin(bin, n) returns negative for bin <= -n; C++ truncation mod of negative input yields negative result; callers use result as array index => UB"
     }
   ],
   "targets": [
+    {"id": 1, "name": "SquaredError", "file": "lean/FVSquad/MathFunctions.lean", "phase": 5, "status": "proved"},
+    {"id": 2, "name": "Expo", "file": "lean/FVSquad/Expo.lean", "phase": 5, "status": "proved"},
+    {"id": 3, "name": "MathUtilClip", "file": "lean/FVSquad/MathFunctions.lean", "phase": 5, "status": "proved"},
+    {"id": 4, "name": "MathUtilSign", "file": "lean/FVSquad/MathFunctions.lean", "phase": 5, "status": "proved", "bug_found": true},
+    {"id": 5, "name": "Negate", "file": "lean/FVSquad/Negate.lean", "phase": 5, "status": "proved", "bug_found": true},
+    {"id": 6, "name": "WrapAngle", "file": "lean/FVSquad/WrapAngle.lean", "phase": 5, "status": "partial", "sorry": 6},
+    {"id": 7, "name": "LowPassFilter", "file": "lean/FVSquad/AlphaFilter.lean", "phase": 5, "status": "proved"},
+    {"id": 8, "name": "AlphaFilter", "file": "lean/FVSquad/AlphaFilter.lean", "phase": 5, "status": "proved"},
+    {"id": 9, "name": "RingBuffer", "file": "lean/FVSquad/RingBuffer.lean", "phase": 5, "status": "proved"},
+    {"id": 10, "name": "Hysteresis", "file": "lean/FVSquad/Hysteresis.lean", "phase": 5, "status": "proved"},
+    {"id": 12, "name": "Crc16Fold", "file": "lean/FVSquad/Crc16Fold.lean", "phase": 5, "status": "proved"},
+    {"id": 13, "name": "SignFromBoolSq", "file": "lean/FVSquad/SignFromBoolSq.lean", "phase": 5, "status": "proved"},
     {
-      "id": 1,
-      "name": "SquaredError",
-      "file": "lean/FVSquad/MathFunctions.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 2,
-      "name": "Expo",
-      "file": "lean/FVSquad/Expo.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 3,
-      "name": "MathUtilClip",
-      "file": "lean/FVSquad/MathFunctions.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 4,
-      "name": "MathUtilSign",
-      "file": "lean/FVSquad/MathFunctions.lean",
-      "phase": 5,
-      "status": "proved",
-      "bug_found": true
-    },
-    {
-      "id": 5,
-      "name": "Negate",
-      "file": "lean/FVSquad/Negate.lean",
-      "phase": 5,
-      "status": "proved",
-      "bug_found": true
-    },
-    {
-      "id": 6,
-      "name": "WrapAngle",
-      "file": "lean/FVSquad/WrapAngle.lean",
-      "phase": 5,
-      "status": "partial",
-      "sorry": 6
-    },
-    {
-      "id": 7,
-      "name": "LowPassFilter",
-      "file": "lean/FVSquad/AlphaFilter.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 8,
-      "name": "AlphaFilter",
-      "file": "lean/FVSquad/AlphaFilter.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 9,
-      "name": "RingBuffer",
-      "file": "lean/FVSquad/RingBuffer.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 10,
-      "name": "Hysteresis",
-      "file": "lean/FVSquad/Hysteresis.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 12,
-      "name": "Crc16Fold",
-      "file": "lean/FVSquad/Crc16Fold.lean",
-      "phase": 5,
-      "status": "proved",
-      "notes": "buffer_crc16 fold/split property. crc16_append: streaming CRC correctness proved via List.foldl_append."
-    },
-    {
-      "id": 13,
-      "name": "SignFromBoolSq",
-      "file": "lean/FVSquad/SignFromBoolSq.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 23,
-      "name": "Atmosphere",
-      "file": "lean/FVSquad/Atmosphere.lean",
-      "phase": 3,
-      "status": "lean_spec",
-      "notes": "densityRat (ideal gas law), tempAtAltRat (ISA lapse rate). 3 sorry: anti-monotonicity in temp, lapse rate equality, strict anti-monotonicity. Exact rational model confirmed by correspondence tests.",
-      "theorems": {
-        "proved": 12,
-        "sorry": 3
-      },
+      "id": 23, "name": "Atmosphere", "file": "lean/FVSquad/Atmosphere.lean", "phase": 3, "status": "lean_spec",
+      "notes": "densityRat (ideal gas law), tempAtAltRat (ISA lapse rate). 3 sorry. Correspondence tests: tests/atmosphere/ (26/26 pass)",
+      "theorems": {"proved": 12, "sorry": 3},
       "correspondence_tests": "tests/atmosphere/ (26/26 pass, max_rel_err=1.9e-16)"
     },
     {
-      "id": 24,
-      "name": "CommanderArmingFSM",
-      "file": "formal-verification/lean/FVSquad/CommanderArming.lean",
-      "phase": 5,
-      "status": "proved",
-      "notes": "20 theorems, 0 sorry. armFSM/disarmFSM pure model. 9-bool ArmConditions. arm_denied_when_calibrating, forced_disarm_always_succeeds, trichotomy, sequential. Correspondence: abstraction. CORRESPONDENCE.md dedicated section added run60.",
-      "theorems_proved": 20,
-      "sorry": 0
+      "id": 24, "name": "CommanderArmingFSM", "file": "formal-verification/lean/FVSquad/CommanderArming.lean",
+      "phase": 5, "status": "proved",
+      "notes": "20 theorems, 0 sorry. armFSM/disarmFSM pure model.",
+      "theorems_proved": 20, "sorry": 0
     },
     {
-      "id": 25,
-      "name": "ObstacleMathWrapBin",
-      "file": null,
-      "phase": 5,
-      "status": "research",
-      "notes": "Fully proved. 20 theorems, 0 sorry. Latent C++ truncation bug confirmed by wrapBinCpp_bug_general.",
-      "priority": "high",
-      "lean_file": "FVSquad/WrapBin.lean",
-      "theorems": 20,
-      "sorry": 0
+      "id": 25, "name": "ObstacleMathWrapBin", "lean_file": "FVSquad/WrapBin.lean",
+      "phase": 5, "status": "proved",
+      "notes": "20 theorems, 0 sorry. Latent C++ truncation bug confirmed by wrapBinCpp_bug_general.",
+      "theorems": 20, "sorry": 0
     },
     {
-      "id": 26,
-      "name": "SqrtLinear",
-      "file": null,
-      "phase": 1,
-      "status": "research",
-      "notes": "Piecewise: 0 for x<0, sqrt(x) for 0<=x<1, x for x>=1. Provable: zero/identity branches, boundary at x=1, monotone x>=1. Sqrt branch: sorry (needs Real.sqrt from Mathlib).",
-      "priority": "medium"
+      "id": 26, "name": "SqrtLinear", "lean_file": "FVSquad/SqrtLinear.lean",
+      "phase": 5, "status": "partial",
+      "notes": "15 theorems: 12 proved, 3 sorry (sqrtBranch theorems need Mathlib Real.sqrt). Informal spec written. Negative branch and identity branch fully proved.",
+      "theorems_proved": 12, "sorry": 3
     },
     {
-      "id": 27,
-      "name": "GetBinAtAngle",
-      "file": null,
-      "phase": 1,
-      "status": "research",
-      "notes": "Depends on wrap_bin (#25). Float round needs Mathlib for complete proof.",
+      "id": 27, "name": "GetBinAtAngle", "file": null, "phase": 1, "status": "research",
+      "notes": "Angle-to-bin conversion; depends on wrap_bin (#25 now proved); float round needs Mathlib for complete proof.",
       "priority": "medium"
     }
   ],
   "correspondence_runs": [
-    {
-      "run": 55,
-      "added_sections": [
-        "Hysteresis.lean"
-      ],
-      "files_audited": 20,
-      "targets_covered": 26,
-      "drift_detected": false
-    },
-    {
-      "run": 57,
-      "added_sections": [
-        "CommanderArming.lean summary table"
-      ],
-      "files_audited": 21,
-      "targets_covered": 27,
-      "drift_detected": false
-    },
-    {
-      "run": 59,
-      "added_sections": [
-        "Atmosphere.lean"
-      ],
-      "files_audited": 22,
-      "targets_covered": 28,
-      "drift_detected": false
-    },
-    {
-      "run": 60,
-      "added_sections": [
-        "CommanderArming.lean dedicated section"
-      ],
-      "files_audited": 22,
-      "targets_covered": 28,
-      "drift_detected": false,
-      "notes": "CommanderArming now has full correspondence section with guard mappings, divergences, and theorem annotations"
-    }
+    {"run": 60, "added_sections": ["CommanderArming.lean dedicated section"], "files_audited": 22, "targets_covered": 28, "drift_detected": false},
+    {"run": 59, "added_sections": ["Atmosphere.lean"], "files_audited": 22, "targets_covered": 28, "drift_detected": false}
   ],
   "run_history": [
+    {
+      "run": 62,
+      "date": "2026-04-22",
+      "task": "Tasks 3+4: SqrtLinear spec + implementation (15 theorems, 12 proved, 3 sorry)",
+      "new_theorems": 15,
+      "new_files": ["SqrtLinear.lean"],
+      "sorry_added": 3,
+      "pr_branch": "lean-squad/sqrtlinear-spec-impl-run62-24790320420",
+      "notes": "math::sqrt_linear piecewise function. Negative and identity branches fully proved. Sqrt branch axiomatised (needs Mathlib Real.sqrt for 3 remaining sorry)."
+    },
     {
       "run": 61,
       "date": "2026-04-22",
       "task": "Tasks 5+10: WrapBin proofs (20 thms, 0 sorry, latent C++ bug confirmed) + REPORT.md update",
       "new_theorems": 20,
-      "new_files": [
-        "WrapBin.lean"
-      ],
+      "new_files": ["WrapBin.lean"],
       "sorry_added": 0,
-      "pr_branch": "lean-squad/wrapbin-proofs-report-run61-24769158406",
-      "bugs_found": [
-        "wrap_bin C++ truncation-mod negative-index bug (latent, confirmed by wrapBinCpp_bug_general)"
-      ]
+      "pr_branch": "lean-squad/wrapbin-proofs-report-run61-24769158406"
     },
     {
       "run": 60,
       "date": "2026-04-22",
-      "task": "Tasks 1+6: Research (3 new targets including wrap_bin latent bug) + Correspondence (CommanderArming.lean dedicated section)",
+      "task": "Tasks 1+6: Research (3 new targets including wrap_bin latent bug) + Correspondence (CommanderArming.lean)",
       "new_theorems": 0,
       "new_files": [],
       "sorry_added": 0,
       "pr_branch": "lean-squad/research-correspondence-run60-24754498980"
-    },
-    {
-      "run": 59,
-      "date": "2026-04-21",
-      "task": "Tasks 8+10: CommanderArming correspondence tests (4102/4102) + REPORT.md update",
-      "new_theorems": 0,
-      "new_files": [],
-      "sorry_added": 0,
-      "pr_branch": "lean-squad/commander-arming-tests-report-run59-24734331090",
-      "correspondence_tests": {
-        "target": "CommanderArming",
-        "route": "B",
-        "cases": 4102,
-        "pass": 4102
-      }
-    },
-    {
-      "run": 57,
-      "date": "2026-04-21",
-      "task": "Tasks 7+6: CRITIQUE.md + CORRESPONDENCE.md updates for run49-56 additions",
-      "new_theorems": 0,
-      "new_files": [],
-      "sorry_added": 0,
-      "pr_branch": "lean-squad/critique-correspondence-run57-24698475184"
     }
   ],
   "discoveries": [
     "density_mono_temp sorry: Rat.inv_lt_inv_of_lt does not exist in stdlib v4.29.0; needs Mathlib",
-    "Lean neg literal normalization: -27315/100 internally becomes -5463/20 (harmless for native_decide)",
-    "Commander FSM proof: rcases Bool.eq_false_or_eq_true on each Bool field generates concrete hypotheses, then simp_all closes trivially",
-    "crc16_append proof: List.foldl_append + simp/simp only closes all goals in one step",
-    "WrapAngle sorry: 6 theorem bodies use sorry (rational wrap, floor-dependent); integer wrap (wrapInt) is fully proved",
-    "wrap_bin latent bug: (bin + bin_count) % bin_count returns negative for bin <= -bin_count; C++ truncation mod of negative is negative"
+    "noncomputable axiom needed for Rat → Rat axioms that have no implementation body (sqrtBranch)",
+    "le_refl not available in Lean 4 stdlib directly; use (by decide : (0:Rat) ≤ 0) for ground terms",
+    "Commander FSM proof: rcases Bool.eq_false_or_eq_true on each Bool field generates concrete hypotheses",
+    "wrap_bin latent bug: (bin + bin_count) % bin_count returns negative for bin <= -bin_count; C++ truncation mod",
+    "WrapAngle sorry: 6 theorem bodies use sorry (rational wrap, floor-dependent); integer wrap (wrapInt) is fully proved"
   ],
-  "notes": "Run 60: Tasks 1+6. Research: wrap_bin latent bug identified (bin <= -bin_count yields negative result). Correspondence: CommanderArming.lean dedicated section added. Next: Task 2+3+4+5 for ObstacleMath::wrap_bin (target 25); all proofs by omega.",
+  "notes": "Run 62: Tasks 3+4 (SqrtLinear). math::sqrt_linear piecewise function: negative and identity branches fully proved (12 theorems). Sqrt branch axiomatised with noncomputable axiom; 3 sorry for sqrt properties. Next run: Task 5 attempt to resolve WrapAngle/Atmosphere sorry, OR Task 8 for GetBinAtAngle (target 27), OR Task 10 (REPORT update).",
   "mathlib_status": "blocked_403_cache_proxy",
   "paper_status": {
     "exists": true,
     "last_updated_run": 54,
     "stale_since": "run49",
-    "stale_items": [
-      "SignFromBoolSq",
-      "Crc16Fold",
-      "CommanderArming",
-      "Atmosphere",
-      "theorem count"
-    ],
-    "pdf_compiled": false
+    "stale_items": ["SignFromBoolSq", "Crc16Fold", "CommanderArming", "Atmosphere", "WrapBin", "SqrtLinear", "theorem count"]
   },
   "report_status": {
     "exists": true,
     "last_updated_run": 61,
     "theorems": 314,
     "files": 23,
-    "stale": false
+    "stale": true,
+    "stale_since": "run62"
   }
 }
