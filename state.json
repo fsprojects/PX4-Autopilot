@@ -1,24 +1,25 @@
 {
-  "run": 63,
-  "last_updated": "2026-04-23T01:04:00Z",
+  "run": 64,
+  "last_updated": "2026-04-23T09:00:00Z",
   "lean_version": "leanprover/lean4:v4.29.0",
   "lake_build_status": "passed",
   "totals": {
-    "theorems_proved": 326,
-    "theorems_total": 338,
-    "examples": 141,
+    "theorems_proved": 334,
+    "theorems_total": 346,
+    "examples": 147,
     "sorry_count": 12,
-    "lean_files": 24,
+    "lean_files": 25,
     "targets": 30
   },
   "sorry_locations": {
     "WrapAngle.lean": 6,
     "Atmosphere.lean": 3,
     "SqrtLinear.lean": 3,
-    "notes": "WrapAngle: 6 rational wrap theorems need Mathlib floor arithmetic. Atmosphere: 3 sorry (densityRat_anti_mono_temp, tempAtAlt_lapse_rate, tempAtAlt_strict_anti). SqrtLinear: 3 sorry (sqrtLinear_zero, sqrtLinear_sqrt_nonneg, sqrtLinear_sqrt_lt_one) need Real.sqrt from Mathlib. All other 21 files are sorry-free."
+    "notes": "All 12 sorry need Mathlib. WrapAngle: floor arithmetic. Atmosphere: mono/anti-mono. SqrtLinear: Real.sqrt branch. All other 22 files sorry-free."
   },
-  "open_prs": [],
-  "merged_prs": [49, 50, 52, 53, 54, 55, 56, 57, 58, 59],
+  "open_prs": [59, 60, 61],
+  "merged_prs": [49, 50, 52, 53, 54, 55, 56, 57, 58],
+  "run64_pr_branch": "lean-squad/crc16sig-wrapbin-tests-run64-24825997330",
   "bugs_found": [
     {
       "target": "SignNoZero",
@@ -33,7 +34,7 @@
     {
       "target": "ObstacleMath::wrap_bin",
       "issue": null,
-      "description": "LATENT BUG (confirmed by FV): wrap_bin(bin, n) returns negative for bin <= -n; C++ truncation mod of negative input yields negative result; callers use result as array index => UB"
+      "description": "LATENT BUG (confirmed by FV + correspondence tests): wrap_bin(bin, n) returns negative for bin <= -n-1; C++ truncation mod; callers use result as array index => UB"
     }
   ],
   "targets": [
@@ -49,126 +50,78 @@
     {"id": 10, "name": "Hysteresis", "file": "lean/FVSquad/Hysteresis.lean", "phase": 5, "status": "proved"},
     {"id": 12, "name": "Crc16Fold", "file": "lean/FVSquad/Crc16Fold.lean", "phase": 5, "status": "proved"},
     {"id": 13, "name": "SignFromBoolSq", "file": "lean/FVSquad/SignFromBoolSq.lean", "phase": 5, "status": "proved"},
-    {
-      "id": 23, "name": "Atmosphere", "file": "lean/FVSquad/Atmosphere.lean", "phase": 3, "status": "lean_spec",
-      "notes": "densityRat (ideal gas law), tempAtAltRat (ISA lapse rate). 3 sorry. Correspondence tests: tests/atmosphere/ (26/26 pass)",
-      "theorems": {"proved": 12, "sorry": 3},
-      "correspondence_tests": "tests/atmosphere/ (26/26 pass, max_rel_err=1.9e-16)"
-    },
-    {
-      "id": 24, "name": "CommanderArmingFSM", "file": "formal-verification/lean/FVSquad/CommanderArming.lean",
-      "phase": 5, "status": "proved",
-      "notes": "20 theorems, 0 sorry. armFSM/disarmFSM pure model.",
-      "theorems_proved": 20, "sorry": 0
-    },
-    {
-      "id": 25, "name": "ObstacleMathWrapBin", "lean_file": "FVSquad/WrapBin.lean",
-      "phase": 5, "status": "proved",
-      "notes": "20 theorems, 0 sorry. Latent C++ truncation bug confirmed by wrapBinCpp_bug_general.",
-      "theorems": 20, "sorry": 0
-    },
-    {
-      "id": 26, "name": "SqrtLinear", "lean_file": "FVSquad/SqrtLinear.lean",
-      "phase": 5, "status": "partial",
-      "notes": "15 theorems: 12 proved, 3 sorry (sqrtBranch theorems need Mathlib Real.sqrt). Informal spec written. Negative branch and identity branch fully proved.",
-      "theorems_proved": 12, "sorry": 3
-    },
-    {
-      "id": 27, "name": "GetBinAtAngle", "file": null, "phase": 1, "status": "research",
-      "notes": "Angle-to-bin conversion; depends on wrap_bin (#25 now proved); float round needs Mathlib for complete proof.",
-      "priority": "medium"
-    },
-    {
-      "id": 28, "name": "GetLowerBoundAngle", "file": null, "phase": 1, "status": "research",
-      "notes": "Lower bound angle of bin; builds on WrapBin theorems; rational model; range invariant [0, 360). Added run 63.",
-      "priority": "medium"
-    },
-    {
-      "id": 29, "name": "Crc16SigFold", "file": null, "phase": 1, "status": "research",
-      "notes": "CRC16 fold/split for CCITT variant (crc.c). Same structure as Crc16Fold.lean; List.foldl_append proof. Added run 63.",
-      "priority": "high"
-    },
-    {
-      "id": 30, "name": "BrakingDistance", "file": null, "phase": 1, "status": "research",
-      "notes": "computeBrakingDistanceFromVelocity in TrajMath.hpp. Safety: non-negativity + monotonicity. Rational model tractable. Added run 63.",
-      "priority": "high"
-    }
+    {"id": 23, "name": "Atmosphere", "file": "lean/FVSquad/Atmosphere.lean", "phase": 3, "status": "lean_spec", "theorems": {"proved": 12, "sorry": 3}, "correspondence_tests": "tests/atmosphere/ (26/26 pass)"},
+    {"id": 24, "name": "CommanderArmingFSM", "file": "lean/FVSquad/CommanderArming.lean", "phase": 5, "status": "proved", "theorems_proved": 20, "sorry": 0},
+    {"id": 25, "name": "ObstacleMathWrapBin", "file": "lean/FVSquad/WrapBin.lean", "phase": 5, "status": "proved", "theorems": 20, "sorry": 0, "correspondence_tests": "tests/wrap_bin/ (34/34 fixture + 2360 invariant grid, all pass)"},
+    {"id": 26, "name": "SqrtLinear", "file": "lean/FVSquad/SqrtLinear.lean", "phase": 5, "status": "partial", "theorems_proved": 12, "sorry": 3},
+    {"id": 29, "name": "Crc16Sig", "file": "lean/FVSquad/Crc16Sig.lean", "phase": 5, "status": "proved", "theorems": 8, "examples": 6, "sorry": 0, "notes": "crc16_add / crc16_signature (bit-by-bit CCITT, poly=0x1021). processBit + processBits 8 + crc16AddStep + crc16Sig. Key: crc16Sig_append_self via List.foldl_append. ADDED RUN 64."},
+    {"id": 27, "name": "GetBinAtAngle", "file": null, "phase": 1, "status": "research", "priority": "medium"},
+    {"id": 28, "name": "GetLowerBoundAngle", "file": null, "phase": 1, "status": "research", "priority": "medium"},
+    {"id": 30, "name": "BrakingDistance", "file": null, "phase": 1, "status": "research", "priority": "high", "notes": "computeBrakingDistanceFromVelocity in TrajMath.hpp. Safety: non-negativity + monotonicity. Rational model tractable. Next high-priority target."}
   ],
-  "correspondence_runs": [
-    {"run": 60, "added_sections": ["CommanderArming.lean dedicated section"], "files_audited": 22, "targets_covered": 28, "drift_detected": false},
-    {"run": 59, "added_sections": ["Atmosphere.lean"], "files_audited": 22, "targets_covered": 28, "drift_detected": false}
-  ],
+  "correspondence_tests": {
+    "atmosphere": "tests/atmosphere/ (26/26 pass, max_rel_err=1.9e-16)",
+    "wrap_bin": "tests/wrap_bin/ (34/34 fixture + 2360 invariant grid; bug confirmed: wrapBinCpp(-73,72)=-1)"
+  },
   "run_history": [
+    {
+      "run": 64,
+      "date": "2026-04-23",
+      "task": "Task 5+8: Crc16Sig.lean (8 thms 0 sorry) + WrapBin correspondence tests (34+2360 cases)",
+      "new_theorems": 8,
+      "new_files": ["Crc16Sig.lean", "tests/wrap_bin/"],
+      "sorry_added": 0,
+      "pr_branch": "lean-squad/crc16sig-wrapbin-tests-run64-24825997330",
+      "notes": "Crc16Sig: crc16_add/crc16_signature fold/split (bit-by-bit CCITT). WrapBin tests: 34 fixture + 2360 invariant. Bug region validated. Next: BrakingDistance (target 30) - rational model, safety properties."
+    },
     {
       "run": 63,
       "date": "2026-04-23",
       "task": "Tasks 7+1: Critique update (338 thms, WrapBin+SqrtLinear) + 3 new research targets",
       "new_theorems": 0,
-      "new_files": [],
-      "sorry_added": 0,
-      "pr_branch": "lean-squad/critique-research-run63-24810866349",
-      "notes": "Merged WrapBin and SqrtLinear open PRs. Updated CRITIQUE.md, RESEARCH.md, TARGETS.md. New targets: get_lower_bound_angle (28), crc16_sig fold (29), computeBrakingDistanceFromVelocity (30). Next: Task 3/4/5 for target 29 (Crc16 CCITT fold) — highest priority, 1-line proof via List.foldl_append."
+      "pr_branch": "lean-squad/critique-research-run63-24810866349-4e5eb93e58432d12"
     },
     {
       "run": 62,
       "date": "2026-04-22",
       "task": "Tasks 3+4: SqrtLinear spec + implementation (15 theorems, 12 proved, 3 sorry)",
       "new_theorems": 15,
-      "new_files": ["SqrtLinear.lean"],
-      "sorry_added": 3,
-      "pr_branch": "lean-squad/sqrtlinear-spec-impl-run62-24790320420-b3cc6e59c51c229e",
-      "notes": "math::sqrt_linear piecewise function. Negative and identity branches fully proved. Sqrt branch axiomatised (needs Mathlib Real.sqrt for 3 remaining sorry)."
+      "pr_branch": "lean-squad/sqrtlinear-spec-impl-run62-24790320420-b3cc6e59c51c229e"
     },
     {
       "run": 61,
       "date": "2026-04-22",
       "task": "Tasks 5+10: WrapBin proofs (20 thms, 0 sorry, latent C++ bug confirmed) + REPORT.md update",
       "new_theorems": 20,
-      "new_files": ["WrapBin.lean"],
-      "sorry_added": 0,
       "pr_branch": "lean-squad/wrapbin-proofs-report-run61-24769158406-ab94247f4cd5886f"
-    },
-    {
-      "run": 60,
-      "date": "2026-04-22",
-      "task": "Tasks 1+6: Research (3 new targets including wrap_bin latent bug) + Correspondence (CommanderArming.lean)",
-      "new_theorems": 0,
-      "new_files": [],
-      "sorry_added": 0,
-      "pr_branch": "lean-squad/research-correspondence-run60-24754498980"
     }
   ],
   "discoveries": [
+    "Crc16Sig: processBits n uses structural recursion on Nat; terminates without partial",
+    "crc16AddStep: UInt8.toUInt16 <<< 8 matches C++ (uint16_t)(value << 8) exactly",
+    "crc16Sig_append_self proof: simp [crc16Sig, List.foldl_append] closes directly (1 tactic)",
+    "WrapBin correspondence: Python floor % matches Lean Int.% exactly (both Euclidean)",
+    "wrap_bin_cpp Python model uses abs/sign decomposition to emulate C++ truncation-toward-zero",
+    "Bug region: bin + bin_count < 0 iff bin < -bin_count; wrapBinCpp(-bin_count-1, bin_count) = -1",
     "density_mono_temp sorry: Rat.inv_lt_inv_of_lt does not exist in stdlib v4.29.0; needs Mathlib",
-    "noncomputable axiom needed for Rat → Rat axioms that have no implementation body (sqrtBranch)",
-    "le_refl not available in Lean 4 stdlib directly; use (by decide : (0:Rat) ≤ 0) for ground terms",
+    "noncomputable axiom needed for Rat -> Rat axioms that have no implementation body (sqrtBranch)",
     "Commander FSM proof: rcases Bool.eq_false_or_eq_true on each Bool field generates concrete hypotheses",
-    "wrap_bin latent bug: (bin + bin_count) % bin_count returns negative for bin <= -bin_count; C++ truncation mod",
     "WrapAngle sorry: 6 theorem bodies use sorry (rational wrap, floor-dependent); integer wrap (wrapInt) is fully proved",
     "SqrtLinear: noncomputable axiom sqrtBranch : Rat -> Rat used as placeholder for sqrt; 3 sorry for sqrt branch",
-    "Crc16 CCITT fold/split (target 29): same List.foldl_append structure as Crc16Fold.lean; highest-tractability new target",
-    "computeBrakingDistanceFromVelocity (target 30): pure rational formula; non-negativity proved by Rat.mul_pos + Rat.add_nonneg"
+    "Crc16 CCITT fold/split (target 29): same List.foldl_append structure as Crc16Fold.lean; confirmed trivially provable"
   ],
-  "notes": "Run 63: Tasks 7+1 (Critique update + Research). 338 total theorems (326 proved, 12 sorry). Merged WrapBin and SqrtLinear from open PRs. New targets 28-30 identified. Next run: Task 3/4/5 for target 29 (crc16 CCITT fold) — trivial proof via List.foldl_append. OR Task 3/4/5 for target 30 (BrakingDistance) — rational model, safety property.",
+  "notes": "Run 64: Task 5 (Crc16Sig.lean, 8 thms 0 sorry) + Task 8 (WrapBin correspondence tests). 346 total theorems (334 proved, 12 sorry). 25 Lean files. Next: Task 3/4/5 for target 30 (BrakingDistance) — pure rational formula, non-negativity + monotonicity provable by omega/Rat arithmetic. OR Task 10 (REPORT.md update to reflect runs 62-64 additions).",
   "mathlib_status": "blocked_403_cache_proxy",
   "paper_status": {
     "exists": true,
     "last_updated_run": 54,
     "stale_since": "run49",
-    "stale_items": ["SignFromBoolSq", "Crc16Fold", "CommanderArming", "Atmosphere", "WrapBin", "SqrtLinear", "theorem count (326 proved not 228)", "bug count (3 not 2)"]
+    "stale_items": ["SignFromBoolSq", "Crc16Fold", "CommanderArming", "Atmosphere", "WrapBin", "SqrtLinear", "Crc16Sig", "theorem count (334 proved not 228)", "bug count (3 not 2)"]
   },
   "report_status": {
     "exists": true,
     "last_updated_run": 61,
-    "theorems": 314,
-    "files": 23,
-    "stale": true,
     "stale_since": "run62",
-    "stale_items": ["SqrtLinear.lean (15 thms)", "theorem count"]
-  },
-  "critique_status": {
-    "exists": true,
-    "last_updated_run": 63,
-    "stale": false
+    "stale_items": ["SqrtLinear.lean (15 thms)", "Crc16Sig.lean (8 thms)", "theorem count (314 -> 346)"]
   }
 }
