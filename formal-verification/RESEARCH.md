@@ -1027,3 +1027,97 @@ must ensure `jerk > 0 ∧ accel > 0` documents this implicit precondition.
 | 5 | `wrapRat` theorems (WrapAngle.lean) | 🔄 Phase 3 | 6 sorrys need Mathlib floor |
 | 6 | `Atmosphere` sorrys | 🔄 Phase 3 | 3 sorrys need Mathlib mul_lt_mul_of_neg_left |
 | 7 | `SqrtLinear` sqrt branch sorrys | 🔄 Phase 3 | 3 sorrys need Mathlib Real.sqrt |
+
+---
+
+## Research Update — Run 65
+
+### Summary of Run 65 Contributions
+
+- Target 30 (`computeBrakingDistanceFromVelocity`) completed: Tasks 3+4+5 done.
+  - 9 theorems proved, 0 sorry, `lake build` passes with Lean v4.29.0.
+  - Informal spec: `specs/braking_dist_informal.md`
+  - Lean file: `lean/FVSquad/BrakingDist.lean`
+
+### New Research Candidates (Run 65)
+
+---
+
+### Target 31: `math::expo`
+
+**File**: `src/lib/mathlib/math/Functions.hpp`
+
+```cpp
+template<typename T>
+const T expo(const T &value, const T &e)
+{
+    T x = constrain(value, (T) - 1, (T) 1);
+    T ec = constrain(e, (T) 0, (T) 1);
+    return (1 - ec) * x + ec * x * x * x;
+}
+```
+
+**Benefit**: The exponential curve function is used to shape RC input for manual control. Key
+properties: (1) bounded output: output ∈ [−1,1]; (2) fixes −1, 0, +1: `expo(−1,e)=−1`,
+`expo(0,e)=0`, `expo(1,e)=1`; (3) linear at e=0: `expo(v,0)=v`; (4) cubic at e=1:
+`expo(v,1)=v³`. These support reasoning about control smoothness and controller correctness.
+
+**Specification size**: ~25 Lean lines.
+
+**Proof tractability**: EASY — rational model, all proofs via `native_decide` or `ring`-style
+arithmetic. `constrain` already has a Lean model from prior FV work.
+
+**Approximations needed**: `float` → `Rat`; `constrain` already modelled in `Constrain.lean`.
+
+**Approach**: Reuse `PX4.Constrain.constrain` from `Constrain.lean`. Define
+`expo (v e : Rat) := let x := constrain v (-1) 1; let ec := constrain e 0 1; (1 - ec)*x + ec*x*x*x`.
+Prove boundary fixes, range preservation, and the e=0 and e=1 cases.
+
+**Bug-finding potential**: LOW (pure math), but range preservation is a useful safety proof
+for manual control input.
+
+---
+
+### Target 32: `math::lerp`
+
+**File**: `src/lib/mathlib/math/Functions.hpp`
+
+```cpp
+template<typename T>
+const T lerp(const T &a, const T &b, const T &s)
+{
+    return (static_cast<T>(1) - s) * a + s * b;
+}
+```
+
+**Benefit**: Linear interpolation used throughout PX4 for setpoints, mixing, and control.
+Key properties: `lerp(a,b,0)=a`, `lerp(a,b,1)=b`, `lerp(a,b,s)` is affine in s,
+monotone in s when a≤b, convex combination when 0≤s≤1 (result stays within [a,b]).
+
+**Specification size**: ~20 Lean lines.
+
+**Proof tractability**: VERY EASY — all proofs are direct algebraic identities, provable
+without Mathlib using `Rat` stdlib. `native_decide` handles all numeric examples.
+
+**Approximations needed**: `float` → `Rat`; no complex approximations needed.
+
+**Approach**: Define `lerp (a b s : Rat) := (1 - s)*a + s*b`. Prove the endpoint cases,
+affinity/linearity, and the convex combination property for 0 ≤ s ≤ 1.
+
+**Bug-finding potential**: LOW (mathematically trivial), but establishing the convex combination
+lemma makes later proofs about interpolated setpoints much easier.
+
+---
+
+## Updated Priority Order (run 65)
+
+| Priority | Target | Phase | Rationale |
+|----------|--------|-------|-----------|
+| 1 | `crc16_signature` fold/split (target 29) | ⬜ Research | Structurally identical to Crc16Fold; 1-line proof via `List.foldl_append` |
+| 2 | `math::lerp` (target 32) | ⬜ Research | Trivial algebra; ~20 lines; provides lemmas for future setpoint proofs |
+| 3 | `math::expo` (target 31) | ⬜ Research | RC input shaping; bounded output is a useful safety proof |
+| 4 | `ObstacleMath::get_bin_at_angle` (target 27) | ⬜ Research | Now that WrapBin proved; float round still needs Mathlib |
+| 5 | `ObstacleMath::get_lower_bound_angle` (target 28) | ⬜ Research | Builds on WrapBin; rational model tractable |
+| 6 | `wrapRat` theorems (WrapAngle.lean) | 🔄 Phase 3 | 6 sorrys need Mathlib floor |
+| 7 | `Atmosphere` sorrys | 🔄 Phase 3 | 3 sorrys need Mathlib mul_lt_mul_of_neg_left |
+| 8 | `SqrtLinear` sqrt branch sorrys | 🔄 Phase 3 | 3 sorrys need Mathlib Real.sqrt |
