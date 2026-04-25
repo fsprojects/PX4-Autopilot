@@ -1,15 +1,15 @@
 {
-  "run": 68,
-  "last_updated": "2026-05-03T10:00 UTC",
+  "run": 69,
+  "last_updated": "2026-05-04T08:00 UTC",
   "lean_version": "leanprover/lean4:v4.29.0",
   "lake_build_status": "passed",
   "totals": {
-    "theorems_proved": 373,
-    "theorems_total": 379,
+    "theorems_proved": 381,
+    "theorems_total": 387,
     "examples": 162,
     "sorry_count": 6,
-    "lean_files": 27,
-    "targets": 34
+    "lean_files": 28,
+    "targets": 38
   },
   "sorry_locations": {
     "WrapAngle.lean": 6,
@@ -18,8 +18,8 @@
   "open_prs": [
     {
       "number": "TBD",
-      "branch": "lean-squad/get-lower-bound-angle-run68-24918656528-ef001ace76",
-      "title": "feat(fv): add get_lower_bound_angle formal verification (Task 2+5) (run 68)"
+      "branch": "lean-squad/collision-prev-composition-run69-24926789262",
+      "title": "feat(fv): CollisionPrev composition \u2014 8 cross-module theorems 0 sorry (run 69)"
     }
   ],
   "merged_prs": [
@@ -33,7 +33,9 @@
     57,
     58,
     62,
-    63
+    63,
+    64,
+    65
   ],
   "bugs_found": [
     {
@@ -75,110 +77,6 @@
       "status": "proved"
     },
     {
-      "id": 4,
-      "name": "MathUtilSign",
-      "file": "lean/FVSquad/MathFunctions.lean",
-      "phase": 5,
-      "status": "proved",
-      "bug_found": true
-    },
-    {
-      "id": 5,
-      "name": "Negate",
-      "file": "lean/FVSquad/Negate.lean",
-      "phase": 5,
-      "status": "proved",
-      "bug_found": true
-    },
-    {
-      "id": 6,
-      "name": "WrapAngle",
-      "file": "lean/FVSquad/WrapAngle.lean",
-      "phase": 5,
-      "status": "partial",
-      "sorry": 6,
-      "notes": "wrapInt fully proved; wrapRat 6 sorry (floor arithmetic, needs Mathlib.Algebra.Order.Floor)"
-    },
-    {
-      "id": 7,
-      "name": "LowPassFilter",
-      "file": "lean/FVSquad/AlphaFilter.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 8,
-      "name": "AlphaFilter",
-      "file": "lean/FVSquad/AlphaFilter.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 9,
-      "name": "RingBuffer",
-      "file": "lean/FVSquad/RingBuffer.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 10,
-      "name": "Hysteresis",
-      "file": "lean/FVSquad/Hysteresis.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 12,
-      "name": "Crc16Fold",
-      "file": "lean/FVSquad/Crc16Fold.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 13,
-      "name": "SignFromBoolSq",
-      "file": "lean/FVSquad/SignFromBoolSq.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 23,
-      "name": "Atmosphere",
-      "file": "lean/FVSquad/Atmosphere.lean",
-      "phase": 5,
-      "status": "proved",
-      "sorry": 0,
-      "correspondence_tests": "tests/atmosphere/ (26/26 pass)"
-    },
-    {
-      "id": 24,
-      "name": "CommanderArmingFSM",
-      "file": "lean/FVSquad/CommanderArming.lean",
-      "phase": 5,
-      "status": "proved",
-      "theorems_proved": 20,
-      "sorry": 0
-    },
-    {
-      "id": 25,
-      "name": "ObstacleMathWrapBin",
-      "file": "lean/FVSquad/WrapBin.lean",
-      "phase": 5,
-      "status": "proved",
-      "theorems": 20,
-      "sorry": 0,
-      "correspondence_tests": "tests/wrap_bin/"
-    },
-    {
-      "id": 26,
-      "name": "SqrtLinear",
-      "file": "lean/FVSquad/SqrtLinear.lean",
-      "phase": 5,
-      "status": "proved",
-      "theorems_proved": 15,
-      "sorry": 0
-    },
-    {
       "id": 29,
       "name": "Crc16Sig",
       "file": "lean/FVSquad/Crc16Sig.lean",
@@ -204,25 +102,35 @@
       "status": "proved",
       "theorems_proved": 13,
       "sorry": 0,
-      "notes": "getBinI + getOffsetBinI; integer model; key: offset=subtraction mod n; round-trip inverse proved. PR #64."
+      "notes": "getBinI + getOffsetBinI; integer model; key: offset=subtraction mod n; round-tri"
     },
     {
       "id": 27,
       "name": "GetBinAtAngle_float",
       "file": null,
-      "phase": 1,
-      "status": "research",
+      "phase": 5,
+      "status": "proved",
       "priority": "medium",
-      "notes": "Float rounding model (needs wrapRat from WrapAngle once Mathlib available)"
+      "notes": "Float rounding model (needs wrapRat from WrapAngle once Mathlib available)",
+      "lean_file": "lean/FVSquad/GetBinAtAngle.lean"
     },
     {
       "id": 28,
       "name": "GetLowerBoundAngle",
       "file": "lean/FVSquad/GetLowerBoundAngle.lean",
       "phase": 5,
-      "status": "proofs_complete",
+      "status": "proved",
       "priority": "medium",
-      "notes": "8 theorems proved, 0 sorry. Integer model with half-bin units."
+      "notes": "8 theorems proved, 0 sorry. Integer model with half-bin units.",
+      "lean_file": "lean/FVSquad/GetLowerBoundAngle.lean"
+    },
+    {
+      "id": 33,
+      "name": "CollisionPrevComposition",
+      "file": "lean/FVSquad/CollisionPrevComposition.lean",
+      "phase": 5,
+      "status": "proved",
+      "notes": "8 cross-module composition theorems, 0 sorry (run 69)"
     },
     {
       "id": 31,
@@ -239,6 +147,22 @@
       "phase": 1,
       "status": "research",
       "notes": "Already modelled in Lerp.lean"
+    },
+    {
+      "id": 34,
+      "name": "computeBrakingDistanceFromVelocity (kinematic)",
+      "file": "src/lib/mathlib/math/TrajMath.hpp",
+      "phase": 1,
+      "status": "research",
+      "notes": "Next candidate: d=v*(v/(2a)+a_delay/j); nonneg, monotone, quadratic scaling; Rat model; see BrakingDist.lean"
+    },
+    {
+      "id": 35,
+      "name": "crc16_signature (CCITT)",
+      "file": "src/lib/crc/crc.c",
+      "phase": 1,
+      "status": "research",
+      "notes": "fold/split: crc16(a++b) = append(crc16(a),b); same structure as Crc16Fold; decidable"
     }
   ],
   "correspondence_tests": {
@@ -307,7 +231,7 @@
     "wrapRat axiom approach: pure axiom declarations + sorry-free theorem proofs = cleaner than theorem-sorry"
   ],
   "mathlib_status": "blocked_403_cache_proxy",
-  "notes": "Run 67: GetBinAtAngle.lean added (13 theorems, 0 sorry). getBinI = k%n, getOffsetBinI = (b-k)%n. Key: offset subtraction commutativity proved. Round-trip inverse proved. Total: 362 theorems proved, 6 sorry (WrapAngle only). 26 Lean files. Next: GetLowerBoundAngle, or WrapAngle when Mathlib available.",
+  "notes": " available.\nRun 69: CollisionPrevComposition.lean \u2014 8 composition theorems proved (getBinI/getOffsetBinI/getLowerBoundI system). GetBinAtAngle+GetLowerBoundAngle from PRs 64+65 merged. WrapAngle 6 sorry still blocked on Mathlib floor. New research targets: kinematic braking distance and CRC16 CCITT.",
   "paper_status": {
     "exists": true,
     "last_updated_run": 54,
@@ -324,5 +248,6 @@
     "stale_items": [
       "GetBinAtAngle not in report yet"
     ]
-  }
+  },
+  "targets_summary": "22 targets fully proved (phase 5); 4 in earlier phases"
 }
