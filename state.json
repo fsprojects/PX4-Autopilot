@@ -1,15 +1,15 @@
 {
-  "run": 67,
-  "last_updated": "2026-04-24T16:32:59Z",
+  "run": 68,
+  "last_updated": "2026-05-03T10:00 UTC",
   "lean_version": "leanprover/lean4:v4.29.0",
   "lake_build_status": "passed",
   "totals": {
-    "theorems_proved": 362,
-    "theorems_total": 368,
+    "theorems_proved": 373,
+    "theorems_total": 379,
     "examples": 162,
     "sorry_count": 6,
-    "lean_files": 26,
-    "targets": 33
+    "lean_files": 27,
+    "targets": 34
   },
   "sorry_locations": {
     "WrapAngle.lean": 6,
@@ -17,22 +17,34 @@
   },
   "open_prs": [
     {
-      "number": 64,
-      "branch": "lean-squad/get-bin-at-angle-run67-24900431008",
-      "title": "feat(formal-verification): GetBinAtAngle — Tasks 2+3+4+5, 13 theorems 0 sorry (run 67)"
+      "number": "TBD",
+      "branch": "lean-squad/get-lower-bound-angle-run68-24918656528-ef001ace76",
+      "title": "feat(fv): add get_lower_bound_angle formal verification (Task 2+5) (run 68)"
     }
   ],
-  "merged_prs": [49, 50, 52, 53, 54, 55, 56, 57, 58, 62, 63],
+  "merged_prs": [
+    49,
+    50,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    62,
+    63
+  ],
   "bugs_found": [
     {
       "target": "SignNoZero",
       "issue": 12,
-      "description": "NaN safety violation in signNoZero<float> — returns 0 for NaN, violating ne_zero contract"
+      "description": "NaN safety violation in signNoZero<float> \u2014 returns 0 for NaN, violating ne_zero contract"
     },
     {
       "target": "Negate",
       "issue": 21,
-      "description": "negate<int16_t> involution error — INT16_MAX special case incorrect, negate(negate(-32767))=-32768"
+      "description": "negate<int16_t> involution error \u2014 INT16_MAX special case incorrect, negate(negate(-32767))=-32768"
     },
     {
       "target": "ObstacleMath::wrap_bin",
@@ -41,29 +53,193 @@
     }
   ],
   "targets": [
-    {"id": 1, "name": "SquaredError", "file": "lean/FVSquad/MathFunctions.lean", "phase": 5, "status": "proved"},
-    {"id": 2, "name": "Expo", "file": "lean/FVSquad/Expo.lean", "phase": 5, "status": "proved"},
-    {"id": 3, "name": "MathUtilClip", "file": "lean/FVSquad/MathFunctions.lean", "phase": 5, "status": "proved"},
-    {"id": 4, "name": "MathUtilSign", "file": "lean/FVSquad/MathFunctions.lean", "phase": 5, "status": "proved", "bug_found": true},
-    {"id": 5, "name": "Negate", "file": "lean/FVSquad/Negate.lean", "phase": 5, "status": "proved", "bug_found": true},
-    {"id": 6, "name": "WrapAngle", "file": "lean/FVSquad/WrapAngle.lean", "phase": 5, "status": "partial", "sorry": 6, "notes": "wrapInt fully proved; wrapRat 6 sorry (floor arithmetic, needs Mathlib.Algebra.Order.Floor)"},
-    {"id": 7, "name": "LowPassFilter", "file": "lean/FVSquad/AlphaFilter.lean", "phase": 5, "status": "proved"},
-    {"id": 8, "name": "AlphaFilter", "file": "lean/FVSquad/AlphaFilter.lean", "phase": 5, "status": "proved"},
-    {"id": 9, "name": "RingBuffer", "file": "lean/FVSquad/RingBuffer.lean", "phase": 5, "status": "proved"},
-    {"id": 10, "name": "Hysteresis", "file": "lean/FVSquad/Hysteresis.lean", "phase": 5, "status": "proved"},
-    {"id": 12, "name": "Crc16Fold", "file": "lean/FVSquad/Crc16Fold.lean", "phase": 5, "status": "proved"},
-    {"id": 13, "name": "SignFromBoolSq", "file": "lean/FVSquad/SignFromBoolSq.lean", "phase": 5, "status": "proved"},
-    {"id": 23, "name": "Atmosphere", "file": "lean/FVSquad/Atmosphere.lean", "phase": 5, "status": "proved", "sorry": 0, "correspondence_tests": "tests/atmosphere/ (26/26 pass)"},
-    {"id": 24, "name": "CommanderArmingFSM", "file": "lean/FVSquad/CommanderArming.lean", "phase": 5, "status": "proved", "theorems_proved": 20, "sorry": 0},
-    {"id": 25, "name": "ObstacleMathWrapBin", "file": "lean/FVSquad/WrapBin.lean", "phase": 5, "status": "proved", "theorems": 20, "sorry": 0, "correspondence_tests": "tests/wrap_bin/"},
-    {"id": 26, "name": "SqrtLinear", "file": "lean/FVSquad/SqrtLinear.lean", "phase": 5, "status": "proved", "theorems_proved": 15, "sorry": 0},
-    {"id": 29, "name": "Crc16Sig", "file": "lean/FVSquad/Crc16Sig.lean", "phase": 5, "status": "proved", "theorems": 8, "sorry": 0},
-    {"id": 30, "name": "BrakingDistance", "file": "lean/FVSquad/BrakingDist.lean", "phase": 5, "status": "proved", "theorems": 9, "sorry": 0},
-    {"id": 33, "name": "GetBinAtAngle", "file": "lean/FVSquad/GetBinAtAngle.lean", "phase": 5, "status": "proved", "theorems_proved": 13, "sorry": 0, "notes": "getBinI + getOffsetBinI; integer model; key: offset=subtraction mod n; round-trip inverse proved. PR #64."},
-    {"id": 27, "name": "GetBinAtAngle_float", "file": null, "phase": 1, "status": "research", "priority": "medium", "notes": "Float rounding model (needs wrapRat from WrapAngle once Mathlib available)"},
-    {"id": 28, "name": "GetLowerBoundAngle", "file": null, "phase": 1, "status": "research", "priority": "medium", "notes": "get_lower_bound_angle; half-integer boundaries"},
-    {"id": 31, "name": "math::expo_lerp_blend", "file": "src/lib/mathlib/math/Functions.hpp", "phase": 1, "status": "research", "notes": "Already modelled in Expo.lean and Lerp.lean"},
-    {"id": 32, "name": "math::lerp", "file": "src/lib/mathlib/math/Functions.hpp", "phase": 1, "status": "research", "notes": "Already modelled in Lerp.lean"}
+    {
+      "id": 1,
+      "name": "SquaredError",
+      "file": "lean/FVSquad/MathFunctions.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 2,
+      "name": "Expo",
+      "file": "lean/FVSquad/Expo.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 3,
+      "name": "MathUtilClip",
+      "file": "lean/FVSquad/MathFunctions.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 4,
+      "name": "MathUtilSign",
+      "file": "lean/FVSquad/MathFunctions.lean",
+      "phase": 5,
+      "status": "proved",
+      "bug_found": true
+    },
+    {
+      "id": 5,
+      "name": "Negate",
+      "file": "lean/FVSquad/Negate.lean",
+      "phase": 5,
+      "status": "proved",
+      "bug_found": true
+    },
+    {
+      "id": 6,
+      "name": "WrapAngle",
+      "file": "lean/FVSquad/WrapAngle.lean",
+      "phase": 5,
+      "status": "partial",
+      "sorry": 6,
+      "notes": "wrapInt fully proved; wrapRat 6 sorry (floor arithmetic, needs Mathlib.Algebra.Order.Floor)"
+    },
+    {
+      "id": 7,
+      "name": "LowPassFilter",
+      "file": "lean/FVSquad/AlphaFilter.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 8,
+      "name": "AlphaFilter",
+      "file": "lean/FVSquad/AlphaFilter.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 9,
+      "name": "RingBuffer",
+      "file": "lean/FVSquad/RingBuffer.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 10,
+      "name": "Hysteresis",
+      "file": "lean/FVSquad/Hysteresis.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 12,
+      "name": "Crc16Fold",
+      "file": "lean/FVSquad/Crc16Fold.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 13,
+      "name": "SignFromBoolSq",
+      "file": "lean/FVSquad/SignFromBoolSq.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 23,
+      "name": "Atmosphere",
+      "file": "lean/FVSquad/Atmosphere.lean",
+      "phase": 5,
+      "status": "proved",
+      "sorry": 0,
+      "correspondence_tests": "tests/atmosphere/ (26/26 pass)"
+    },
+    {
+      "id": 24,
+      "name": "CommanderArmingFSM",
+      "file": "lean/FVSquad/CommanderArming.lean",
+      "phase": 5,
+      "status": "proved",
+      "theorems_proved": 20,
+      "sorry": 0
+    },
+    {
+      "id": 25,
+      "name": "ObstacleMathWrapBin",
+      "file": "lean/FVSquad/WrapBin.lean",
+      "phase": 5,
+      "status": "proved",
+      "theorems": 20,
+      "sorry": 0,
+      "correspondence_tests": "tests/wrap_bin/"
+    },
+    {
+      "id": 26,
+      "name": "SqrtLinear",
+      "file": "lean/FVSquad/SqrtLinear.lean",
+      "phase": 5,
+      "status": "proved",
+      "theorems_proved": 15,
+      "sorry": 0
+    },
+    {
+      "id": 29,
+      "name": "Crc16Sig",
+      "file": "lean/FVSquad/Crc16Sig.lean",
+      "phase": 5,
+      "status": "proved",
+      "theorems": 8,
+      "sorry": 0
+    },
+    {
+      "id": 30,
+      "name": "BrakingDistance",
+      "file": "lean/FVSquad/BrakingDist.lean",
+      "phase": 5,
+      "status": "proved",
+      "theorems": 9,
+      "sorry": 0
+    },
+    {
+      "id": 33,
+      "name": "GetBinAtAngle",
+      "file": "lean/FVSquad/GetBinAtAngle.lean",
+      "phase": 5,
+      "status": "proved",
+      "theorems_proved": 13,
+      "sorry": 0,
+      "notes": "getBinI + getOffsetBinI; integer model; key: offset=subtraction mod n; round-trip inverse proved. PR #64."
+    },
+    {
+      "id": 27,
+      "name": "GetBinAtAngle_float",
+      "file": null,
+      "phase": 1,
+      "status": "research",
+      "priority": "medium",
+      "notes": "Float rounding model (needs wrapRat from WrapAngle once Mathlib available)"
+    },
+    {
+      "id": 28,
+      "name": "GetLowerBoundAngle",
+      "file": "lean/FVSquad/GetLowerBoundAngle.lean",
+      "phase": 5,
+      "status": "proofs_complete",
+      "priority": "medium",
+      "notes": "8 theorems proved, 0 sorry. Integer model with half-bin units."
+    },
+    {
+      "id": 31,
+      "name": "math::expo_lerp_blend",
+      "file": "src/lib/mathlib/math/Functions.hpp",
+      "phase": 1,
+      "status": "research",
+      "notes": "Already modelled in Expo.lean and Lerp.lean"
+    },
+    {
+      "id": 32,
+      "name": "math::lerp",
+      "file": "src/lib/mathlib/math/Functions.hpp",
+      "phase": 1,
+      "status": "research",
+      "notes": "Already modelled in Lerp.lean"
+    }
   ],
   "correspondence_tests": {
     "atmosphere": "tests/atmosphere/ (26/26 pass, max_rel_err=1.9e-16)",
@@ -71,11 +247,27 @@
   },
   "run_history": [
     {
+      "run": 68,
+      "date": "2026-05-03T10:00 UTC",
+      "workflow_run_id": 24918656528,
+      "tasks": [
+        "Task 2: get_lower_bound_angle informal spec",
+        "Task 5: GetLowerBoundAngle.lean 8 theorems 0 sorry"
+      ],
+      "theorems_proved": 8,
+      "sorry_changes": 0,
+      "pr": "TBD (lean-squad/get-lower-bound-angle-run68-24918656528-ef001ace76)",
+      "notes": "modeq_two helper + toNat_mod_add2 helper proved. All 8 public theorems with 0 sorry."
+    },
+    {
       "run": 67,
       "date": "2026-04-24",
       "tasks": "Tasks 4+5 (GetBinAtAngle: 13 theorems, 0 sorry, phase 5)",
       "new_theorems": 13,
-      "new_files": ["GetBinAtAngle.lean", "specs/get_bin_at_angle_informal.md"],
+      "new_files": [
+        "GetBinAtAngle.lean",
+        "specs/get_bin_at_angle_informal.md"
+      ],
       "sorry_added": 0,
       "sorry_removed": 0,
       "pr_branch": "lean-squad/get-bin-at-angle-run67-24900431008",
@@ -84,7 +276,7 @@
     {
       "run": 66,
       "date": "2026-04-24",
-      "tasks": "Task 5 (sorry 12→6) + Task 10 (REPORT.md update)",
+      "tasks": "Task 5 (sorry 12\u21926) + Task 10 (REPORT.md update)",
       "new_theorems": 6,
       "sorry_removed": 6,
       "pr_branch": "lean-squad/sorry-reduction-run66-24881003176"
@@ -94,21 +286,23 @@
       "date": "2026-05-02",
       "tasks": "Task 1 + Tasks 3+4+5 (BrakingDist: 9 theorems 0 sorry)",
       "new_theorems": 9,
-      "new_files": ["BrakingDist.lean"]
+      "new_files": [
+        "BrakingDist.lean"
+      ]
     }
   ],
   "discoveries": [
-    "Int.add_emod_right : (a + b) % b = a % b — direct periodicity lemma (run 67)",
-    "Int.sub_emod a b n : (a - b) % n = (a%n - b%n) % n — key for congruence proofs (run 67)",
-    "Int.fmod_nonneg_of_pos a (h : 0 < b) : 0 ≤ a.fmod b — works for any sign of a (run 67)",
-    "Int.fmod_lt_of_pos a (h : 0 < b) : a.fmod b < b — upper bound for floor mod (run 67)",
+    "Int.add_emod_right : (a + b) % b = a % b \u2014 direct periodicity lemma (run 67)",
+    "Int.sub_emod a b n : (a - b) % n = (a%n - b%n) % n \u2014 key for congruence proofs (run 67)",
+    "Int.fmod_nonneg_of_pos a (h : 0 < b) : 0 \u2264 a.fmod b \u2014 works for any sign of a (run 67)",
+    "Int.fmod_lt_of_pos a (h : 0 < b) : a.fmod b < b \u2014 upper bound for floor mod (run 67)",
     "Int.fdiv_mul_add_fmod a b : a.fdiv b * b + a.fmod b = a (run 67)",
     "omega can prove fdiv_mul_le via: have h1 := fdiv_mul_add_fmod; have h2 := fmod_nonneg_of_pos; omega (run 67)",
     "Std.lt_trans is the correct transitivity lemma for Rat in Lean 4.29 stdlib",
     "ring tactic is NOT available in Lean 4.29 stdlib without imports",
     "linarith tactic is NOT available in Lean 4.29 stdlib without imports",
-    "Int.emod_nonneg requires 0 ≤ a; use Int.emod_nonneg_of_pos for arbitrary a (not in 4.29?)",
-    "Int.emod_nonneg k (by omega) works when k is Int and n > 0 (emod_nonneg takes h : b ≠ 0)",
+    "Int.emod_nonneg requires 0 \u2264 a; use Int.emod_nonneg_of_pos for arbitrary a (not in 4.29?)",
+    "Int.emod_nonneg k (by omega) works when k is Int and n > 0 (emod_nonneg takes h : b \u2260 0)",
     "Rat.inv_lt_inv_of_lt is NOT in stdlib v4.29; can be proved from Rat.mul_lt_mul_right",
     "wrapRat axiom approach: pure axiom declarations + sorry-free theorem proofs = cleaner than theorem-sorry"
   ],
@@ -118,11 +312,17 @@
     "exists": true,
     "last_updated_run": 54,
     "stale_since": "run49",
-    "stale_items": ["theorem count (362 proved)", "bug count (3)", "GetBinAtAngle new"]
+    "stale_items": [
+      "theorem count (362 proved)",
+      "bug count (3)",
+      "GetBinAtAngle new"
+    ]
   },
   "report_status": {
     "exists": true,
     "last_updated_run": 66,
-    "stale_items": ["GetBinAtAngle not in report yet"]
+    "stale_items": [
+      "GetBinAtAngle not in report yet"
+    ]
   }
 }
