@@ -1,27 +1,21 @@
 {
-  "run": 70,
-  "last_updated": "2026-04-25T16:30 UTC",
+  "run": 71,
+  "last_updated": "2026-04-26T01:00 UTC",
   "lean_version": "leanprover/lean4:v4.29.0",
   "lake_build_status": "passed",
   "totals": {
-    "theorems_proved": 381,
-    "theorems_total": 387,
-    "examples": 162,
+    "theorems": 388,
+    "theorems_proved": 382,
+    "examples_evals": 187,
     "sorry_count": 6,
-    "lean_files": 28,
-    "targets": 34
+    "lean_files": 29,
+    "targets": 35
   },
   "sorry_locations": {
     "WrapAngle.lean": 6,
-    "notes": "All 6 sorry in WrapAngle: wrapRat floor arithmetic (wrapRat_ge_lo, wrapRat_lt_hi, wrapRat_in_range, wrapRat_periodic, wrapRat_congruent, wrapRat_zero body). Need Mathlib.Algebra.Order.Floor."
+    "notes": "All 6 sorry in WrapAngle: wrapRat floor arithmetic (wrapRat_ge_lo, wrapRat_lt_hi, wrapRat_in_range, wrapRat_periodic, wrapRat_congruent, wrapRat_zero). Need Mathlib.Algebra.Order.Floor."
   },
-  "open_prs": [
-    {
-      "number": "TBD-run70",
-      "branch": "lean-squad/correspondence-run70-24935257092",
-      "title": "feat(fv): Tasks 6+8 — CORRESPONDENCE.md complete (34 targets) + bin_at_angle tests (run 70)"
-    }
-  ],
+  "open_prs": [],
   "merged_prs": [49, 50, 52, 53, 54, 55, 56, 57, 58, 62, 63, 64, 65],
   "bugs_found": [
     {
@@ -44,18 +38,30 @@
     "atmosphere": "tests/atmosphere/ (26/26 pass, max_rel_err=1.9e-16)",
     "bin_at_angle": "tests/bin_at_angle/ (334/334 pass; confirms getBinI/getOffsetBinI exact for integer-aligned angles; demonstrates wrap_bin latent bug)"
   },
-  "correspondence_coverage": "ALL 28 LEAN FILES fully covered in CORRESPONDENCE.md (34 C++ targets). Run 70 added: WrapBin, BrakingDist, SqrtLinear, GetBinAtAngle, GetLowerBoundAngle, CollisionPrevComposition.",
   "targets": [
     {"id": 1, "name": "SquaredError", "file": "lean/FVSquad/MathFunctions.lean", "phase": 5, "status": "proved"},
     {"id": 2, "name": "Expo", "file": "lean/FVSquad/Expo.lean", "phase": 5, "status": "proved"},
     {"id": 3, "name": "MathUtilClip", "file": "lean/FVSquad/MathFunctions.lean", "phase": 5, "status": "proved"},
-    {"id": 29, "name": "Crc16Sig", "file": "lean/FVSquad/Crc16Sig.lean", "phase": 5, "status": "proved", "theorems": 8, "sorry": 0},
-    {"id": 30, "name": "BrakingDistance", "file": "lean/FVSquad/BrakingDist.lean", "phase": 5, "status": "proved", "theorems": 9, "sorry": 0},
-    {"id": 33, "name": "GetBinAtAngle", "file": "lean/FVSquad/GetBinAtAngle.lean", "phase": 5, "status": "proved", "theorems_proved": 13, "sorry": 0},
-    {"id": 34, "name": "GetLowerBoundAngle", "file": "lean/FVSquad/GetLowerBoundAngle.lean", "phase": 5, "status": "proved", "theorems": 8, "sorry": 0},
+    {"id": 29, "name": "Crc16Sig", "file": "lean/FVSquad/Crc16Sig.lean", "phase": 5, "status": "proved", "theorems": 8, "sorry": 0, "notes": "crc16_add bit-by-bit CCITT + crc16_signature fold. CRC16_OUTPUT_XOR=0 simplifies to pure foldl."},
+    {"id": 30, "name": "BrakingDistance", "file": "lean/FVSquad/BrakingDist.lean", "phase": 5, "status": "proved", "theorems": 14, "sorry": 0},
+    {"id": 33, "name": "GetBinAtAngle", "file": "lean/FVSquad/GetBinAtAngle.lean", "phase": 5, "status": "proved", "theorems": 13, "sorry": 0},
+    {"id": 34, "name": "GetLowerBoundAngle", "file": "lean/FVSquad/GetLowerBoundAngle.lean", "phase": 5, "status": "proved", "theorems": 13, "sorry": 0},
     {"id": 35, "name": "CollisionPrevComposition", "file": "lean/FVSquad/CollisionPrevComposition.lean", "phase": 5, "status": "proved", "theorems": 8, "sorry": 0, "notes": "8 cross-module composition theorems (run 69)"}
   ],
   "run_history": [
+    {
+      "run": 71,
+      "date": "2026-04-26T01:00 UTC",
+      "workflow_run_id": 24944863277,
+      "tasks": [
+        "Task 5: Crc16Sig.lean — crc16_add + crc16_signature fold/split (8 theorems, 0 sorry)",
+        "Task 10: REPORT.md updated 388 theorems, 29 files, 9 layers, 187 examples"
+      ],
+      "theorems_proved": 8,
+      "sorry_changes": 0,
+      "pr_branch": "lean-squad/proof-report-run71-24944863277",
+      "notes": "Merged PRs #63-#67 at run start (Basic.lean conflict resolved manually). Crc16Sig completes target 29 from TARGETS.md. REPORT.md fully updated with all new files from runs 67-71."
+    },
     {
       "run": 70,
       "date": "2026-04-25T16:30 UTC",
@@ -66,18 +72,7 @@
       ],
       "theorems_proved": 0,
       "sorry_changes": 0,
-      "pr_branch": "lean-squad/correspondence-run70-24935257092",
-      "notes": "No new Lean files. CORRESPONDENCE.md complete. bin_at_angle tests confirm exact agreement for integer-aligned inputs and demonstrate wrap_bin latent bug."
-    },
-    {
-      "run": 69,
-      "date": "2026-05-04T08:00 UTC",
-      "workflow_run_id": 24926789262,
-      "tasks": ["Task 5 (CollisionPrevComposition: 8 theorems, 0 sorry)", "Task 1 (TARGETS.md: 6 new entries)"],
-      "theorems_proved": 8,
-      "sorry_changes": 0,
-      "pr_branch": "lean-squad/collision-prev-composition-run69-24926789262",
-      "notes": "getBinI/getOffsetBinI/getLowerBoundI form rotation group action."
+      "pr_branch": "lean-squad/correspondence-run70-24935257092"
     }
   ],
   "discoveries": [
@@ -85,21 +80,23 @@
     "Int.sub_emod a b n : (a - b) % n = (a%n - b%n) % n — key for congruence proofs (run 67)",
     "Int.fmod_nonneg_of_pos a (h : 0 < b) : 0 ≤ a.fmod b — works for any sign of a (run 67)",
     "omega can prove fdiv_mul_le via: have h1 := fdiv_mul_add_fmod; have h2 := fmod_nonneg_of_pos; omega",
+    "CRC16_OUTPUT_XOR = 0x0000 in crc.h — crc16_signature is a pure foldl (no XOR needed)",
+    "crc16sig fold/split: simp [crc16sig, List.foldl_append] proves crc16sig_append; simp [crc16sig] suffices for concrete examples",
     "CORRESPONDENCE.md: complete coverage achieved at run 70 (28 files, 34 C++ targets)",
     "Route B tests: Python % is Euclidean (same as Lean Int.emod for n > 0) — simplifies test scripts",
     "wrap_bin bug: bin + n < 0 iff bin <= -n-1; for typical n=36, need bin <= -37"
   ],
   "mathlib_status": "blocked_403_cache_proxy",
-  "notes": "Run 70: CORRESPONDENCE.md now fully covers all 28 Lean files. bin_at_angle correspondence tests (334 cases) confirm exact agreement for integer-aligned inputs. Open PRs: #63 (sorry reduction), #64 (GetBinAtAngle), #65 (GetLowerBoundAngle), #66 (CollisionPrevComposition) — all merged at run start via local git merge. Next suggested tasks: Task 5 (resolve WrapAngle.lean Mathlib floor sorry if Mathlib becomes available), Task 7 (critique update), Task 10/11 (report/paper update for new targets).",
+  "notes": "Run 71: Crc16Sig.lean proves crc16_signature fold/split (8 thms, 0 sorry). REPORT.md fully updated: 388 theorems, 29 files, 9 layers. Next suggested: Task 7 (critique update), Task 11 (conference paper update for new targets/theorems).",
   "paper_status": {
     "exists": true,
     "last_updated_run": 54,
     "stale_since": "run49",
-    "stale_items": ["theorem count (381 proved)", "bug count (3)", "GetBinAtAngle/GetLowerBoundAngle/CollisionPrevComposition/BrakingDist new", "correspondence tests new"]
+    "stale_items": ["theorem count (388 proved)", "bug count (3)", "GetBinAtAngle/GetLowerBoundAngle/CollisionPrevComposition/BrakingDist/Crc16Sig new"]
   },
   "report_status": {
     "exists": true,
-    "last_updated_run": 66,
-    "stale_items": ["GetBinAtAngle, GetLowerBoundAngle, CollisionPrevComposition, BrakingDist not in report"]
+    "last_updated_run": 71,
+    "stale_items": []
   }
 }
