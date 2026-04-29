@@ -1,7 +1,7 @@
 {
   "run": 81,
-  "last_updated": "2026-04-29T09:30:00Z",
-  "lean_version": "leanprover/lean4:v4.29.0",
+  "last_updated": "2026-04-29",
+  "lean_version": "4.29.0",
   "lake_build_status": "passed",
   "totals": {
     "theorems": 390,
@@ -22,23 +22,7 @@
       "title": "feat(fv): Tasks 5+6 \u2014 ConstrainToInt16 (13 thms) + Crc64 (8 thms) + CORRESPONDENCE.md run 81"
     }
   ],
-  "bugs_found": [
-    {
-      "target": "SignNoZero",
-      "issue": 12,
-      "description": "NaN safety violation in signNoZero<float> \u2014 returns 0 for NaN, violating ne_zero contract"
-    },
-    {
-      "target": "Negate",
-      "issue": 21,
-      "description": "negate<int16_t> involution error \u2014 INT16_MAX special case incorrect, negate(negate(-32767))=-32768"
-    },
-    {
-      "target": "ObstacleMath::wrap_bin",
-      "issue": null,
-      "description": "LATENT BUG (confirmed by FV + 334 correspondence tests): wrap_bin(bin, n) returns negative for bin <= -n-1; C++ truncation mod; callers use result as array index => UB"
-    }
-  ],
+  "bugs_found": 3,
   "correspondence_tests": {
     "atmosphere": "tests/atmosphere/ (26/26 pass, max_rel_err=1.9e-16)",
     "bin_at_angle": "tests/bin_at_angle/ (334/334 pass; confirms getBinI/getOffsetBinI exact for integer-aligned angles; demonstrates wrap_bin latent bug)"
@@ -122,6 +106,24 @@
       "theorems": 8,
       "sorry": 0,
       "notes": "crc64_add_word CRC-64-WE ECMA-182, poly 0x42F0E1EBA9EA3693 MSBIT-first. Fold/split streaming theorem via List.foldl_append."
+    },
+    {
+      "name": "constrainToInt16",
+      "file": "src/lib/mathlib/math/Functions.hpp",
+      "lean_file": "formal-verification/lean/FVSquad/ConstrainToInt16.lean",
+      "phase": 5,
+      "theorems": 13,
+      "sorry": 0,
+      "notes": "Recreated run82. abbrev INT16_MIN/MAX for omega. 5 simp/omega interaction fixes for Lean 4.29."
+    },
+    {
+      "name": "crc64",
+      "file": "src/lib/crc/crc64.cpp",
+      "lean_file": "formal-verification/lean/FVSquad/Crc64.lean",
+      "phase": 5,
+      "theorems": 8,
+      "sorry": 0,
+      "notes": "Recreated run82. Key: crc64Words_append via List.foldl_append. Fixed rfl kernel timeout for two/cons cases."
     }
   ],
   "run_history": [
@@ -192,7 +194,7 @@
     }
   ],
   "mathlib_status": "blocked_403_cache_proxy",
-  "notes": "Run 80: Crc64.lean proved (10 theorems, 0 sorry). CORRESPONDENCE.md updated for Crc16Sig/Crc32Sig/IsInRange/Crc64. WrapAngle/Basic.lean conflict artifacts fixed. Next: ConstrainToInt16.lean (run79 work lost \u2014 reproduce), or REPORT.md update, or new target.",
+  "notes": "Run82: recreated ConstrainToInt16.lean (13 thms) and Crc64.lean (8 thms) lost from runs 78/80. Added 4327-case Route B correspondence tests for SlewRate (all pass). Paper updated: 389 thms, 3 bugs, 33 modules. Lean 4.29 simp fix: in eq_max_iff, case h1:v<-32768 closes by contradiction so no omega needed; case h2:v>32767 proved by simp at h then omega. Crc64 rfl kernel timeout: prove via crc64Words_append + List.foldl_append instead of rfl.",
   "report_status": {
     "exists": true,
     "last_updated_run": 79,
@@ -212,7 +214,7 @@
     ]
   },
   "sorry_count": 0,
-  "lean_files": 32,
+  "lean_files": 33,
   "lean_file_list": [
     "AlphaFilter",
     "Atmosphere",
@@ -247,5 +249,8 @@
     "WrapAngle",
     "WrapBin"
   ],
-  "workflow_run_id": "25099906929"
+  "workflow_run_id": "25099906929",
+  "run_number": 82,
+  "theorem_count": 389,
+  "axiom_count": 16
 }
