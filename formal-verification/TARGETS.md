@@ -56,6 +56,8 @@ rationale. Phase legend: 1=Research, 2=Informal Spec, 3=Lean Spec, 4=Implementat
 | # | Name | File | Phase | Status | Lean File | Notes |
 |---|------|------|-------|--------|-----------|-------|
 | 28 | `ObstacleMath::get_lower_bound_angle` | `src/lib/collision_prevention/ObstacleMath.cpp` | 1 | ⬜ Research | — | Lower bound angle of a bin; builds on WrapBin; rational model; range invariant [0, 360) |
+| 29 | `crc16_signature` fold/split (CCITT) | `src/lib/crc/crc.c` | 1 | ⬜ Research | — | CRC fold/split: `crc16(a++b) = crc16_append(crc16(a),b)`; same structure as Crc16Fold; `List.foldl_append` proof |
+| 35 | `crc32_signature` fold/split (ISO-HDLC) | `src/lib/crc/crc.c` | 2 | ✅ Informal Spec | — | CRC-32/ISO-HDLC (poly `0xEDB88320`); informal spec in `specs/crc32_informal.md`; fold property mirrors Crc16Fold; used in UAVCAN bootloader |
 | 29 | `crc16_signature` fold/split (CCITT) | `src/lib/crc/crc.c` | 5 | ✅ Proved | `lean/FVSquad/Crc16Sig.lean` | 8 theorems, 0 sorry; fold/split via `List.foldl_append` |
 | 35 | `crc32_signature` fold/split (ISO-HDLC) | `src/lib/crc/crc.c` | 5 | ✅ Proved | `lean/FVSquad/Crc32Sig.lean` | 11 theorems, 0 sorry; LSBIT-first CRC-32/ISO-HDLC; fold/split + 6 concrete examples; used in UAVCAN bootloader |
 | 30 | `math::computeBrakingDistanceFromVelocity` | `src/lib/mathlib/math/TrajMath.hpp` | 5 | ✅ Proved | `lean/FVSquad/BrakingDist.lean` | 9 theorems, 0 sorry; non-negativity, monotonicity, quadratic scaling, no-delay formula; informal spec in `specs/braking_dist_informal.md` |
