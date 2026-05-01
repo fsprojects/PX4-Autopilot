@@ -1,14 +1,14 @@
 {
-  "run": 87,
-  "last_updated": "2026-05-01T09:00:00Z",
+  "run": 88,
+  "last_updated": "2026-05-02T12:00:00Z",
   "lean_version": "4.29.0",
   "lake_build_status": "passed",
   "totals": {
-    "theorems": 458,
-    "theorems_proved": 458,
+    "theorems": 475,
+    "theorems_proved": 475,
     "axioms": 16,
     "sorry_count": 0,
-    "lean_files": 36,
+    "lean_files": 37,
     "targets": 44
   },
   "sorry_locations": {
@@ -19,20 +19,15 @@
     "Crc64": "RESOLVED run80+82: 0 sorry, 8 theorems.",
     "Crc8": "RESOLVED run84: 0 sorry, 8 theorems (new file).",
     "RadiansDegrees": "RESOLVED run86: 0 sorry, 36 theorems.",
-    "Min3Max3": "RESOLVED run87: 0 sorry, 29 theorems (new file)."
+    "Min3Max3": "RESOLVED run87: 0 sorry, 29 theorems (new file).",
+    "VelocitySmoothing": "RESOLVED run88: 0 sorry, 17 theorems (computeT2 + computeT3Scaled)."
   },
   "open_prs": [
     {
-      "number": 78,
-      "branch": "lean-squad/tasks-5-7-run86-88cdeb5a0c8125a8",
-      "run": 86,
-      "title": "[Lean Squad] feat(fv): run86 — RadiansDegrees Lean proofs + CRITIQUE.md update"
-    },
-    {
       "number": "TBD",
-      "branch": "lean-squad/min3max3-run87-25208640880",
-      "run": 87,
-      "title": "[Lean Squad] feat(fv): run87 — Min3Max3 Lean proofs + informal spec"
+      "branch": "lean-squad/velocity-smoothing-run88-25222714086",
+      "run": 88,
+      "title": "[Lean Squad] feat(fv): run88 \u2014 VelocitySmoothing computeT2/computeT3 formal proofs"
     }
   ],
   "bugs_found": 3,
@@ -42,22 +37,101 @@
     "slew_rate": "tests/slew_rate/ (4327/4327 pass)"
   },
   "correspondence_sections": {
-    "covered": "MathFunctions, AlphaFilter, SlewRate, Deadzone, Interpolate, WelfordMean, Lerp, Negate, WrapAngle, Expo, RingBuffer, MedianFilter, SuperExpo, ExpoDeadzone, InterpolateNXY, InterpolateN, SignFromBoolSq, Hysteresis, Crc16Fold, Crc16Sig, Crc32Sig, CommanderArming, Atmosphere, WrapBin, BrakingDist, SqrtLinear, GetBinAtAngle, GetLowerBoundAngle, CollisionPrevComposition, IsInRange, ConstrainToInt16, Crc64, Crc8, RadiansDegrees, Min3Max3",
-    "missing": "RadiansDegrees and Min3Max3 need CORRESPONDENCE sections (run88)"
+    "covered": "MathFunctions, AlphaFilter, SlewRate, Deadzone, Interpolate, WelfordMean, Lerp, Negate, WrapAngle, Expo, RingBuffer, MedianFilter, SuperExpo, ExpoDeadzone, InterpolateNXY, InterpolateN, SignFromBoolSq, Hysteresis, Crc16Fold, Crc16Sig, Crc32Sig, CommanderArming, Atmosphere, WrapBin, BrakingDist, SqrtLinear, GetBinAtAngle, GetLowerBoundAngle, CollisionPrevComposition, IsInRange, ConstrainToInt16, Crc64, Crc8, RadiansDegrees, Min3Max3, VelocitySmoothing",
+    "missing": "RadiansDegrees and Min3Max3 CORRESPONDENCE sections still needed"
   },
   "targets": [
-    {"id": 1, "name": "SquaredError", "file": "lean/FVSquad/MathFunctions.lean", "phase": 5, "status": "proved"},
-    {"id": 2, "name": "Expo", "file": "lean/FVSquad/Expo.lean", "phase": 5, "status": "proved"},
-    {"id": 29, "name": "Crc16Sig", "file": "lean/FVSquad/Crc16Sig.lean", "phase": 5, "status": "proved"},
-    {"id": 35, "name": "Crc32Sig", "file": "lean/FVSquad/Crc32Sig.lean", "phase": 5, "status": "proved"},
-    {"id": 36, "name": "crc64_add_word", "file": "lean/FVSquad/Crc64.lean", "phase": 5, "status": "proved"},
-    {"id": 37, "name": "isInRange", "file": "lean/FVSquad/IsInRange.lean", "phase": 5, "status": "proved"},
-    {"id": 38, "name": "constrainFloatToInt16", "file": "lean/FVSquad/ConstrainToInt16.lean", "phase": 5, "status": "proved"},
-    {"id": 40, "name": "radians/degrees", "file": "lean/FVSquad/RadiansDegrees.lean", "phase": 5, "status": "proved", "theorems": 36, "sorry": 0},
-    {"id": 41, "name": "VelocitySmoothing::computeT3", "file": "src/lib/motion_planning/VelocitySmoothing.cpp:157", "phase": 1, "status": "research"},
-    {"id": 42, "name": "CRC-8 CRSF fold-split", "file": "lean/FVSquad/Crc8.lean", "phase": 5, "status": "proved"},
-    {"id": 43, "name": "VelocitySmoothing::computeT2 simple", "file": "src/lib/motion_planning/VelocitySmoothing.cpp:151", "phase": 1, "status": "research"},
-    {"id": 44, "name": "math::min3/max3", "file": "lean/FVSquad/Min3Max3.lean", "phase": 5, "status": "proved", "theorems": 29, "sorry": 0, "notes": "run87: lower/upper bound, GLB/LUB, idempotence, commutativity, duality. 0 sorry."}
+    {
+      "id": 1,
+      "name": "SquaredError",
+      "file": "lean/FVSquad/MathFunctions.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 2,
+      "name": "Expo",
+      "file": "lean/FVSquad/Expo.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 29,
+      "name": "Crc16Sig",
+      "file": "lean/FVSquad/Crc16Sig.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 35,
+      "name": "Crc32Sig",
+      "file": "lean/FVSquad/Crc32Sig.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 36,
+      "name": "crc64_add_word",
+      "file": "lean/FVSquad/Crc64.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 37,
+      "name": "isInRange",
+      "file": "lean/FVSquad/IsInRange.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 38,
+      "name": "constrainFloatToInt16",
+      "file": "lean/FVSquad/ConstrainToInt16.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 40,
+      "name": "radians/degrees",
+      "file": "lean/FVSquad/RadiansDegrees.lean",
+      "phase": 5,
+      "status": "proved",
+      "theorems": 36,
+      "sorry": 0
+    },
+    {
+      "id": 41,
+      "name": "VelocitySmoothing::computeT3",
+      "file": "src/lib/motion_planning/VelocitySmoothing.cpp:157",
+      "phase": 5,
+      "status": "research",
+      "notes": "DONE run88: 17 theorems proved, 0 sorry"
+    },
+    {
+      "id": 42,
+      "name": "CRC-8 CRSF fold-split",
+      "file": "lean/FVSquad/Crc8.lean",
+      "phase": 5,
+      "status": "proved"
+    },
+    {
+      "id": 43,
+      "name": "VelocitySmoothing::computeT2 simple",
+      "file": "src/lib/motion_planning/VelocitySmoothing.cpp:151",
+      "phase": 5,
+      "status": "research",
+      "notes": "DONE run88: 17 theorems proved, 0 sorry"
+    },
+    {
+      "id": 44,
+      "name": "math::min3/max3",
+      "file": "lean/FVSquad/Min3Max3.lean",
+      "phase": 5,
+      "status": "proved",
+      "theorems": 29,
+      "sorry": 0,
+      "notes": "run87: lower/upper bound, GLB/LUB, idempotence, commutativity, duality. 0 sorry."
+    }
   ],
   "run_history": [
     {
@@ -65,8 +139,8 @@
       "date": "2026-05-01T08:52 UTC",
       "workflow_run_id": 25208640880,
       "tasks": [
-        "Task 3: Informal spec for math::min3/max3 (Limits.hpp:60-75) — min3_max3_informal.md",
-        "Task 5: Lean 4 file Min3Max3.lean — 29 theorems (lower/upper bounds, GLB/LUB, idempotence, commutativity, duality) + 0 sorry; lake build 39/39 passed"
+        "Task 3: Informal spec for math::min3/max3 (Limits.hpp:60-75) \u2014 min3_max3_informal.md",
+        "Task 5: Lean 4 file Min3Max3.lean \u2014 29 theorems (lower/upper bounds, GLB/LUB, idempotence, commutativity, duality) + 0 sorry; lake build 39/39 passed"
       ],
       "theorems_proved": 29,
       "sorry_changes": 0,
@@ -78,8 +152,8 @@
       "date": "2026-05-01T01:14 UTC",
       "workflow_run_id": 25197442944,
       "tasks": [
-        "Task 5: RadiansDegrees.lean — 36 theorems (round-trip, mono, injective, linear, concrete values); 0 sorry",
-        "Task 7: CRITIQUE.md — comprehensive update from run63 state to run86 (430 theorems, 0 sorry)"
+        "Task 5: RadiansDegrees.lean \u2014 36 theorems (round-trip, mono, injective, linear, concrete values); 0 sorry",
+        "Task 7: CRITIQUE.md \u2014 comprehensive update from run63 state to run86 (430 theorems, 0 sorry)"
       ],
       "theorems_proved": 36,
       "sorry_changes": 0,
@@ -91,24 +165,24 @@
       "workflow_run_id": 25156728406,
       "tasks": [
         "Task 2: CRC-8 CRSF informal spec",
-        "Task 3: Crc8.lean — 8 theorems, 0 sorry; completes CRC family"
+        "Task 3: Crc8.lean \u2014 8 theorems, 0 sorry; completes CRC family"
       ],
       "theorems_proved": 8,
       "sorry_changes": 0
     }
   ],
   "discoveries": [
-    "import must come BEFORE module docblock (/-! ... -/) in Lean 4 — docblock goes AFTER imports",
+    "import must come BEFORE module docblock (/-! ... -/) in Lean 4 \u2014 docblock goes AFTER imports",
     "INT16_MIN/INT16_MAX: use simp only [INT16_MIN, INT16_MAX] at * before omega",
-    "prefix is a reserved keyword in Lean 4 — use pfx/sfx",
+    "prefix is a reserved keyword in Lean 4 \u2014 use pfx/sfx",
     "CRC-32 is LSBIT-first; CRC-64-WE is MSBIT-first",
     "FVSquad.lean AND Basic.lean must both explicitly import new files",
-    "lemma is NOT a keyword in Lean 4.29 stdlib (without Mathlib) — use theorem",
+    "lemma is NOT a keyword in Lean 4.29 stdlib (without Mathlib) \u2014 use theorem",
     "Int.min_le_left, Int.min_le_right, Int.le_min, Int.min_eq_left/right available in stdlib",
     "Int.le_max_left, Int.le_max_right, Int.max_le, Int.max_eq_left/right available in stdlib",
     "Int.min_assoc, Int.max_assoc, Int.min_comm, Int.max_comm available in stdlib",
     "Int.min_self, Int.max_self available in stdlib",
-    "neg_min/neg_max proofs: by_cases h : a ≤ b + rw [min_eq_left h, max_eq_left (neg_le_neg h)] pattern works",
+    "neg_min/neg_max proofs: by_cases h : a \u2264 b + rw [min_eq_left h, max_eq_left (neg_le_neg h)] pattern works",
     "Duality proof pattern: rw [show -(min X Y) = max (-X) (-Y) from neg_min_aux _ _]",
     "CRC-8/DVB-S2 poly 0xD5: crc8 [0xFF] = 0xF9; always verify concrete values with native_decide",
     "computeT3 proof: simp [max_def] + linarith covers all cases",
@@ -119,6 +193,11 @@
   "report_status": {
     "exists": true,
     "last_updated_run": 79,
-    "stale_items": ["run82 additions", "run84 additions (Crc8)", "run86 additions (RadiansDegrees)", "run87 additions (Min3Max3)"]
+    "stale_items": [
+      "run82 additions",
+      "run84 additions (Crc8)",
+      "run86 additions (RadiansDegrees)",
+      "run87 additions (Min3Max3)"
+    ]
   }
 }
