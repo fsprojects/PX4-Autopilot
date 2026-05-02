@@ -4,8 +4,8 @@
 
 ## Last Updated
 
-- **Date**: 2026-05-02 08:43 UTC
-- **Commit**: `72303932499305ddf1ce544af5ee5bc5f6370911`
+- **Date**: 2026-05-02 16:28 UTC
+- **Commit**: `23492457d8c37934a1f323edebffaefc139353bf`
 
 ---
 
@@ -282,12 +282,13 @@ returns a negative index for `bin ≤ -n` in the C++ truncation-mod implementati
     `degreesQ_radiansQ_degreesQ` (round-trip), monotonicity, injectivity, linearity properties,
     and concrete special values (radians(180) = π, degrees(π) = 180).
 
-14. ~~**`VelocitySmoothing::computeT2` and `math::min3/max3`**~~ ✅ **DONE** (runs 87–88):
-    `Min3Max3.lean` (31 theorems, 0 sorry, run87) and `VelocitySmoothing.lean` (17 theorems,
-    0 sorry, run88) fully proved. Key results: `min3_le_left`/`_mid`/`_right` (bound safety),
+14. ~~**`VelocitySmoothing::computeT2` and `math::min3/max3`**~~ ✅ **DONE** (runs 87–90):
+    `Min3Max3.lean` (31 theorems, 0 sorry, run87) and `VelocitySmoothing.lean` (25 theorems,
+    0 sorry, runs 88+90) fully proved. Key results: `min3_le_left`/`_mid`/`_right` (bound safety),
     `max3_neg_min3`/`min3_neg_max3` (negation duality), `computeT2_nonneg` (non-negative
     trajectory time), `computeT2_partition` (time budget identity `T2 + T1 + T3 = T123`),
-    and `computeT3Scaled_mono_T1`/`_mono_a0` (monotonicity for feasibility).
+    `computeT3Scaled_mono_T1`/`_mono_a0` (monotonicity for feasibility), and
+    `T2_decreases_as_T3_grows` (cross-function anti-correlation of coasting and decel phases).
 
 15. **`AlphaFilter` multi-step convergence** ✅ **DONE** (run89):
     Five new theorems added to `AlphaFilter.lean` (0 sorry): `alphaIterate_error_formula`
@@ -313,11 +314,22 @@ returns a negative index for `bin ≤ -n` in the C++ truncation-mod implementati
     and new multi-step theorems cover the time-domain response completely. The z-transform
     transfer function could be stated and proved with Mathlib complex number support.
 
-14. **Conference paper** (Task 11): With 533 proved theorems across 37 files, 3 confirmed bugs,
+14. **Conference paper** (Task 11): With 541 proved theorems across 37 files, 3 confirmed bugs,
     and a formal demonstration of latent C++ truncation-mod vulnerability in collision
     prevention, the project has substantial material for a conference paper (IEEE FM,
     FMCAD, or CAV). **Recommendation**: update `formal-verification/paper/paper.tex` to
-    reflect runs 49–89 additions (see Paper Review section above).
+    reflect runs 49–90 additions (see Paper Review section above).
+
+16. **`VelocitySmoothing` full S-curve planner** (new high-priority target): The two simple
+    helpers `computeT2` and `computeT3` are fully proved (25 theorems). The next layer is
+    the 5-argument `computeT2` overload (line 138) and the full `updateDurations` planner
+    (line ~190), which calls both helpers and additionally clamps to kinematic limits.
+    **Properties to prove**: that `updateDurations` produces a valid S-curve decomposition
+    (T1+T2+T3 = T_total when feasible), that all output times are non-negative, and that
+    the planner is monotone in the input velocity request. This is the highest-value
+    VelocitySmoothing extension given the proofs already in place. **Tractability**: medium —
+    requires modelling the clamping logic and the two-step helper composition, but the
+    cross-function composition pattern (`T2_decreases_as_T3_grows`) shows this is achievable.
 
 ---
 
@@ -543,14 +555,18 @@ to show the numerator is strictly negative. No sorry remains in `Deadzone.lean`.
     All commutativity, idempotence, and selectivity (min3 equals one of its inputs) theorems
     are proved by `omega`.
 
-23. **`VelocitySmoothing::computeT2` and `computeT3Scaled` fully proved (17 theorems, 0 sorry)**:
-    `VelocitySmoothing.lean` proves 17 theorems on the minimum-jerk trajectory solver.
+23. **`VelocitySmoothing::computeT2` and `computeT3Scaled` fully proved (25 theorems, 0 sorry)**:
+    `VelocitySmoothing.lean` proves 25 theorems on the minimum-jerk trajectory solver.
     The central result `computeT2_nonneg` formally rules out negative trajectory time — a
     physical impossibility that would crash trajectory integration. `computeT2_partition`
     proves the key time-budget identity `T2 = T123 - T1 - T3` (when feasible), confirming
     the S-curve time allocation is self-consistent. Monotonicity and anti-monotonicity theorems
     (`computeT2_mono_T123`, `computeT2_anti_T1/T3`, `computeT3Scaled_mono_T1/a0`) bound how
     the computed times respond to changes in inputs — directly useful for feasibility analysis.
+    Run 90 added 8 new theorems including `computeT3Scaled_mono_jMax` (higher jerk → larger T3),
+    `computeT2_strict_mono_T123` (strict monotonicity when clamp is inactive), and the two
+    cross-function composition theorems `total_T_partition` and `T2_decreases_as_T3_grows`
+    (see finding #25 below).
 
 24. **`AlphaFilter` multi-step convergence fully proved (5 new theorems, 0 sorry)**:
     Run 89 adds `alphaIterate_error_formula` (error decays as `(state₀-target)·(1-α)ⁿ`),
@@ -561,12 +577,24 @@ to show the numerator is strictly negative. No sorry remains in `Deadzone.lean`.
     state. The proofs use `induction n generalizing state` with `alphaUpdate_no_overshoot_*`
     as the inductive building blocks.
 
+25. **Cross-function schedule composition: `T2_decreases_as_T3_grows` (run 90)**:
+    `VelocitySmoothing.lean` proves two cross-function composition theorems that capture
+    a key physical invariant of S-curve trajectory planning. `total_T_partition` establishes
+    the general identity `T1 + T2 + T3Scaled = max T123 (T1 + T3Scaled)`, showing that the
+    three-phase schedule always partitions the total time budget exactly. The companion theorem
+    `T2_decreases_as_T3_grows` proves — via two-step transitivity linking `computeT3Scaled_mono_T1`
+    and `computeT2_anti_T3` — that as phase-1 jerk duration grows, the trajectory planner
+    computes a longer phase-3, leaving less coasting time. This anti-correlation is a
+    non-trivial system invariant: it is not visible from either `computeT2` or `computeT3Scaled`
+    in isolation, but emerges only from their joint semantics. The formal proof confirms
+    that the jerk-limited planner's time allocation is physically self-consistent.
+
 
 ---
 
 ## Known Sorry-Guarded Theorems
 
-As of run 89, **0 theorems use `sorry`** across all 37 Lean files. The three groups of
+As of run 90, **0 theorems use `sorry`** across all 37 Lean files. The three groups of
 theorems previously sorry-guarded were resolved via abstract `axiom` declarations (runs 73–82):
 
 **`WrapAngle.lean`** (6 → 0 sorry, resolved run73+80):
@@ -598,9 +626,9 @@ was most recently revised in run54. The paper now has **significantly stale cont
 has not been updated since run 63, and 14 new Lean files, 103+ new theorems, and several
 resolved sorry-counts have accumulated since then.
 
-### Stale Items (run89 assessment)
+### Stale Items (run90 assessment)
 
-Since the last paper update (run54), **twenty new Lean files** have been added and proved:
+Since the last paper update (run54), **twenty-one new Lean files** have been added and proved:
 
 1. **`SignFromBoolSq.lean`** (run49, 17 theorems): Add to Table 1; `signFromBool_ne_zero` to §3.2.
 2. **`Crc16Fold.lean`** (run51, 8 theorems): Exact-correspondence CRC; new row in Table 1.
@@ -618,23 +646,23 @@ Since the last paper update (run54), **twenty new Lean files** have been added a
 14. **`Crc8.lean`** (run84, 10 theorems): CRSF RC protocol CRC-8 fold/split.
 15. **`BrakingDist.lean`** (run~84, 16 theorems): Trajectory math; braking distance non-negativity and monotonicity.
 16. **`CollisionPrevComposition.lean`** (run~85, 14 theorems): Compositional: bin/lower-bound functions tile 360° without gaps.
-17. **`RadiansDegrees.lean`** (run86, 28 theorems): Round-trip, monotonicity, injectivity, linearity for `math::radians`/`math::degrees`.
+17. **`RadiansDegrees.lean`** (run86, 43 theorems): Round-trip, monotonicity, injectivity, linearity for `math::radians`/`math::degrees`.
 18. **`Min3Max3.lean`** (run87, 31 theorems): Bound safety, idempotence, commutativity, negation duality for `min3`/`max3`.
-19. **`VelocitySmoothing.lean`** (run88, 17 theorems): `computeT2` non-negativity, partition identity, monotonicity.
+19. **`VelocitySmoothing.lean`** (runs 88+90, 25 theorems): `computeT2` non-negativity, partition identity, monotonicity, jMax monotonicity, cross-function `T2_decreases_as_T3_grows`.
 20. **`AlphaFilter.lean` (5 new theorems, run89)**: Multi-step convergence: error formula, no-overshoot (n steps), monotone convergence.
 
-### Accuracy (run89 assessment)
+### Accuracy (run90 assessment)
 
-- Abstract theorem count is **stale** — actual count is 533 proved (all, 0 sorry).
+- Abstract theorem count is **stale** — actual count is 541 proved (all, 0 sorry).
 - Abstract bug count is **stale** — 3 bugs now confirmed (signNoZero NaN, negate involution, wrap_bin negative-index).
-- Table 1 is missing 20 files added since run54.
+- Table 1 is missing 20+ files added since run54.
 - Future Work references several items now complete — should be moved to Results.
 - The sorry count should reflect 0 sorry (converted to axioms in runs 73–82).
 - The "21 C++ targets with Lean proofs" claim is stale — actual is 43+ targets, 37 Lean files.
 
 ### Remaining Open Suggestions
 
-1. **Update paper for run49–89 additions**: Add all 20 new files to Table 1, update
+1. **Update paper for run49–90 additions**: Add all 21 new files to Table 1, update
    abstract counts, revise Findings to include the `wrap_bin` bug, revise Future Work.
    This is the highest-priority paper update.
 2. **PDF compilation**: LaTeX is not available in the CI environment; the paper is submitted
