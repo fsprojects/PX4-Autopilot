@@ -335,4 +335,51 @@ theorem T2_decreases_as_T3_grows (T123 T1 T1' a0 jMax : Int)
     computeT2_anti_T3 T123 T1 (computeT3Scaled T1 a0 jMax) (computeT3Scaled T1' a0 jMax) hT3mono
   exact Int.le_trans step1 step2
 
+-- ============================================================
+-- § 10  Additional corollaries: T2 decreasing as a0 or jMax grows
+-- ============================================================
+
+/-- Larger initial acceleration (fixed T1, fixed jMax) → longer T3Scaled → shorter T2.
+
+    `a0` increasing raises the scaled phase-3 duration (`computeT3Scaled_mono_a0`),
+    which in turn squeezes the coasting phase (`computeT2_anti_T3`). -/
+theorem T2_decreases_as_a0_grows (T123 T1 a0 a0' jMax : Int) (hle : a0 ≤ a0') :
+    computeT2 T123 T1 (computeT3Scaled T1 a0' jMax) ≤
+    computeT2 T123 T1 (computeT3Scaled T1 a0  jMax) :=
+  computeT2_anti_T3 T123 T1 (computeT3Scaled T1 a0 jMax) (computeT3Scaled T1 a0' jMax)
+    (computeT3Scaled_mono_a0 T1 a0 a0' jMax hle)
+
+/-- Higher jerk limit (with `T1 ≥ 0`) → longer T3Scaled → shorter T2.
+
+    When `jMax` increases and `T1 ≥ 0`, the scaled phase-3 duration grows
+    (`computeT3Scaled_mono_jMax`), which squeezes the coasting phase (`computeT2_anti_T3`). -/
+theorem T2_decreases_as_jMax_grows (T123 T1 a0 jMax jMax' : Int)
+    (hT1 : 0 ≤ T1) (hle : jMax ≤ jMax') :
+    computeT2 T123 T1 (computeT3Scaled T1 a0 jMax') ≤
+    computeT2 T123 T1 (computeT3Scaled T1 a0 jMax) :=
+  computeT2_anti_T3 T123 T1 (computeT3Scaled T1 a0 jMax) (computeT3Scaled T1 a0 jMax')
+    (computeT3Scaled_mono_jMax T1 a0 jMax jMax' hT1 hle)
+
+-- ============================================================
+-- § 11  Total schedule duration is monotone in T1
+-- ============================================================
+
+/-- **Total schedule monotonicity**: when T1 grows (with `jMax > 0`), the total
+    schedule duration `max T123 (T1 + T3Scaled)` is non-decreasing.
+
+    By `total_T_partition`, the total schedule is `max T123 (T1 + computeT3Scaled T1 a0 jMax)`.
+    Since `T1 + computeT3Scaled` is monotone in `T1` when `jMax > 0`, the max is too. -/
+theorem total_T_mono_T1 (T123 T1 T1' a0 jMax : Int)
+    (hjMax : 0 < jMax) (hle : T1 ≤ T1') :
+    max T123 (T1  + computeT3Scaled T1  a0 jMax) ≤
+    max T123 (T1' + computeT3Scaled T1' a0 jMax) := by
+  have hT3 : computeT3Scaled T1 a0 jMax ≤ computeT3Scaled T1' a0 jMax :=
+    computeT3Scaled_mono_T1 T1 T1' a0 jMax hjMax hle
+  have hA : T1 + computeT3Scaled T1 a0 jMax ≤ T1' + computeT3Scaled T1' a0 jMax := by omega
+  by_cases h : T123 ≤ T1 + computeT3Scaled T1 a0 jMax
+  · rw [Int.max_eq_right h]
+    exact Int.le_trans hA (Int.le_max_right _ _)
+  · rw [Int.max_eq_left (by omega)]
+    exact Int.le_max_left _ _
+
 end PX4.VelocitySmoothing
