@@ -1,5 +1,5 @@
 {
-  "run": 92,
+  "run": 93,
   "last_updated": "2026-05-03",
   "lean_version": "4.29.1",
   "lake_build_status": "passed",
@@ -28,17 +28,24 @@
       "title": "feat(fv): run91 \u2014 CRITIQUE.md + CORRESPONDENCE.md refresh (conflicts with run90)"
     },
     {
-      "number": "TBD",
-      "branch": "lean-squad/velocity-smoothing-run92-25266373719",
+      "number": 84,
+      "branch": "lean-squad/velocity-smoothing-run92-25266373719-4e10da85f6fd3bb2",
       "run": 92,
       "title": "feat(fv): run92 \u2014 VelocitySmoothing +3 theorems + CORRESPONDENCE.md update"
+    },
+    {
+      "number": "TBD",
+      "branch": "lean-squad/tasks-8-9-run93-25274614042",
+      "run": 93,
+      "title": "feat(fv): run93 \u2014 VelocitySmoothing Route B tests + CI correspondence-test job"
     }
   ],
   "bugs_found": 3,
   "correspondence_tests": {
     "atmosphere": "tests/atmosphere/ (26/26 pass, max_rel_err=1.9e-16)",
-    "bin_at_angle": "tests/bin_at_angle/ (334/334 pass; confirms getBinI/getOffsetBinI exact for integer-aligned angles; demonstrates wrap_bin latent bug)",
-    "slew_rate": "tests/slew_rate/ (4327/4327 pass; confirms SlewRate::update exact for Rat model)"
+    "bin_at_angle": "tests/bin_at_angle/ (334/334 pass; confirms getBinI/getOffsetBinI exact; demonstrates wrap_bin latent bug)",
+    "slew_rate": "tests/slew_rate/ (4327/4327 pass; confirms SlewRate::update exact for Rat model)",
+    "velocity_smoothing": "tests/velocity_smoothing/ (1237/1237 pass; computeT2 441 cases + computeT3Scaled 596 cases + partition 200 cases; run93)"
   },
   "correspondence_sections": {
     "covered": "MathFunctions, AlphaFilter, SlewRate, Deadzone, Interpolate, WelfordMean, Lerp, Negate, WrapAngle, Expo, RingBuffer, MedianFilter, SuperExpo, ExpoDeadzone, InterpolateNXY, InterpolateN, SignFromBoolSq, Hysteresis, Crc16Fold, Crc16Sig, Crc32Sig, CommanderArming, Atmosphere, WrapBin, BrakingDist, SqrtLinear, GetBinAtAngle, GetLowerBoundAngle, CollisionPrevComposition, IsInRange, ConstrainToInt16, Crc64, Crc8, RadiansDegrees, Min3Max3, VelocitySmoothing",
@@ -226,5 +233,10 @@
     "stale_items": [
       "run82 additions (SlewRate tests, ConstrainToInt16, Crc64)"
     ]
+  },
+  "ci": {
+    "lean_ci": "lean-ci.yml \u2014 two jobs: 'build' (Lean proofs) and 'correspondence-tests' (Route B Python harnesses). Triggers on lean/** and tests/**. Updated run93.",
+    "status": "healthy (last known)",
+    "correspondence_test_job": "Added run93: runs atmosphere, slew_rate, velocity_smoothing on every PR/push"
   }
 }
