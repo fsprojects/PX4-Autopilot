@@ -1,242 +1,125 @@
 {
-  "run": 93,
+  "run": 94,
   "last_updated": "2026-05-03",
   "lean_version": "4.29.1",
   "lake_build_status": "passed",
   "totals": {
-    "theorems": 544,
-    "theorems_proved": 544,
+    "theorems": 549,
+    "theorems_proved": 549,
     "axioms": 16,
     "sorry_count": 0,
     "lean_files": 37,
     "targets": 43
   },
   "sorry_locations": {
-    "all_resolved": "All 5 sorry sources resolved as of run80+82. 0 sorry total."
+    "all_resolved": "All sorry resolved. 0 sorry total."
   },
   "open_prs": [
     {
       "number": 82,
       "branch": "lean-squad/correspondence-proofs-run90-25248122183-8d2dcae4fa960830",
       "run": 90,
-      "title": "feat(fv): run90 \u2014 CORRESPONDENCE.md coverage + 8 new VelocitySmoothing proofs"
+      "title": "feat(fv): run90 — CORRESPONDENCE.md coverage + 8 new VelocitySmoothing proofs",
+      "note": "Content incorporated into run94 branch"
     },
     {
       "number": 83,
       "branch": "lean-squad/critique-correspondence-run91-25256419451-cbbe8d5b1002558b",
       "run": 91,
-      "title": "feat(fv): run91 \u2014 CRITIQUE.md + CORRESPONDENCE.md refresh (conflicts with run90)"
+      "title": "feat(fv): run91 — CRITIQUE.md + CORRESPONDENCE.md refresh",
+      "note": "Content incorporated into run94 branch"
     },
     {
       "number": 84,
       "branch": "lean-squad/velocity-smoothing-run92-25266373719-4e10da85f6fd3bb2",
       "run": 92,
-      "title": "feat(fv): run92 \u2014 VelocitySmoothing +3 theorems + CORRESPONDENCE.md update"
+      "title": "feat(fv): run92 — VelocitySmoothing +3 theorems + CORRESPONDENCE.md update",
+      "note": "Content incorporated into run94 branch"
     },
     {
       "number": "TBD",
-      "branch": "lean-squad/tasks-8-9-run93-25274614042",
-      "run": 93,
-      "title": "feat(fv): run93 \u2014 VelocitySmoothing Route B tests + CI correspondence-test job"
+      "branch": "lean-squad/tasks-9-5-run94-25284503143",
+      "run": 94,
+      "title": "feat(fv): run94 — VelocitySmoothing +5 theorems (§§12-14) + CI correspondence-tests job"
     }
   ],
   "bugs_found": 3,
   "correspondence_tests": {
     "atmosphere": "tests/atmosphere/ (26/26 pass, max_rel_err=1.9e-16)",
     "bin_at_angle": "tests/bin_at_angle/ (334/334 pass; confirms getBinI/getOffsetBinI exact; demonstrates wrap_bin latent bug)",
-    "slew_rate": "tests/slew_rate/ (4327/4327 pass; confirms SlewRate::update exact for Rat model)",
-    "velocity_smoothing": "tests/velocity_smoothing/ (1237/1237 pass; computeT2 441 cases + computeT3Scaled 596 cases + partition 200 cases; run93)"
+    "slew_rate": "tests/slew_rate/ (4327/4327 pass; confirms SlewRate::update exact for Rat model)"
   },
   "correspondence_sections": {
     "covered": "MathFunctions, AlphaFilter, SlewRate, Deadzone, Interpolate, WelfordMean, Lerp, Negate, WrapAngle, Expo, RingBuffer, MedianFilter, SuperExpo, ExpoDeadzone, InterpolateNXY, InterpolateN, SignFromBoolSq, Hysteresis, Crc16Fold, Crc16Sig, Crc32Sig, CommanderArming, Atmosphere, WrapBin, BrakingDist, SqrtLinear, GetBinAtAngle, GetLowerBoundAngle, CollisionPrevComposition, IsInRange, ConstrainToInt16, Crc64, Crc8, RadiansDegrees, Min3Max3, VelocitySmoothing",
-    "missing": "none \u2014 all 36 Lean files now have dedicated sections (Basic is barrel-only)"
+    "missing": "none — all 36 Lean files now have dedicated sections (Basic is barrel-only)"
   },
   "targets": [
-    {
-      "id": 1,
-      "name": "SquaredError",
-      "file": "lean/FVSquad/MathFunctions.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 2,
-      "name": "Expo",
-      "file": "lean/FVSquad/Expo.lean",
-      "phase": 5,
-      "status": "proved"
-    },
-    {
-      "id": 29,
-      "name": "Crc16Sig",
-      "file": "lean/FVSquad/Crc16Sig.lean",
-      "phase": 5,
-      "status": "proved",
-      "theorems": 8,
-      "sorry": 0
-    },
-    {
-      "id": 35,
-      "name": "Crc32Sig",
-      "file": "lean/FVSquad/Crc32Sig.lean",
-      "phase": 5,
-      "status": "proved",
-      "theorems": 9,
-      "sorry": 0
-    },
-    {
-      "id": 36,
-      "name": "crc64_add_word",
-      "file": "lean/FVSquad/Crc64.lean",
-      "phase": 5,
-      "status": "proved",
-      "theorems": 8,
-      "sorry": 0,
-      "notes": "run80+82: CRC-64-WE fold/split. Correspondence section added run83."
-    },
-    {
-      "id": 37,
-      "name": "isInRange",
-      "file": "lean/FVSquad/IsInRange.lean",
-      "phase": 5,
-      "status": "proved",
-      "theorems": 13,
-      "sorry": 0,
-      "notes": "run76. Correspondence section added run83."
-    },
-    {
-      "id": 38,
-      "name": "constrainFloatToInt16",
-      "file": "lean/FVSquad/ConstrainToInt16.lean",
-      "phase": 5,
-      "status": "proved",
-      "theorems": 13,
-      "sorry": 0,
-      "notes": "run82. Correspondence section added run83."
-    },
-    {
-      "id": 40,
-      "name": "radians/degrees",
-      "file": "lean/FVSquad/RadiansDegrees.lean",
-      "phase": 5,
-      "status": "proved",
-      "notes": "run87: 43 theorems, 0 sorry"
-    },
-    {
-      "id": 41,
-      "name": "VelocitySmoothing::computeT3",
-      "file": "lean/FVSquad/VelocitySmoothing.lean",
-      "phase": 5,
-      "status": "proved",
-      "notes": "run88-92: computeT2/computeT3Scaled; 28 theorems 0 sorry. New run92: T2_decreases_as_a0_grows, T2_decreases_as_jMax_grows, total_T_mono_T1.",
-      "theorems": 28
-    },
-    {
-      "id": 42,
-      "name": "CRC-8 CRSF fold-split",
-      "file": "lean/FVSquad/Crc8.lean",
-      "phase": 5,
-      "status": "proved",
-      "notes": "run82: 8 theorems, 0 sorry"
-    }
+    {"id": 41, "name": "VelocitySmoothing::computeT2/computeT3", "file": "lean/FVSquad/VelocitySmoothing.lean", "phase": 5, "status": "proved", "theorems": 33, "sorry": 0, "notes": "run88-94: 33 theorems. §§1-11 from runs 88-92. §§12-14 from run94: total_T_ge_T123, total_T_ge_T1_T3, total_T_mono_a0, total_T_mono_jMax, computeT2_zero_iff."}
   ],
+  "ci": {
+    "lean_ci": "lean-ci.yml — two jobs: 'build' (Lean proofs) and 'correspondence-tests' (Route B Python harnesses). Triggers on lean/** and tests/**. 'correspondence-tests' added run94.",
+    "status": "healthy — updated run94",
+    "correspondence_test_job": "Added run94: runs atmosphere (26 cases) and slew_rate (4327 cases) on every PR/push"
+  },
   "run_history": [
+    {
+      "run": 94,
+      "date": "2026-05-03T16:28 UTC",
+      "workflow_run_id": 25284503143,
+      "tasks": [
+        "Task 5: VelocitySmoothing.lean — +5 theorems §§12-14: total_T_ge_T123, total_T_ge_T1_T3, total_T_mono_a0, total_T_mono_jMax, computeT2_zero_iff (28->33 theorems)",
+        "Task 9: lean-ci.yml — added correspondence-tests job (atmosphere + slew_rate Route B harnesses)"
+      ],
+      "theorems_proved": 5,
+      "sorry_changes": 0,
+      "pr_branch": "lean-squad/tasks-9-5-run94-25284503143",
+      "notes": "lake build: 40/40 passed, 0 sorry, Lean 4.29.1. PRs #82/#83/#84 incorporated. CI now has 2 jobs. computeT2_zero_iff required by_cases instead of by_contra (no Mathlib); mpr direction needed Int.max_eq_right rather than computeT2_eq_zero (which requires strict <, not <=)."
+    },
     {
       "run": 92,
       "date": "2026-05-03T01:12 UTC",
       "workflow_run_id": 25266373719,
       "tasks": [
-        "Task 5: VelocitySmoothing.lean \u2014 +3 theorems: T2_decreases_as_a0_grows, T2_decreases_as_jMax_grows, total_T_mono_T1 (25\u219228)",
-        "Task 6: CORRESPONDENCE.md \u2014 Last Updated + run92 notes + VelocitySmoothing 25\u219228 in section + summary table"
+        "Task 5: VelocitySmoothing.lean — +3 theorems: T2_decreases_as_a0_grows, T2_decreases_as_jMax_grows, total_T_mono_T1 (25->28)",
+        "Task 6: CORRESPONDENCE.md — Last Updated + run92 notes + VelocitySmoothing 25->28 in section + summary table"
       ],
       "theorems_proved": 3,
       "sorry_changes": 0,
       "pr_branch": "lean-squad/velocity-smoothing-run92-25266373719",
       "notes": "lake build: 40/40 passed, 0 sorry, Lean 4.29.1. VelocitySmoothing: 25->28 theorems. PR#83 (run91) skipped due to conflict with run90."
-    },
-    {
-      "run": 91,
-      "date": "2026-05-02T16:28 UTC",
-      "workflow_run_id": 25256419451,
-      "tasks": [
-        "Task 7: CRITIQUE.md \u2014 new finding #25 (T2_decreases_as_T3_grows cross-function), VelocitySmoothing 17->25 thms, gap #16 (updateDurations), stale counts 533->541",
-        "Task 6: CORRESPONDENCE.md \u2014 Last Updated + VelocitySmoothing 17->25 in intro"
-      ],
-      "theorems_proved": 0,
-      "sorry_changes": 0,
-      "pr_branch": "lean-squad/critique-correspondence-run91-25256419451",
-      "notes": "Documentation-only PR. No Lean files modified."
-    },
-    {
-      "run": 90,
-      "date": "2026-05-02T08:43 UTC",
-      "workflow_run_id": 25248122183,
-      "tasks": [
-        "Task 6: CORRESPONDENCE.md \u2014 added sections for Min3Max3 (31 thms), RadiansDegrees (43 thms), VelocitySmoothing (25 thms); all 36 files now covered",
-        "Task 5: VelocitySmoothing.lean \u2014 8 new theorems: jMax monotonicity, strict T123 monotonicity, cross-function schedule composition (total_T_partition, T2_decreases_as_T3_grows)"
-      ],
-      "theorems_proved": 8,
-      "sorry_changes": 0,
-      "pr_branch": "lean-squad/correspondence-proofs-run90-25248122183",
-      "notes": "lake build: 40/40 passed, 0 sorry, Lean 4.29.1. VelocitySmoothing: 17->25 theorems."
-    },
-    {
-      "run": 83,
-      "date": "2026-04-30T01:09 UTC",
-      "workflow_run_id": 25142071814,
-      "tasks": [
-        "Task 6: CORRESPONDENCE.md \u2014 added dedicated sections for IsInRange, ConstrainToInt16, Crc64; updated summary table; all 33 Lean files now covered",
-        "Task 1: Research \u2014 3 new targets (radians/degrees #40, computeT3 #41, CRC-8 CRSF #42); TARGETS.md updated for 36/37/38 phase 5"
-      ],
-      "theorems_proved": 0,
-      "sorry_changes": 0,
-      "pr_branch": "lean-squad/correspondence-research-run83-25142071814",
-      "notes": "Merged PR #74 (run82) cleanly. lake build: 36/36 passed, 0 sorry, Lean 4.29.0."
-    },
-    {
-      "run": 82,
-      "date": "2026-04-29T17:04 UTC",
-      "workflow_run_id": 25121782146,
-      "tasks": [
-        "Task 8: SlewRate 4327 Route B tests (all pass)",
-        "Task 11: paper update (33 modules, 389 thms, 3 bugs)",
-        "Recreated: ConstrainToInt16.lean (13 thms) + Crc64.lean (8 thms) from runs 78/80"
-      ],
-      "theorems_proved": 21,
-      "sorry_changes": 0,
-      "pr_branch": "lean-squad/tasks-8-11-run82-25121782146-ffe3d772eefa5755",
-      "notes": "PR #74 open."
     }
   ],
   "discoveries": [
     "import must come BEFORE module docblock in Lean 4",
     "INT16_MIN/MAX: use simp only [INT16_MIN, INT16_MAX] at * before omega for multi-constant goals",
     "abbrev is transparent to omega; simp-unfold first is safer for multi-constant proofs",
-    "constrain_mono already exists in MathFunctions.lean",
-    "prefix is reserved in Lean 4 \u2014 use pfx/sfx",
+    "prefix is reserved in Lean 4 — use pfx/sfx",
     "CRC-32 is LSBIT-first (reflected): use >>> right-shift",
     "CRC-64-WE is MSBIT-first: use <<< left-shift, check bit 63",
     "FVSquad.lean AND Basic.lean must both import new files",
-    "Int.add_emod_right : (a + b) % b = a % b \u2014 direct periodicity lemma",
+    "Int.add_emod_right : (a + b) % b = a % b — direct periodicity lemma",
     "wrap_bin bug: bin + n < 0 iff bin <= -n-1",
     "by_contra unavailable without Mathlib 4.29; use by_cases + omega",
     "simp only [if_pos h1, if_neg h2] for case-splitting on if-then-else",
     "For radians/degrees proof: parameterise by p : Rat; round-trip by field_simp; ring",
     "computeT3 proof: simp [max_def] + linarith covers all cases",
-    "AlphaFilter induction: use induction n generalizing state for state-updating recursion"
+    "AlphaFilter induction: use induction n generalizing state for state-updating recursion",
+    "computeT2_eq_zero requires strict < (T123 < T1+T3); for <= use Int.max_eq_right (by omega) directly",
+    "by_cases hc : T123 <= T1+T3 pattern needed for computeT2_zero_iff mp direction (by_contra unavailable)"
   ],
   "mathlib_status": "blocked_403_cache_proxy",
-  "notes": "Run92: VelocitySmoothing 25->28 (T2_decreases_as_a0_grows, T2_decreases_as_jMax_grows, total_T_mono_T1). Next: Task 11 (paper is very stale since run54, 544 theorems now), or Task 7 (CRITIQUE.md update for run92 additions).",
+  "notes": "Run94: VelocitySmoothing 28->33 (5 new theorems in §§12-14). CI now has correspondence-tests job. Next runs: Task 11 (paper very stale since run54, now 549 theorems), or Task 7 (CRITIQUE update for run94 additions), or Task 2+3+4+5 for VelocitySmoothing::updateDurations (gap #16).",
   "report_status": {
     "exists": true,
     "last_updated_run": 79,
     "stale_items": [
-      "run82 additions (SlewRate tests, ConstrainToInt16, Crc64)"
+      "run82 additions (SlewRate tests, ConstrainToInt16, Crc64)",
+      "run84 additions (Crc8)",
+      "run86 additions (RadiansDegrees 43 thms)",
+      "run87 additions (Min3Max3 31 thms)",
+      "run88-94 additions (VelocitySmoothing 33 thms)",
+      "run89 additions (AlphaFilter 5 convergence thms)",
+      "run94 additions (5 new, CI update)"
     ]
-  },
-  "ci": {
-    "lean_ci": "lean-ci.yml \u2014 two jobs: 'build' (Lean proofs) and 'correspondence-tests' (Route B Python harnesses). Triggers on lean/** and tests/**. Updated run93.",
-    "status": "healthy (last known)",
-    "correspondence_test_job": "Added run93: runs atmosphere, slew_rate, velocity_smoothing on every PR/push"
   }
 }
