@@ -1,85 +1,68 @@
 {
-  "run": 96,
+  "run": 97,
   "last_updated": "2026-05-04",
   "lean_version": "4.29.1",
   "lake_build_status": "passed",
   "totals": {
-    "theorems": 496,
-    "theorems_proved": 496,
+    "theorems": 492,
+    "theorems_proved": 492,
     "axioms": 10,
     "sorry_count": 0,
     "lean_files": 37,
-    "targets": 43
+    "targets": 37
   },
   "sorry_locations": {
-    "all_resolved": "All sorry resolved. 0 sorry total. 10 axioms for irrational arithmetic."
+    "all_resolved": "0 sorry in proof bodies. 10 axioms for irrational arithmetic."
   },
-  "open_prs": [
-    {
-      "number": 83,
-      "branch": "lean-squad/critique-correspondence-run91-25256419451-cbbe8d5b1002558b",
-      "run": 91,
-      "title": "feat(fv): run91 — CRITIQUE.md + CORRESPONDENCE.md refresh",
-      "note": "Conflict with run90 — skip"
-    },
-    {
-      "number": 84,
-      "branch": "lean-squad/velocity-smoothing-run92-25266373719-4e10da85f6fd3bb2",
-      "run": 92,
-      "title": "feat(fv): run92 — VelocitySmoothing +3 theorems + CORRESPONDENCE.md update",
-      "note": "Conflict with run90 — theorems recovered in run96"
-    },
-    {
-      "number": "TBD",
-      "branch": "lean-squad/velocity-smoothing-hysteresis-run96-25310368866-4373d7f980",
-      "run": 96,
-      "title": "feat(fv): run96 — VelocitySmoothing +8 theorems + Hysteresis Route B tests (259/259)"
-    }
-  ],
+  "open_prs": [],
   "bugs_found": 3,
   "correspondence_tests": {
     "atmosphere": "tests/atmosphere/ (26/26 pass, max_rel_err=1.9e-16)",
     "bin_at_angle": "tests/bin_at_angle/ (334/334 pass; confirms getBinI/getOffsetBinI exact; demonstrates wrap_bin latent bug)",
-    "slew_rate": "tests/slew_rate/ (4327/4327 pass; confirms SlewRate::update exact for Rat model)",
-    "hysteresis": "tests/hysteresis/ (259/259 pass; run96: constructor + zero-delay + dwell timing + cancellation + timer-restart + grid sweep + 5-cycle sequence)"
-  },
-  "correspondence_sections": {
-    "covered": "MathFunctions, AlphaFilter, SlewRate, Deadzone, Interpolate, WelfordMean, Lerp, Negate, WrapAngle, Expo, RingBuffer, MedianFilter, SuperExpo, ExpoDeadzone, InterpolateNXY, InterpolateN, SignFromBoolSq, Hysteresis, Crc16Fold, Crc16Sig, Crc32Sig, CommanderArming, Atmosphere, WrapBin, BrakingDist, SqrtLinear, GetBinAtAngle, GetLowerBoundAngle, CollisionPrevComposition, IsInRange, ConstrainToInt16, Crc64, Crc8, RadiansDegrees, Min3Max3, VelocitySmoothing",
-    "missing": "none — all 36 Lean files now have dedicated sections (Basic is barrel-only)"
+    "slew_rate": "tests/slew_rate/ (4327/4327 pass; confirms SlewRate::update exact for Rat model)"
   },
   "ci": {
-    "lean_ci": "lean-ci.yml — two jobs: 'build' (Lean proofs) and 'correspondence-tests' (Route B Python harnesses: atmosphere, slew_rate, hysteresis). Triggers on lean/** and tests/**.",
-    "status": "healthy — updated run96",
-    "correspondence_test_job": "run96: atmosphere (26), slew_rate (4327), hysteresis (259) = 4612 total on every PR/push"
+    "lean_ci": "lean-ci.yml — two jobs: 'build' (Lean proofs) and 'correspondence-tests' (atmosphere 26 + slew_rate 4327). Triggers on lean/** and tests/**.",
+    "status": "healthy — updated run97",
+    "correspondence_test_job": "run97: atmosphere (26), slew_rate (4327) = 4353 total on every PR/push"
   },
   "run_history": [
+    {
+      "run": 97,
+      "date": "2026-05-04T16:50 UTC",
+      "workflow_run_id": 25331199166,
+      "tasks": [
+        "Task 9 (CI Audit): lean-ci.yml — added correspondence-tests job (atmosphere 26/26, slew_rate 4327/4327); extended triggers to tests/**",
+        "Task 10 (Project Report): REPORT.md — 383→492 theorems, 31→37 files, Layer 10 VelocitySmoothing added, full inventory table, runs 80-97 timeline"
+      ],
+      "theorems_proved": 0,
+      "sorry_changes": 0,
+      "pr_branch": "lean-squad/ci-report-run97-25331199166",
+      "notes": "No new proofs — CI and report refresh run. All 492 theorems in 37 files, 0 sorry."
+    },
     {
       "run": 96,
       "date": "2026-05-04T09:04 UTC",
       "workflow_run_id": 25310368866,
       "tasks": [
         "Task 5: VelocitySmoothing.lean — +8 theorems (25→33): T2_decreases_as_a0_grows, T2_decreases_as_jMax_grows, total_T_ge_T123, total_T_ge_T1_T3, total_T_mono_a0, total_T_mono_jMax, total_T_mono_T1, computeT2_zero_iff",
-        "Task 8 (Route B): Hysteresis correspondence tests — 259/259 pass (11 sections, all state-machine properties)",
-        "Task 9 (inline): lean-ci.yml — added hysteresis to correspondence-tests job; extended trigger paths to tests/**"
+        "Task 8 (Route B): Hysteresis correspondence tests — 259/259 pass"
       ],
       "theorems_proved": 8,
       "sorry_changes": 0,
-      "pr_branch": "lean-squad/velocity-smoothing-hysteresis-run96-25310368866-4373d7f980",
-      "notes": "lake build: 40/40 passed, 0 sorry, Lean 4.29.1. Merged PR#82 (run90) and run95 cleanly. PRs #83/#84 still conflict. 8 VelocitySmoothing theorems recovered from conflicted PRs #84/run94."
+      "pr_branch": "lean-squad/velocity-smoothing-hysteresis-run96-25310368866-4373d7f980-d6e57ee7ecf8ff34",
+      "notes": "PR branch is stale (before run92 merge) - content was merged in earlier PRs. Run96 theorems landed via PR#84."
     },
     {
-      "run": 95,
-      "date": "2026-05-04T01:10 UTC",
-      "workflow_run_id": 25296180966,
+      "run": 92,
+      "date": "2026-05-03T01:12 UTC",
+      "workflow_run_id": 25266373719,
       "tasks": [
-        "Task 8 (Route B): AlphaFilter correspondence tests — 268/268 pass",
-        "Task 10: REPORT.md refresh — 383→488 theorems",
-        "Task 9 (inline): lean-ci.yml — correspondence-tests job (atmosphere + slew_rate + alpha_filter)"
+        "Task 5: VelocitySmoothing — +3 theorems; CORRESPONDENCE.md update"
       ],
-      "theorems_proved": 0,
-      "sorry_changes": 0,
-      "pr_branch": "lean-squad/tasks-8-10-run95-25296180966-alpha-filter-report-510d034bb0dcfba0",
-      "notes": "run95 PR was duplicate of run90 content. AlphaFilter tests and REPORT changes may not have landed cleanly."
+      "theorems_proved": 3,
+      "pr_branch": "lean-squad/velocity-smoothing-run92-25266373719-4e10da85f6fd3bb2",
+      "notes": "PR#84 merged."
     }
   ],
   "discoveries": [
@@ -102,10 +85,10 @@
     "total_T_mono_T1: case-split on T1+T3scaled <= T123; use Int.max_eq_left/right after establishing hsum via omega"
   ],
   "mathlib_status": "blocked_403_cache_proxy",
-  "notes": "Run96: VelocitySmoothing at 33 theorems (8 new). Hysteresis Route B 259/259. CI updated. Next: Task 7 (CRITIQUE update for run89-96), Task 11 (paper very stale), new FV targets, or VelocitySmoothing::updateDurations pure model.",
+  "notes": "Run97: CI correspondence-tests job added (atmosphere + slew_rate). REPORT.md refreshed to 492 theorems. Next: Task 7 (CRITIQUE refresh for runs 87-97), new FV targets (e.g. MotorMixer, PID controller), or VelocitySmoothing::updateDurations pure model.",
   "report_status": {
     "exists": true,
-    "last_updated_run": 95,
-    "stale_items": ["run96 additions (8 VelocitySmoothing theorems, Hysteresis tests)"]
+    "last_updated_run": 97,
+    "stale_items": []
   }
 }
