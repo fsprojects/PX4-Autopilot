@@ -1,7 +1,7 @@
 {
-  "run": 99,
+  "run": 100,
   "last_updated": "2026-05-05",
-  "lean_version": "4.29.0",
+  "lean_version": "4.29.1",
   "lake_build_status": "passed",
   "totals": {
     "theorems": 519,
@@ -14,13 +14,18 @@
   "sorry_locations": {
     "all_resolved": "0 sorry in proof bodies. 10 axioms for irrational arithmetic."
   },
-  "open_prs": [],
+  "open_prs": [
+    {"number": 90, "title": "VelocitySmoothing +5 theorems + CORRESPONDENCE.md (run98)"},
+    {"number": 91, "title": "PID controller Lean 4 proofs + critique update (run99)"},
+    {"number": "new", "branch": "lean-squad/report-corr-run100-25389651187", "title": "REPORT.md refresh + PID Route B correspondence tests (run100)"}
+  ],
   "bugs_found": 3,
   "correspondence_tests": {
     "atmosphere": "tests/atmosphere/ (26/26 pass, max_rel_err=1.9e-16)",
     "bin_at_angle": "tests/bin_at_angle/ (334/334 pass; confirms getBinI/getOffsetBinI exact; demonstrates wrap_bin latent bug)",
     "slew_rate": "tests/slew_rate/ (4327/4327 pass; confirms SlewRate::update exact for Rat model)",
-    "hysteresis": "tests/hysteresis/ (259/259 pass)"
+    "hysteresis": "tests/hysteresis/ (259/259 pass)",
+    "pid": "tests/pid/ (7964/7964 pass; confirms clamp/derivative/integral/output for Int model)"
   },
   "ci": {
     "lean_ci": "lean-ci.yml — two jobs: 'build' (Lean proofs) and 'correspondence-tests' (atmosphere 26 + slew_rate 4327). Triggers on lean/** and tests/**.",
@@ -28,6 +33,19 @@
     "correspondence_test_job": "run97: atmosphere (26), slew_rate (4327) = 4353 total on every PR/push"
   },
   "run_history": [
+    {
+      "run": 100,
+      "date": "2026-05-05T16:46 UTC",
+      "workflow_run_id": 25389651187,
+      "tasks": [
+        "Task 10 (Project Report): REPORT.md updated — 519 theorems, 38 files, Layer 10 (ConstrainToInt16/RadiansDegrees/Min3Max3) + Layer 11 (VelocitySmoothing/PID) added, timeline runs 77-100",
+        "Task 8 (Route B Correspondence): PID tests created in tests/pid/ — 7964/7964 pass; CORRESPONDENCE.md updated with 3 PID rows + Run 100 review notes"
+      ],
+      "theorems_proved": 0,
+      "sorry_changes": 0,
+      "pr_branch": "lean-squad/report-corr-run100-25389651187",
+      "notes": "Merged PRs #90 and #91. REPORT.md refreshed from run76 state (383 thms) to run100 (519 thms). PID Route B tests: 7964 cases across clamp, derivative, integral, full PID, multi-step sequences."
+    },
     {
       "run": 99,
       "date": "2026-05-05T09:25 UTC",
@@ -52,19 +70,7 @@
       "theorems_proved": 5,
       "sorry_changes": 0,
       "pr_branch": "lean-squad/velocity-smoothing-correspondence-run98-25352213774-c35e8fdf737cd7d2",
-      "notes": "PR #90 merged into run99 branch."
-    },
-    {
-      "run": 97,
-      "date": "2026-05-04T16:50 UTC",
-      "workflow_run_id": 25331199166,
-      "tasks": [
-        "Task 9 (CI Audit): lean-ci.yml — added correspondence-tests job (atmosphere 26/26, slew_rate 4327/4327)",
-        "Task 10 (Project Report): REPORT.md — runs 80-97 timeline, full inventory table"
-      ],
-      "theorems_proved": 0,
-      "sorry_changes": 0,
-      "notes": "No new proofs — CI and report refresh run."
+      "notes": "PR #90 open (merged into run99+ branches)."
     }
   ],
   "discoveries": [
@@ -91,11 +97,11 @@
     "simp handles mul_zero/zero_mul/add_zero for Int without explicit lemma names"
   ],
   "mathlib_status": "blocked_403_cache_proxy",
-  "notes": "Run99: PID.lean added (22 theorems). Next high-value targets: MotorMixer (mixer normalization/saturation), TF (transfer function invariants), or PID::updateDurations model extension. CRITIQUE.md refreshed for runs 89-99.",
+  "notes": "Run100: REPORT.md refreshed (519 thms, 38 files, runs 77-100). PID Route B tests (7964/7964). Next: Task 5 on new targets (MotorMixer normalization/saturation?), or Task 7 CRITIQUE.md update for run100.",
   "report_status": {
     "exists": true,
-    "last_updated_run": 97,
-    "stale_items": ["run98-99 additions (VelocitySmoothing +5, PID +22 theorems)"]
+    "last_updated_run": 100,
+    "stale_items": []
   },
   "targets": {
     "PID": {
@@ -104,6 +110,7 @@
       "phase": 5,
       "theorems": 22,
       "sorry": 0,
+      "correspondence_tests": "tests/pid/ (7964/7964)",
       "notes": "Clamping, anti-windup, equilibrium, monotonicity. Int model abstracts float/NaN."
     },
     "VelocitySmoothing": {
