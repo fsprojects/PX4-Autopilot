@@ -1,15 +1,15 @@
 {
-  "run": 98,
+  "run": 99,
   "last_updated": "2026-05-05",
-  "lean_version": "4.29.1",
+  "lean_version": "4.29.0",
   "lake_build_status": "passed",
   "totals": {
-    "theorems": 497,
-    "theorems_proved": 497,
+    "theorems": 519,
+    "theorems_proved": 519,
     "axioms": 10,
     "sorry_count": 0,
-    "lean_files": 37,
-    "targets": 37
+    "lean_files": 38,
+    "targets": 38
   },
   "sorry_locations": {
     "all_resolved": "0 sorry in proof bodies. 10 axioms for irrational arithmetic."
@@ -29,6 +29,19 @@
   },
   "run_history": [
     {
+      "run": 99,
+      "date": "2026-05-05T09:25 UTC",
+      "workflow_run_id": 25367144830,
+      "tasks": [
+        "Task 5 (Proof Assistance): PID.lean NEW — 22 theorems: clamp safety, anti-windup, equilibrium, monotonicity, derivative properties",
+        "Task 7 (Proof Utility Critique): CRITIQUE.md updated — theorem count 519, 38 files, PID table rows, Positive Finding #25"
+      ],
+      "theorems_proved": 22,
+      "sorry_changes": 0,
+      "pr_branch": "lean-squad/proof-critique-run99-25367144830",
+      "notes": "PID.lean: 22 theorems, 0 sorry. Key: pidOutput_in_range (safety), updateIntegral_in_range (anti-windup), pidOutput_zero_steady_state (equilibrium). Also merged PR #90 (VelocitySmoothing +5 from run98)."
+    },
+    {
       "run": 98,
       "date": "2026-05-05T01:03 UTC",
       "workflow_run_id": 25352213774,
@@ -38,45 +51,20 @@
       ],
       "theorems_proved": 5,
       "sorry_changes": 0,
-      "pr_branch": "lean-squad/velocity-smoothing-correspondence-run98-25352213774",
-      "notes": "28→33 theorems in VelocitySmoothing. Full param monotonicity cover (T1/a0/jMax). computeT2_zero_iff closes iff characterisation."
+      "pr_branch": "lean-squad/velocity-smoothing-correspondence-run98-25352213774-c35e8fdf737cd7d2",
+      "notes": "PR #90 merged into run99 branch."
     },
     {
       "run": 97,
       "date": "2026-05-04T16:50 UTC",
       "workflow_run_id": 25331199166,
       "tasks": [
-        "Task 9 (CI Audit): lean-ci.yml — added correspondence-tests job (atmosphere 26/26, slew_rate 4327/4327); extended triggers to tests/**",
-        "Task 10 (Project Report): REPORT.md — 383→492 theorems, 31→37 files, Layer 10 VelocitySmoothing added, full inventory table, runs 80-97 timeline"
+        "Task 9 (CI Audit): lean-ci.yml — added correspondence-tests job (atmosphere 26/26, slew_rate 4327/4327)",
+        "Task 10 (Project Report): REPORT.md — runs 80-97 timeline, full inventory table"
       ],
       "theorems_proved": 0,
       "sorry_changes": 0,
-      "pr_branch": "lean-squad/ci-report-run97-25331199166",
-      "notes": "No new proofs — CI and report refresh run. All 492 theorems in 37 files, 0 sorry."
-    },
-    {
-      "run": 96,
-      "date": "2026-05-04T09:04 UTC",
-      "workflow_run_id": 25310368866,
-      "tasks": [
-        "Task 5: VelocitySmoothing.lean — +8 theorems (25→33): T2_decreases_as_a0_grows, T2_decreases_as_jMax_grows, total_T_ge_T123, total_T_ge_T1_T3, total_T_mono_a0, total_T_mono_jMax, total_T_mono_T1, computeT2_zero_iff",
-        "Task 8 (Route B): Hysteresis correspondence tests — 259/259 pass"
-      ],
-      "theorems_proved": 8,
-      "sorry_changes": 0,
-      "pr_branch": "lean-squad/velocity-smoothing-hysteresis-run96-25310368866-4373d7f980-d6e57ee7ecf8ff34",
-      "notes": "PR branch is stale (before run92 merge). Run96 content NOT yet in main — theorems partially re-added in run98."
-    },
-    {
-      "run": 92,
-      "date": "2026-05-03T01:12 UTC",
-      "workflow_run_id": 25266373719,
-      "tasks": [
-        "Task 5: VelocitySmoothing — +3 theorems; CORRESPONDENCE.md update"
-      ],
-      "theorems_proved": 3,
-      "pr_branch": "lean-squad/velocity-smoothing-run92-25266373719-4e10da85f6fd3bb2",
-      "notes": "PR#84 merged."
+      "notes": "No new proofs — CI and report refresh run."
     }
   ],
   "discoveries": [
@@ -94,16 +82,37 @@
     "For radians/degrees proof: parameterise by p : Rat; round-trip by field_simp; ring",
     "computeT3 proof: simp [max_def] + linarith covers all cases",
     "AlphaFilter induction: use induction n generalizing state for state-updating recursion",
-    "computeT2_zero_iff backward direction: unfold computeT2; exact Int.max_eq_right (by omega)",
     "total_T_ge_T123: rw [total_T_partition] then exact Int.le_max_left _ _",
-    "total_T_ge_T1_T3: rw [total_T_partition] then exact Int.le_max_right _ _",
-    "linarith cannot combine equalities with max; use rw to substitute the equality first"
+    "linarith cannot combine equalities with max; use rw to substitute the equality first",
+    "ring, nlinarith, linarith are MATHLIB ONLY — not available in standard Lean 4 stdlib",
+    "Int.mul_le_mul_of_nonneg_right : a * c <= b * c when a <= b and 0 <= c (available stdlib)",
+    "simp only [def_name] beta-reduces let-bindings in goals (needed for pidOutputRaw)",
+    "rw [if_neg h]; no closing tactic needed when goal is already trivially closed by rw",
+    "simp handles mul_zero/zero_mul/add_zero for Int without explicit lemma names"
   ],
   "mathlib_status": "blocked_403_cache_proxy",
-  "notes": "Run98: VelocitySmoothing 28→33 theorems (+total_T_ge_T123, total_T_ge_T1_T3, computeT2_zero_iff, total_T_mono_a0, total_T_mono_jMax). CORRESPONDENCE.md updated. Next: Task 7 (CRITIQUE refresh for runs 87-98), new FV targets (e.g. MotorMixer, PID controller), or VelocitySmoothing::updateDurations pure model.",
+  "notes": "Run99: PID.lean added (22 theorems). Next high-value targets: MotorMixer (mixer normalization/saturation), TF (transfer function invariants), or PID::updateDurations model extension. CRITIQUE.md refreshed for runs 89-99.",
   "report_status": {
     "exists": true,
     "last_updated_run": 97,
-    "stale_items": ["run98 additions (VelocitySmoothing +5 theorems)"]
+    "stale_items": ["run98-99 additions (VelocitySmoothing +5, PID +22 theorems)"]
+  },
+  "targets": {
+    "PID": {
+      "file": "formal-verification/lean/FVSquad/PID.lean",
+      "source": "src/lib/pid/PID.cpp",
+      "phase": 5,
+      "theorems": 22,
+      "sorry": 0,
+      "notes": "Clamping, anti-windup, equilibrium, monotonicity. Int model abstracts float/NaN."
+    },
+    "VelocitySmoothing": {
+      "file": "formal-verification/lean/FVSquad/VelocitySmoothing.lean",
+      "source": "src/lib/motion_planning/VelocitySmoothing.cpp",
+      "phase": 5,
+      "theorems": 33,
+      "sorry": 0,
+      "notes": "computeT2/T3, total_T monotonicity, anti-windup, schedule partition."
+    }
   }
 }
