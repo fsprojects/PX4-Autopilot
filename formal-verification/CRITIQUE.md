@@ -4,26 +4,29 @@
 
 ## Last Updated
 
-- **Date**: 2026-05-05 09:25 UTC
-- **Commit**: `789a6aa32342340545634a6c9cfddccb510111e1`
+- **Date**: 2026-05-07 09:30 UTC
+- **Commit**: `ac284baadf4149f77dd7c31cfa2c3208a8d65b5a`
 
 ---
 
 ## Overall Assessment
 
-Forty-three targets from PX4's mathlib, control library, sensor-fusion stack, Commander
+Forty-four targets from PX4's mathlib, control library, sensor-fusion stack, Commander
 module, collision-prevention stack, CRC subsystem, and angle-conversion utilities have been
-identified; 38 have Lean files with fully proved theorems. The library now covers
-**519 theorem statements, all fully proved, 0 `sorry`** (Lean 4 v4.29.1, standard
-library only). Since run 63, fifteen new Lean files have been added
+identified; 39 have Lean files with fully proved theorems. The library now covers
+**541 theorem statements, all fully proved, 0 `sorry`** (Lean 4 v4.29.1, standard
+library only). This run (105) adds `FilteredDerivative.lean` with 12 theorems verifying
+the discrete derivative + IIR low-pass filter pipeline: first-call structural invariants,
+constant-input convergence to 0 (with exponential-formula closed form from AlphaFilter),
+monotone-shrink bounds, and linear-ramp derivative identity. Since run 63, sixteen new
+Lean files have been added
 (`BrakingDist`, `CollisionPrevComposition`, `Crc16Sig`, `Crc32Sig`, `Crc64`, `Crc8`,
 `IsInRange`, `ConstrainToInt16`, `GetBinAtAngle`, `GetLowerBoundAngle`, `RadiansDegrees`,
-`Min3Max3`, `VelocitySmoothing`, — in run 89 — 5 new AlphaFilter multi-step convergence
-theorems, and — in run 99 — `PID.lean`). Runs 90–98 added 16 new VelocitySmoothing
-theorems covering jMax monotonicity, strict T123 monotonicity, cross-function schedule
-composition, and T2/T3 tradeoff theorems. Run 99 (this run) adds 22 theorems for
-`PID.lean`, formally verifying clamping safety, anti-windup bounds, equilibrium
-(zero-error zero-output), and monotonicity properties of the PX4 generic PID controller.
+`Min3Max3`, `VelocitySmoothing`, `PID`, `FilteredDerivative`, and prior additions).
+Runs 90–98 added 16 new VelocitySmoothing theorems covering jMax monotonicity, strict
+T123 monotonicity, cross-function schedule composition, and T2/T3 tradeoff theorems.
+Run 99 added 22 theorems for `PID.lean`, run 101 added 11 MathFunctions theorems, and
+run 105 adds 12 FilteredDerivative theorems.
 Three confirmed bugs remain open: `signNoZero<float>` returns 0 for NaN,
 `negate<int16_t>` has an incorrect INT16_MAX special case, and `wrap_bin(bin, n)`
 returns a negative index for `bin ≤ -n` in the C++ truncation-mod implementation.
@@ -219,6 +222,11 @@ returns a negative index for `bin ≤ -n` in the C++ truncation-mod implementati
 | `pidOutput_ge_neg` / `pidOutput_le` / `pidOutput_in_range` | [PID.lean](lean/FVSquad/PID.lean) | **high** | **high** | [L] | [C++](../src/lib/pid/PID.cpp) | **Output clamping invariant**: actuator command is always in `[-limitO, limitO]` |
 | `pidOutput_zero_steady_state` / `pidOutput_zero_first_call` | [PID.lean](lean/FVSquad/PID.lean) | **high** | **high** | [L] | [C++](../src/lib/pid/PID.cpp) | **Equilibrium**: setpoint=feedback, integral=0 → output=0 (both steady-state and first-call cases) |
 | `pidOutput_mono_sp` / `pidOutput_mono_integral` | [PID.lean](lean/FVSquad/PID.lean) | **high** | **high** | [L] | [C++](../src/lib/pid/PID.cpp) | **Monotonicity**: larger setpoint → larger output (gainP≥0); larger integral → larger output |
+| `fdUpdate_first_call_state` / `_initialized` / `_stores_prev_sample` | [FilteredDerivative.lean](lean/FVSquad/FilteredDerivative.lean) | **high** | **high** | [L] | [C++](../src/lib/mathlib/math/filter/FilteredDerivative.hpp) | First-call structural invariants: alpha state frozen, flag set, sample stored |
+| `fdUpdate_second_call_deriv` / `fdUpdate_const_deriv_zero` | [FilteredDerivative.lean](lean/FVSquad/FilteredDerivative.lean) | **high** | **high** | [L] | [C++](../src/lib/mathlib/math/filter/FilteredDerivative.hpp) | Initialized-call: derivative computed correctly; same sample twice → derivative = 0 |
+| `fdIter_const_alpha_formula` | [FilteredDerivative.lean](lean/FVSquad/FilteredDerivative.lean) | **high** | **high** | [L] | [C++](../src/lib/mathlib/math/filter/FilteredDerivative.hpp) | Constant input n steps → `alphaIterate state alpha 0 n` (exponential decay to 0) |
+| `fdIter_const_bounded_pos` / `fdIter_const_bounded_neg` / `fdIter_const_shrinks_pos` / `fdIter_const_nonneg` | [FilteredDerivative.lean](lean/FVSquad/FilteredDerivative.lean) | **high** | **high** | [L] | [C++](../src/lib/mathlib/math/filter/FilteredDerivative.hpp) | No-overshoot bounds and monotone shrink toward 0 under constant input |
+| `fdUpdate_linear_deriv` | [FilteredDerivative.lean](lean/FVSquad/FilteredDerivative.lean) | **high** | **high** | [L] | [C++](../src/lib/mathlib/math/filter/FilteredDerivative.hpp) | Linear ramp input: raw derivative = slope/dt (before filtering) |
 
 ---
 
@@ -306,6 +314,15 @@ returns a negative index for `bin ≤ -n` in the C++ truncation-mod implementati
     (monotone convergence). These complete the multi-step analysis started with
     `alphaIterate_formula`. **Total AlphaFilter theorems: 17**.
 
+16. **`FilteredDerivative::update`** ✅ **DONE** (run105):
+    `FilteredDerivative.lean` (12 theorems, 0 sorry) formally verifies the discrete
+    derivative IIR filter pipeline: first-call structural invariants (`fdUpdate_first_call_state`,
+    `fdUpdate_first_call_initialized`, `fdUpdate_stores_prev_sample`), second-call semantics
+    (`fdUpdate_second_call_deriv`), constant-input convergence (`fdIter_const_alpha_formula`
+    reusing `alphaIterate_formula` with target=0), no-overshoot bounds (`fdIter_const_bounded_pos/neg`),
+    monotone shrink (`fdIter_const_shrinks_pos`), non-negativity (`fdIter_const_nonneg`),
+    and linear-ramp derivative identity (`fdUpdate_linear_deriv`). **Total theorems: 541**.
+
 ### Medium priority
 
 11. **`SlewRate` float precision**: The proved theorems use an integer model (`Int`). The
@@ -323,11 +340,11 @@ returns a negative index for `bin ≤ -n` in the C++ truncation-mod implementati
     and new multi-step theorems cover the time-domain response completely. The z-transform
     transfer function could be stated and proved with Mathlib complex number support.
 
-14. **Conference paper** (Task 11): With 533 proved theorems across 37 files, 3 confirmed bugs,
+14. **Conference paper** (Task 11): With 541 proved theorems across 39 files, 3 confirmed bugs,
     and a formal demonstration of latent C++ truncation-mod vulnerability in collision
     prevention, the project has substantial material for a conference paper (IEEE FM,
     FMCAD, or CAV). **Recommendation**: update `formal-verification/paper/paper.tex` to
-    reflect runs 49–89 additions (see Paper Review section above).
+    reflect runs 49–105 additions (FilteredDerivative, PID, MathFunctions, etc.).
 
 ---
 
