@@ -1,15 +1,15 @@
 {
-    "run": 103,
-    "last_updated": "2026-05-06",
-    "lean_version": "4.29.0",
+    "run": 104,
+    "last_updated": "2026-05-07",
+    "lean_version": "4.29.1",
     "lake_build_status": "passed",
     "totals": {
-        "theorems": 545,
-        "theorems_proved": 545,
+        "theorems": 556,
+        "theorems_proved": 556,
         "axioms": 10,
         "sorry_count": 0,
-        "lean_files": 39,
-        "targets": 39
+        "lean_files": 40,
+        "targets": 40
     },
     "sorry_locations": {
         "all_resolved": "0 sorry in proof bodies. 10 axioms for irrational arithmetic."
@@ -17,8 +17,8 @@
     "open_prs": [
         {
             "number": "new",
-            "branch": "lean-squad/sensor-orientation-ci-run103-25448623268",
-            "title": "Task 5 + Task 9: SensorOrientation +15 theorems + CI correspondence-tests job (run103)"
+            "branch": "lean-squad/filtered-derivative-run104-25470078499",
+            "title": "Task 3+4+5: FilteredDerivative.lean +13 theorems, 0 sorry (run104)"
         }
     ],
     "bugs_found": 3,
@@ -30,18 +30,31 @@
         "pid": "tests/pid/ (7964/7964 pass; confirms clamp/derivative/integral/output for Int model)"
     },
     "ci": {
-        "lean_ci": "lean-ci.yml — two jobs: 'build' (Lean proofs) and 'correspondence-tests' (atmosphere 26 + slew_rate 4327). Triggers on lean/** and tests/**.",
-        "status": "updated run103 — correspondence-tests job restored",
+        "lean_ci": "lean-ci.yml \u2014 two jobs: 'build' (Lean proofs) and 'correspondence-tests' (atmosphere 26 + slew_rate 4327). Triggers on lean/** and tests/**.",
+        "status": "updated run103 \u2014 correspondence-tests job restored",
         "correspondence_test_job": "run103: added atmosphere (26) + slew_rate (4327) = 4353 total on every PR/push"
     },
     "run_history": [
+        {
+            "run": 104,
+            "date": "2026-05-07T01:08 UTC",
+            "workflow_run_id": 25470078499,
+            "tasks": [
+                "Task 2 (Informal Spec): filteredderivative_informal.md \u2014 purpose, preconditions, postconditions, invariants, edge cases, examples",
+                "Task 3+4+5 (Spec+Impl+Proofs): FilteredDerivative.lean \u2014 13 theorems, 0 sorry. Builds on AlphaFilter.lean. fdUpdate structure, constant-input convergence toward 0."
+            ],
+            "theorems_proved": 13,
+            "sorry_changes": 0,
+            "pr_branch": "lean-squad/filtered-derivative-run104-25470078499",
+            "notes": "Target 47 done. Priority next: target 46 (goldensection interval invariant, MODERATE) or new target identification (Task 1)."
+        },
         {
             "run": 103,
             "date": "2026-05-06T16:46 UTC",
             "workflow_run_id": 25448623268,
             "tasks": [
-                "Task 5 (Proof Assistance): SensorOrientation.lean — new file, 15 theorems (9 exact-value + 6 structural), 0 sorry. Target #45 sensor_orientation_to_yaw_offset fully proved.",
-                "Task 9 (CI Automation): lean-ci.yml — added correspondence-tests job (atmosphere 26 + slew_rate 4327). Extended triggers to tests/**."
+                "Task 5 (Proof Assistance): SensorOrientation.lean \u2014 new file, 15 theorems (9 exact-value + 6 structural), 0 sorry. Target #45 sensor_orientation_to_yaw_offset fully proved.",
+                "Task 9 (CI Automation): lean-ci.yml \u2014 added correspondence-tests job (atmosphere 26 + slew_rate 4327). Extended triggers to tests/**."
             ],
             "theorems_proved": 15,
             "sorry_changes": 0,
@@ -53,8 +66,8 @@
             "date": "2026-05-06T09:13 UTC",
             "workflow_run_id": 25426090735,
             "tasks": [
-                "Task 6 (Correspondence Review): CORRESPONDENCE.md — added dedicated ## FVSquad/PID.lean section (22 theorems, 3 C++ mappings, Route B 7964/7964, divergences analysis). Updated Last Updated header.",
-                "Task 1 (Research & Target Identification): TARGETS.md + RESEARCH.md — 3 new Phase 1 targets: #45 sensor_orientation_to_yaw_offset (finite enum decidable), #46 goldensection interval invariant, #47 FilteredDerivative::update (AlphaFilter composition)."
+                "Task 6 (Correspondence Review): CORRESPONDENCE.md \u2014 added dedicated ## FVSquad/PID.lean section (22 theorems, 3 C++ mappings, Route B 7964/7964, divergences analysis). Updated Last Updated header.",
+                "Task 1 (Research & Target Identification): TARGETS.md + RESEARCH.md \u2014 3 new Phase 1 targets: #45 sensor_orientation_to_yaw_offset (finite enum decidable), #46 goldensection interval invariant, #47 FilteredDerivative::update (AlphaFilter composition)."
             ],
             "theorems_proved": 0,
             "sorry_changes": 0,
@@ -66,11 +79,11 @@
         "import must come BEFORE module docblock in Lean 4",
         "INT16_MIN/MAX: use simp only [INT16_MIN, INT16_MAX] at * before omega for multi-const goals",
         "abbrev is transparent to omega; simp-unfold first is safer for multi-constant proofs",
-        "prefix is reserved in Lean 4 — use pfx/sfx",
+        "prefix is reserved in Lean 4 \u2014 use pfx/sfx",
         "CRC-32 is LSBIT-first (reflected): use >>> right-shift",
         "CRC-64-WE is MSBIT-first: use <<< left-shift, check bit 63",
         "FVSquad.lean AND Basic.lean must both import new files",
-        "Int.add_emod_right : (a + b) % b = a % b — direct periodicity lemma",
+        "Int.add_emod_right : (a + b) % b = a % b \u2014 direct periodicity lemma",
         "wrap_bin bug: bin + n < 0 iff bin <= -n-1",
         "by_contra unavailable without Mathlib 4.29; use by_cases + omega",
         "simp only [if_pos h1, if_neg h2] for case-splitting on if-then-else",
@@ -79,21 +92,28 @@
         "AlphaFilter induction: use induction n generalizing state for state-updating recursion",
         "total_T_ge_T123: rw [total_T_partition] then exact Int.le_max_left _ _",
         "linarith cannot combine equalities with max; use rw to substitute the equality first",
-        "ring, nlinarith, linarith are MATHLIB ONLY — not available in standard Lean 4 stdlib",
+        "ring, nlinarith, linarith are MATHLIB ONLY \u2014 not available in standard Lean 4 stdlib",
         "Int.mul_le_mul_of_nonneg_right : a * c <= b * c when a <= b and 0 <= c (available stdlib)",
         "simp only [def_name] beta-reduces let-bindings in goals (needed for pidOutputRaw)",
         "rw [if_neg h]; no closing tactic needed when goal is already trivially closed by rw",
         "simp handles mul_zero/zero_mul/add_zero for Int without explicit lemma names",
         "For SensorOrientation injectivity: use exfalso + simp only [yawOffsetK, Option.some.injEq] at heq + omega (not simp_all which leaves non-integer goal)",
-        "yawOffsetK_zero_unique: simp_all [yawOffsetK] works — simp_all can close integer equality contradictions and SensorOrientation equality goals together",
-        "Coverage proofs: rcases hk with rfl | ... after simp [List.mem_cons, List.mem_nil_iff, or_false] — goals are in list order (left to right)"
+        "yawOffsetK_zero_unique: simp_all [yawOffsetK] works \u2014 simp_all can close integer equality contradictions and SensorOrientation equality goals together",
+        "Coverage proofs: rcases hk with rfl | ... after simp [List.mem_cons, List.mem_nil_iff, or_false] \u2014 goals are in list order (left to right)",
+        "alphaUpdate_ge_sample (state alpha 0 hpos ha0 ha1): gives 0 \u2264 alphaUpdate state alpha 0 when 0 \u2264 state (use for lower-bound in fdConst)",
+        "alphaUpdate_le_sample (state alpha 0 hneg ha0 ha1): gives alphaUpdate state alpha 0 \u2264 0 when state \u2264 0",
+        "FDState needs deriving Repr to use #eval directly; use .1/.2 to extract fields",
+        "Rat.div_def + Rat.zero_mul proves 0/dt = 0 (Rat.zero_div not available)"
     ],
     "mathlib_status": "blocked_403_cache_proxy",
-    "notes": "Run103: Target 45 (SensorOrientation) done — 15 theorems, 0 sorry. CI correspondence-tests job restored. Next priority: target 47 (FilteredDerivative::update, EASY) reuses AlphaFilter.lean proofs directly.",
+    "notes": "Run104: Target 47 (FilteredDerivative) done \u2014 13 theorems, 0 sorry. Builds on AlphaFilter.lean. Next: target 46 (goldensection, MODERATE) or Task 1 for new targets.",
     "report_status": {
         "exists": true,
         "last_updated_run": 100,
-        "stale_items": ["run101 additions (MathFunctions +11)", "run103 additions (SensorOrientation +15)"]
+        "stale_items": [
+            "run101 additions (MathFunctions +11)",
+            "run103 additions (SensorOrientation +15)"
+        ]
     },
     "targets": {
         "PID": {
@@ -128,8 +148,8 @@
         },
         "target_47_FilteredDerivative": {
             "source": "src/lib/mathlib/math/filter/FilteredDerivative.hpp:84-103",
-            "phase": 1,
-            "notes": "EASY. Builds on AlphaFilter.lean. Constant-input convergence to zero."
+            "phase": 5,
+            "notes": "DONE. 13 theorems, 0 sorry. fdUpdate structural + fdConstAlphaIter convergence (bounded_pos, bounded_neg, shrinks, nonneg)."
         }
     }
 }
