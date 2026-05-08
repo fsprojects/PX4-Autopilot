@@ -65,6 +65,14 @@ private theorem le_sub_of_add_le {x y z : Rat} (h : x + z ≤ y) : x ≤ y - z :
 private theorem add_sub_comm (a b : Rat) : a + (b - a) = b := by
   rw [Rat.add_comm, Rat.sub_add_cancel]
 
+/-- Distributivity of multiplication over subtraction: `a * (b - c) = a*b - a*c`. -/
+private theorem rat_mul_sub (a b c : Rat) : a * (b - c) = a * b - a * c := by
+  rw [Rat.sub_eq_add_neg, Rat.mul_add, Rat.mul_neg, ← Rat.sub_eq_add_neg]
+
+/-- `r + r = 2 * r`. -/
+private theorem rat_two_mul (r : Rat) : r + r = 2 * r := by
+  rw [← Rat.one_mul r, ← Rat.add_mul, show (1:Rat) + 1 = 2 from by native_decide, Rat.one_mul]
+
 /-! ## Interior-point computation -/
 
 /-- Left interior point: `c = b - (b - a) * r`. With r = 1/φ ≈ 0.618, this sits
@@ -128,20 +136,33 @@ theorem gsD_ge_a (a b r : Rat) (hab : a ≤ b) (hr0 : 0 ≤ r) :
     point d. This is the key property that ensures the two probe points are
     distinct and ordered. The golden ratio satisfies r ≈ 0.618 > 1/2.
 
-    The proof reduces to the ring identity
+    The proof reduces to the identity
       `d - c = (b - a) * (2*r - 1)`
-    which is non-negative when `r ≥ 1/2` and `b ≥ a`.
+    which is non-negative when `r ≥ 1/2` and `b ≥ a`. -/
 
-    This requires algebraic manipulation that goes beyond the available
-    stdlib tactics (needs `ring` or `linarith`); left as `sorry` pending
-    Mathlib availability. -/
+-- Helper: `w*r + w*r - w = w*(2*r - 1)`.
+private theorem gs_interior_key (w r : Rat) : w * r + w * r - w = w * (2 * r - 1) := by
+  symm
+  rw [rat_mul_sub, Rat.mul_one, ← rat_two_mul, Rat.mul_add]
+
+-- Helper: normalise `a + (b-a)*r - (b - (b-a)*r)` to `(b-a)*r + (b-a)*r - (b-a)`.
+private theorem gs_interior_expand (a b r : Rat) :
+    a + (b - a) * r - (b - (b - a) * r) = (b - a) * r + (b - a) * r - (b - a) := by
+  simp only [Rat.sub_eq_add_neg, Rat.add_mul, Rat.neg_mul, Rat.neg_neg, Rat.neg_add]
+  simp [Rat.add_comm, Rat.add_assoc, Rat.add_left_comm]
+
 theorem gsC_le_gsD (a b r : Rat) (hab : a ≤ b) (hr_half : 1/2 ≤ r) :
     gsC a b r ≤ gsD a b r := by
   simp only [gsC, gsD]
   -- b - (b-a)*r ≤ a + (b-a)*r
-  -- ↔ 0 ≤ a + (b-a)*r - (b - (b-a)*r) = (b-a)*(2*r-1)
-  -- Requires ring manipulation; provable with Mathlib's linarith/ring.
-  sorry
+  -- ↔ 0 ≤ a + (b-a)*r - (b - (b-a)*r) = (b-a)*(2*r-1) ≥ 0
+  have hd : 0 ≤ b - a := (Rat.le_iff_sub_nonneg a b).mp hab
+  rw [Rat.le_iff_sub_nonneg, gs_interior_expand, gs_interior_key]
+  apply Rat.mul_nonneg hd
+  -- 0 ≤ 2*r - 1 from r ≥ 1/2
+  have h2 : (1:Rat)/2 * 2 ≤ r * 2 := Rat.mul_le_mul_of_nonneg_right hr_half (by native_decide)
+  rw [show (1:Rat)/2 * 2 = 1 from by native_decide, Rat.mul_comm] at h2
+  exact (Rat.le_iff_sub_nonneg 1 (2 * r)).mp h2
 
 /-! ## Width after the `b ← d` step -/
 
@@ -209,14 +230,11 @@ theorem gsC_in_range (a b r : Rat) (hab : a ≤ b) (hr0 : 0 ≤ r) (hr1 : r ≤ 
           rw [Rat.sub_eq_add_neg (a := b), Rat.neg_sub, Rat.add_comm, Rat.sub_add_cancel]]
     exact Rat.mul_nonneg ((Rat.le_iff_sub_nonneg a b).mp hab) hr0
 
-/-! ## Full ordering invariant: `a ≤ c ≤ d ≤ b`
-
-    With `c ≤ d` guarded by sorry (pending Mathlib), the combined ordering theorem
-    also carries sorry. -/
+/-! ## Full ordering invariant: `a ≤ c ≤ d ≤ b` -/
 theorem gs_ordering (a b r : Rat) (hab : a ≤ b) (hr0 : 0 ≤ r) (hr1 : r ≤ 1) (hr_half : 1/2 ≤ r) :
     a ≤ gsC a b r ∧ gsC a b r ≤ gsD a b r ∧ gsD a b r ≤ b :=
   ⟨gsC_ge_a a b r hab hr1,
-   gsC_le_gsD a b r hab hr_half,  -- contains sorry
+   gsC_le_gsD a b r hab hr_half,
    gsD_le_b a b r hab hr1⟩
 
 /-! ## Midpoint containment -/
@@ -226,15 +244,22 @@ theorem gs_ordering (a b r : Rat) (hab : a ≤ b) (hr0 : 0 ≤ r) (hr1 : r ≤ 1
     This is guaranteed by the width bound: since `|b - a| ≤ tol` at termination,
     the midpoint is within `tol/2` of any contained point.
 
-    Proof sketch: `a ≤ (a+b)/2 ≤ b` ↔ `a ≤ b`. The division step requires
-    `Rat.div_le_iff` which is not available in stdlib without Mathlib; left as
-    sorry pending Mathlib availability. -/
+    Proof: `(a+b)/2 = (a+b) * (1/2)`. Since `a*(1/2) ≤ b*(1/2)` and
+    `x = x*(1/2) + x*(1/2)` for any `x`, both bounds follow from monotonicity
+    of `(· * (1/2))`. -/
 theorem gs_midpoint_in_range (a b : Rat) (hab : a ≤ b) :
     a ≤ (a + b) / 2 ∧ (a + b) / 2 ≤ b := by
-  -- a ≤ (a+b)/2 ↔ 2*a ≤ a+b ↔ a ≤ b ✓
-  -- (a+b)/2 ≤ b ↔ a+b ≤ 2*b ↔ a ≤ b ✓
-  -- Requires Rat.le_div_iff / Rat.div_le_iff; not in stdlib without Mathlib.
-  sorry
+  have h2inv : (2:Rat)⁻¹ = 1/2 := by native_decide
+  have hmul : a * (1/2) ≤ b * (1/2) :=
+    Rat.mul_le_mul_of_nonneg_right hab (by native_decide)
+  have hxx : ∀ x : Rat, x = x * (1/2) + x * (1/2) := fun x => by
+    rw [← Rat.mul_add, show (1:Rat)/2 + 1/2 = 1 from by native_decide, Rat.mul_one]
+  rw [Rat.div_def, h2inv, Rat.add_mul]
+  constructor
+  · calc a = a * (1/2) + a * (1/2) := hxx a
+         _ ≤ a * (1/2) + b * (1/2) := Rat.add_le_add_left.mpr hmul
+  · calc a * (1/2) + b * (1/2) ≤ b * (1/2) + b * (1/2) := Rat.add_le_add_right.mpr hmul
+         _ = b := (hxx b).symm
 
 /-! ## Concrete verification (golden ratio r = 618/1000 ≈ 1/φ) -/
 
