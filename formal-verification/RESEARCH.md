@@ -1623,3 +1623,91 @@ induction, reusing `alphaIterate_converges_up/down`), `fdUpdate_output_in_range`
 | 5 | `wrapRat` Mathlib sorry closure | 🔄 Phase 3 | 6 axioms; needs Mathlib `Int.floor` |
 | 6 | `Atmosphere` sorry closure | 🔄 Phase 3 | 3 axioms; needs Mathlib |
 | 7 | `SqrtLinear` sqrt branch sorry closure | 🔄 Phase 3 | 3 axioms; needs Mathlib `Real.sqrt` |
+
+---
+
+## New Research Targets — Run 108
+
+### Target 48: `GainCompression::update`
+
+**File**: `src/lib/rate_control/gain_compression.cpp`
+**Phase**: 1 — Research
+
+The `GainCompression` class implements an adaptive gain-reduction mechanism based on
+the Orr & Van Zwieten 2012 algorithm. When oscillations are detected (high HPF × LPF
+spectral energy), `_compression_gain` is driven toward `_compression_gain_min` (default 0.3).
+When oscillations subside, a leakage term restores gain toward 1.
+
+The update equation is:
+```
+ka     = max(compression_gain - gain_min, 0)
+damper = -200 * ka * lpf_state
+leakage = 0.1 * (1 - compression_gain)
+ka_dot  = damper + leakage
+gain' = constrain(gain + ka_dot * dt, gain_min, 1)
+```
+
+**Benefit**: `compression_gain ∈ [gain_min, 1]` is a safety invariant — values outside
+this range would cause sign-flip or saturation in the rate controller. The leakage term
+ensures gain eventually recovers to 1 in the absence of oscillations.
+
+**Specification size**: ~25–30 Lean lines for the key range invariant and leakage lemma.
+
+**Proof tractability**: The range invariant follows directly from the `constrain` call —
+`constrain_range` from `MathFunctions.lean` closes it in one step. The leakage lemma
+requires showing that when `compression_gain = 1` and `lpf_state = 0`, `ka_dot = 0`.
+
+**Approximations needed**: `constrain` over `Rat` (not `Float`); `lpf_state` treated as
+opaque `Rat` input. The `AlphaFilter` LPF update is abstracted away (treated as a black-box
+input). The `dt` is a positive `Rat`.
+
+**Approach**: Import `AlphaFilter.lean`, reuse `constrainRat_range` from `MathFunctions.lean`,
+prove `compression_gain_in_range` by case analysis on the `constrain` application.
+
+---
+
+### Target 49: `sensor_orientation_to_yaw_offset` (non-CUSTOM)
+
+**File**: `src/lib/collision_prevention/ObstacleMath.cpp:72`
+**Phase**: 1 — Research
+
+A switch on 8 `SensorOrientation` enum variants (ROTATION_YAW_0 through 315 and CUSTOM).
+Each of the 8 non-CUSTOM cases maps to a rational multiple of π/4.
+
+**Benefit**: The collision-prevention system uses yaw offsets to rotate obstacle sensor data.
+An incorrect mapping (e.g., returning the wrong multiple) silently corrupts obstacle maps.
+Verifying that the 8 cases are correct and exhaustive (minus CUSTOM) eliminates this class of bug.
+
+**Specification size**: ~20 Lean lines — an `inductive SensorOrient`, a `def yawOffsetMul`, and
+a decidable `theorem yawOffset_correct : ∀ o ≠ CUSTOM, yawOffsetMul o = ...`.
+
+**Proof tractability**: All 8 non-CUSTOM cases are decidable with `decide`.
+
+**Approximations needed**: π is abstracted as a rational parameter (model over `Rat`). The
+CUSTOM branch is excluded (requires quaternion math). Model over the enum directly.
+
+**Approach**: `native_decide` or `decide` for all theorems; no Mathlib required.
+
+---
+
+### Target 50: `GainCompression::update` — leakage-only steady state
+
+As a companion to Target 48, when `lpf_state = 0` (no oscillations), `damper = 0` and
+`ka_dot = leakage` only. In steady state (`compression_gain = 1`, no oscillations):
+`leakage = 0.1 * 0 = 0`, so gain is at equilibrium 1.
+
+This is a useful safety property: if the spectral damper sees zero energy for sufficiently
+long, gain will eventually settle at 1 (full gain), restoring normal control authority.
+
+---
+
+## Updated Priority Order (run 108)
+
+| Priority | Target | Phase | Rationale |
+|----------|--------|-------|-----------|
+| 1 | `GainCompression::update` (target 48) | ⬜ Research | Range invariant via `constrain`; reuses `MathFunctions.lean`; safety-critical |
+| 2 | `sensor_orientation_to_yaw_offset` (target 49) | ⬜ Research | Finite enum; `decide`-provable; collision-prevention safety |
+| 3 | Multi-step PID convergence (extend PID.lean) | 🔄 Phase 5 | Analogous to AlphaFilter convergence; error → 0 over time |
+| 4 | `wrapRat` Mathlib sorry closure | 🔄 Phase 3 | 10 axioms; needs Mathlib `Int.floor` — awaiting network access |
+| 5 | `Atmosphere` sorry closure | 🔄 Phase 3 | Needs Mathlib |
+| 6 | `SqrtLinear` sqrt branch sorry closure | 🔄 Phase 3 | Needs Mathlib `Real.sqrt` |

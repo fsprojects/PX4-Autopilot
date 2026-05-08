@@ -2,19 +2,19 @@
 
 > 🔬 *Lean Squad — automated formal verification for `dsyme/PX4-Autopilot`.*
 
-**Status**: ✅ ACTIVE — 519 theorems · **0 `sorry`** · Lean 4.29.1 · 38 files
+**Status**: ✅ ACTIVE — 555 theorems · **0 `sorry`** · Lean 4.29.1 · 40 files
 
 ## Last Updated
 
-- **Date**: 2026-05-05 16:46 UTC
-- **Commit**: `c6296e49e0`
+- **Date**: 2026-05-08 08:47 UTC
+- **Commit**: `db0b76ce60`
 
 ---
 
 ## Executive Summary
 
-The Lean Squad has formally verified **519 named theorems** across
-**38 Lean 4 files**, covering the core mathematical utility library (`src/lib/mathlib/`),
+The Lean Squad has formally verified **555 named theorems** across
+**40 Lean 4 files**, covering the core mathematical utility library (`src/lib/mathlib/`),
 the EKF2 ring-buffer (`src/lib/ringbuffer/`), the `systemlib::Hysteresis` state machine
 (`src/lib/hysteresis/`), the Septentrio GNSS CRC-16 algorithm, the Commander arming FSM,
 the ISA atmosphere model, `ObstacleMath::wrap_bin` / `get_bin_at_angle` / `get_lower_bound_angle`
@@ -22,13 +22,15 @@ the ISA atmosphere model, `ObstacleMath::wrap_bin` / `get_bin_at_angle` / `get_l
 (`src/lib/crc/crc.c`), piecewise-linear sqrt, braking-distance safety, `math::isInRange`
 (the generic closed-interval predicate), `math::constrainFloatToInt16`, the CRC-64-WE hash,
 the CRC-8/CRSF protocol checksum, radians/degrees conversions, `math::min3`/`max3`,
-the jerk-limited trajectory planner (`VelocitySmoothing`, 33 theorems), and the generic
+the jerk-limited trajectory planner (`VelocitySmoothing`, 33 theorems), the generic
 PID controller (`src/lib/pid/PID.cpp`, 22 theorems including output safety bounds and
-anti-windup invariants). Three genuine implementation bugs were discovered through formal
-verification. **Zero** `sorry` remain in proof bodies (10 axioms for irrational arithmetic
-are the only non-proved elements). Runs 77–100 added 136 new theorems across 7 new Lean files:
-`ConstrainToInt16`, `Crc64`, `Crc8`, `RadiansDegrees`, `Min3Max3`, `VelocitySmoothing`, and
-`PID`. Route B correspondence tests cover `atmosphere` (26 cases), `slew_rate` (4327 cases),
+anti-windup invariants), the `FilteredDerivative` discrete-derivative + alpha-IIR filter
+(12 theorems, 0 sorry), and the **golden-section search** interval invariants
+(`src/lib/mathlib/math/SearchMin.hpp`, 13 theorems, 0 sorry). Three genuine implementation
+bugs were discovered through formal verification. **Zero** `sorry` remain in proof bodies
+(10 axioms for irrational arithmetic are the only non-proved elements). Runs 101–108 added
+36 new theorems across 2 new Lean files: `FilteredDerivative` and `GoldenSection`. Route B
+correspondence tests cover `atmosphere` (26 cases), `slew_rate` (4327 cases),
 and `pid` (7964 cases).
 
 ---
@@ -51,7 +53,8 @@ graph TD
     L8["Layer 8: Physical Models<br/>Atmosphere (15) · SqrtLinear (15)<br/>SignFromBoolSq · BrakingDist (9)<br/>56 theorems"]
     L9["Layer 9: Collision Prevention<br/>GetBinAtAngle · GetLowerBoundAngle<br/>CollisionPrevComposition<br/>29 theorems"]
     L10["Layer 10: Math Extensions<br/>ConstrainToInt16 (10) · RadiansDegrees (36) · Min3Max3 (29)<br/>75 theorems"]
-    L11["Layer 11: Motion Planning + Control<br/>VelocitySmoothing (33) · PID (22)<br/>55 theorems"]
+    L11["Layer 11: Motion Planning + Control<br/>VelocitySmoothing (33) · PID (22) · FilteredDerivative (12)<br/>67 theorems"]
+    L12["Layer 12: Optimization Algorithms<br/>GoldenSection (13)<br/>13 theorems"]
     L1 --> L2a
     L1 --> L2b
     L2b --> L2c
@@ -63,6 +66,8 @@ graph TD
     L1 --> L10
     L2a --> L11
     L10 --> L11
+    L2a --> L12
+    L1 --> L12
 ```
 
 All proof files import only **Lean 4 stdlib** — no Mathlib is required.
@@ -370,13 +375,15 @@ graph LR
 
 ---
 
-### Layer 11 — Motion Planning & Control (2 files, 55 theorems)
+### Layer 11 — Motion Planning & Control (3 files, 67 theorems)
 
 ```mermaid
 graph LR
     VS["VelocitySmoothing.lean<br/>33 theorems<br/>Jerk-limited trajectory planner"]
     PID["PID.lean<br/>22 theorems<br/>Generic PID controller"]
+    FD["FilteredDerivative.lean<br/>12 theorems<br/>Discrete derivative + alpha-IIR filter"]
     VS --- PID
+    FD --- PID
 ```
 
 **`VelocitySmoothing.lean`** (33 theorems) models PX4's jerk-limited trajectory planner
@@ -404,6 +411,36 @@ which underlies rate, attitude, and velocity control throughout the firmware.
 
 **Correspondence** (Route B): `formal-verification/tests/pid/` — 7964 cases pass, confirming
 exact agreement between Lean model and C++ reference for integer-valued inputs.
+
+**`FilteredDerivative.lean`** (12 theorems) models `FilteredDerivative::update`
+(`src/lib/mathlib/math/filter/FilteredDerivative.hpp`) — a discrete derivative with an
+alpha-IIR low-pass filter. Builds on `AlphaFilter.lean`.
+
+**Key results**:
+- `fdUpdate_first_call_no_alpha_update`: first call sets `prev` but does not update the alpha filter.
+- `fdUpdate_second_call_zero_diff`: second call with same sample → derivative estimate 0.
+- `fdUpdate_const_input_converges_up/down`: for constant input, the filtered derivative converges toward 0 (inherits from `alphaIterate_converges_*`).
+- `fdUpdate_alpha_in_range`: alpha filter state stays in `[0, init_val]` for non-negative inputs.
+
+---
+
+### Layer 12 — Optimization Algorithms (1 file, 13 theorems)
+
+```mermaid
+graph LR
+    GS["GoldenSection.lean<br/>13 theorems<br/>Golden-section search invariants"]
+```
+
+**`GoldenSection.lean`** (13 theorems) models the golden-section search algorithm
+(`src/lib/mathlib/math/SearchMin.hpp`) — the interval-shrinking univariate minimiser.
+
+**Key results**:
+- `gs_ordering`: `a ≤ c ≤ d ≤ b` always holds after one step when `r ∈ [1/2, 1]`.
+- `gsC_in_range` / `gsD_in_range`: interior probe points always stay inside `[a, b]`.
+- `gs_width_contracts`: `b − a` strictly decreases by factor `r` on every step.
+- `gsC_le_gsD`: left probe ≤ right probe (probes never cross).
+- `gs_midpoint_in_range`: midpoint `(a+b)/2 ∈ [a,b]` (trivial but confirms model well-typed).
+- `gs_width_steps_equal`: both reduction steps yield equal remaining interval widths.
 
 ---
 
@@ -446,8 +483,10 @@ exact agreement between Lean model and C++ reference for integer-valued inputs.
 | `Min3Max3.lean` | 29 | 0 | ✅ Phase 5 | min3/max3: bounds, GLB/LUB, idempotence, commutativity, duality |
 | `VelocitySmoothing.lean` | 33 | 0 | ✅ Phase 5 | Jerk-limited schedule: partition, T≥0, monotonicity, T2_zero_iff |
 | `PID.lean` | 22 | 0 | ✅ Phase 5 | PID safety (output+integral bounds), equilibrium, monotonicity |
+| `FilteredDerivative.lean` | 12 | 0 | ✅ Phase 5 | Discrete derivative + IIR: first-call no-update, const-input convergence |
+| `GoldenSection.lean` | 13 | 0 | ✅ Phase 5 | GS search: ordering invariant, probe-in-range, width contraction |
 | `Basic.lean` | — | — | ✅ | Barrel file |
-| **Total** | **519** | **0** | — | **3 bugs found; 0 sorry; 38 files; lake build passes** |
+| **Total** | **555** | **0** | — | **3 bugs found; 0 sorry; 40 files; lake build passes** |
 
 ---
 
@@ -710,6 +749,11 @@ timeline
         PID               : generic PID controller (22 thms): safety bounds + anti-windup
         Correspondence    : PID Route B tests (7964/7964 pass)
         Report            : REPORT.md updated — 519 theorems, 38 files, 0 sorry
+    section Runs 101-108
+        FilteredDerivative : discrete derivative + alpha-IIR (12 thms, 0 sorry)
+        GoldenSection      : interval-shrinking search invariants (13 thms, 0 sorry)
+        CORRESPONDENCE     : CORRESPONDENCE.md updated — FilteredDerivative + GoldenSection sections
+        Report             : REPORT.md updated — 555 theorems, 40 files, 0 sorry
 ```
 
 ---
@@ -739,5 +783,5 @@ timeline
 
 > 🔬 *This report was generated by Lean Squad automated formal verification.*
 > *`lake build` verified with Lean 4.29.1. **0 `sorry`** — sorry-free since run 73.*
-> *519 theorems across 38 files. 11 proof layers. 3 bugs found.*
+> *555 theorems across 40 files. 12 proof layers. 3 bugs found.*
 > *CORRESPONDENCE.md covers all Lean files. Tests: `tests/atmosphere/` (26/26 pass), `tests/slew_rate/` (4327/4327 pass), `tests/pid/` (7964/7964 pass).*
