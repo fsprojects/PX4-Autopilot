@@ -38,3 +38,5 @@ import FVSquad.VelocitySmoothing
 import FVSquad.PID
 import FVSquad.FilteredDerivative
 import FVSquad.GoldenSection
+import FVSquad.GainCompression
+import FVSquad.SensorOrientation
