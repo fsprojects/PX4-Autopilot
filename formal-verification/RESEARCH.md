@@ -1520,7 +1520,7 @@ inline const _Tp goldensection(const _Tp &arg1, const _Tp &arg2, _Tp(*fun)(_Tp),
 **Benefit**: Used for flight-envelope optimisation (e.g., maximum-speed in
 waypoint transitions: `computeMaxSpeedInWaypoint` calls `goldensection` indirectly).
 The key correctness property is that after each iteration:
-1. `a ≤ c ≤ d ≤ b` (ordering invariant)  
+1. `a ≤ c ≤ d ≤ b` (ordering invariant)
 2. The interval width `(b - a)` shrinks by factor `1/φ ≈ 0.618` per iteration
 3. The returned midpoint is always in `[arg1, arg2]`
 

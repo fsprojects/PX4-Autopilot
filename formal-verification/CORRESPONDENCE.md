@@ -896,7 +896,7 @@ the buffer with `qsort` and returns `sorted[WINDOW / 2]`.
 - **NaN/non-finite**: C++ `cmp` sorts NaN to the top (implementation-defined IEEE 754 behaviour).
   This is not modelled — the Lean model assumes a total integer order.
 - **Zero-initialisation**: C++ zero-initialises the buffer; early calls before `WINDOW` inserts
-  return a mix of zeros and real data. The Lean model treats any list as a complete window, 
+  return a mix of zeros and real data. The Lean model treats any list as a complete window,
   abstracting away the initialisation phase.
 
 **Impact on proofs**: `mfMedian_mem`, `mfMedian_const`, `mfMedian_ge_sorted_first`, and
