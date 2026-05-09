@@ -1,33 +1,49 @@
 {
-    "run": 109,
-    "last_updated": "2026-05-08",
-    "lean_version": "4.29.0",
+    "run": 110,
+    "last_updated": "2026-05-09",
+    "lean_version": "4.29.1",
     "lake_build_status": "passed",
     "totals": {
-        "theorems": 586,
-        "theorems_proved": 586,
+        "theorems": 606,
+        "theorems_proved": 606,
         "axioms": 10,
         "sorry_count": 0,
-        "lean_files": 42,
-        "targets": 53
+        "lean_files": 43,
+        "targets": 54
     },
     "sorry_locations": {
-        "all": "0 sorry in all 40 files. 10 axioms for irrational arithmetic."
+        "all": "0 sorry in all 43 files. 10 axioms for irrational arithmetic."
     },
-    "open_prs": [],
+    "open_prs": [
+        "run110-work"
+    ],
     "bugs_found": 3,
     "correspondence_tests": {
         "atmosphere": "tests/atmosphere/ (26/26 pass, max_rel_err=1.9e-16)",
         "bin_at_angle": "tests/bin_at_angle/ (334/334 pass; confirms getBinI/getOffsetBinI exact; demonstrates wrap_bin latent bug)",
         "slew_rate": "tests/slew_rate/ (4327/4327 pass; confirms SlewRate::update exact for Rat model)",
         "hysteresis": "tests/hysteresis/ (259/259 pass)",
-        "pid": "tests/pid/ (7964/7964 pass; confirms clamp/derivative/integral/output for Int model)"
+        "pid": "tests/pid/ (7964/7964 pass; confirms clamp/derivative/integral/output for Int model)",
+        "count_set_bits": "tests/count_set_bits/ (871/871 pass; exact Nat model; all 0-255, powers of 2, 2^k-1, 64-bit LCG)"
     },
     "ci": {
         "lean_ci": "lean-ci.yml \u2014 two jobs: 'build' (Lean proofs) and 'correspondence-tests' (atmosphere 26 + slew_rate 4327). Triggers on lean/** and tests/**.",
         "status": "passing"
     },
     "run_history": [
+        {
+            "run": 110,
+            "date": "2026-05-09T01:07 UTC",
+            "workflow_run_id": 25587217644,
+            "tasks": [
+                "Task 5 (Proof Assistance): CountSetBits.lean \u2014 20 theorems, 0 sorry. even/odd recurrences, pos, le, zero_iff, pow2 characterisation (bidirectional).",
+                "Task 8 (Correspondence Validation Route B): tests/count_set_bits/ \u2014 871/871 tests pass."
+            ],
+            "theorems_proved": 20,
+            "sorry_changes": 0,
+            "pr_branch": "run110-work",
+            "notes": "606 theorems total, 43 files. New: countBits_eq_one_iff_pow2 fully characterises numbers with one set bit as powers of 2."
+        },
         {
             "run": 109,
             "date": "2026-05-08T16:43 UTC",
@@ -78,18 +94,6 @@
             "theorems_proved": 11,
             "sorry_changes": 2,
             "pr_branch": "lean-squad/goldensection-run106-25509561227-e6674099fdb8ac68"
-        },
-        {
-            "run": 105,
-            "date": "2026-05-07T09:30 UTC",
-            "workflow_run_id": 25486614078,
-            "tasks": [
-                "Task 5 (Proof Assistance): FilteredDerivative.lean \u2014 12 theorems, 0 sorry.",
-                "Task 7 (Proof Utility Critique): CRITIQUE.md updated."
-            ],
-            "theorems_proved": 12,
-            "sorry_changes": 0,
-            "pr_branch": "lean-squad/critique-proof-run105-25486614078-5d92a60bd2f3d1a5"
         }
     ],
     "discoveries": [
