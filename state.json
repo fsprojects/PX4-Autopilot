@@ -1,23 +1,23 @@
 {
-    "run": 110,
+    "run": 111,
     "last_updated": "2026-05-09",
     "lean_version": "4.29.1",
     "lake_build_status": "passed",
     "totals": {
-        "theorems": 606,
-        "theorems_proved": 606,
+        "theorems": 624,
+        "theorems_proved": 624,
         "axioms": 10,
         "sorry_count": 0,
-        "lean_files": 43,
-        "targets": 54
+        "lean_files": 44,
+        "targets": 55
     },
     "sorry_locations": {
         "all": "0 sorry in all 43 files. 10 axioms for irrational arithmetic."
     },
     "open_prs": [
-        "run110-work"
+        "run111-work"
     ],
-    "bugs_found": 3,
+    "bugs_found": 6,
     "correspondence_tests": {
         "atmosphere": "tests/atmosphere/ (26/26 pass, max_rel_err=1.9e-16)",
         "bin_at_angle": "tests/bin_at_angle/ (334/334 pass; confirms getBinI/getOffsetBinI exact; demonstrates wrap_bin latent bug)",
@@ -31,6 +31,19 @@
         "status": "passing"
     },
     "run_history": [
+        {
+            "run": 111,
+            "date": "2026-05-09T08:45 UTC",
+            "workflow_run_id": 25596828934,
+            "tasks": [
+                "Task 5 (Proof Assistance): Negate16.lean \u2014 18 theorems, 0 sorry. Key findings: not involutive for x=\u221232767, not injective (collision at \u221232767,\u221232768), not surjective (\u221232767 never in image).",
+                "Task 4 (Implementation Extraction): merged run110 work (CountSetBits + correspondence tests)."
+            ],
+            "theorems_proved": 18,
+            "sorry_changes": 0,
+            "pr_branch": "run111-work",
+            "notes": "624 theorems total, 44 files. negate16: INT16_MAX\u2192INT16_MIN mapping causes non-injectivity and non-involutivity. Findings filed as part of PR."
+        },
         {
             "run": 110,
             "date": "2026-05-09T01:07 UTC",
@@ -82,18 +95,6 @@
             "sorry_changes": -2,
             "pr_branch": "run107-work",
             "notes": "0 sorry now in all 41 files. Key discoveries: rat_mul_sub/rat_two_mul helpers enable ring-like Rat proofs without Mathlib. Midpoint proof: use Rat.div_def + native_decide for (2:Rat)\u207b\u00b9 = 1/2."
-        },
-        {
-            "run": 106,
-            "date": "2026-05-07T16:48 UTC",
-            "workflow_run_id": 25509561227,
-            "tasks": [
-                "Task 2 (Informal Spec): goldensection_informal.md",
-                "Task 3+4+5: GoldenSection.lean \u2014 13 theorems (11 proved, 2 sorry)"
-            ],
-            "theorems_proved": 11,
-            "sorry_changes": 2,
-            "pr_branch": "lean-squad/goldensection-run106-25509561227-e6674099fdb8ac68"
         }
     ],
     "discoveries": [
