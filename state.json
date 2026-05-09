@@ -1,21 +1,21 @@
 {
-    "run": 111,
+    "run": 112,
     "last_updated": "2026-05-09",
     "lean_version": "4.29.1",
     "lake_build_status": "passed",
     "totals": {
-        "theorems": 624,
-        "theorems_proved": 624,
+        "theorems": 634,
+        "theorems_proved": 634,
         "axioms": 10,
         "sorry_count": 0,
         "lean_files": 44,
         "targets": 55
     },
     "sorry_locations": {
-        "all": "0 sorry in all 43 files. 10 axioms for irrational arithmetic."
+        "all": "0 sorry in all 44 files. 10 axioms for irrational arithmetic."
     },
     "open_prs": [
-        "run111-work"
+        "run112-work"
     ],
     "bugs_found": 6,
     "correspondence_tests": {
@@ -27,85 +27,46 @@
         "count_set_bits": "tests/count_set_bits/ (871/871 pass; exact Nat model; all 0-255, powers of 2, 2^k-1, 64-bit LCG)"
     },
     "ci": {
-        "lean_ci": "lean-ci.yml \u2014 two jobs: 'build' (Lean proofs) and 'correspondence-tests' (atmosphere 26 + slew_rate 4327). Triggers on lean/** and tests/**.",
+        "lean_ci": "lean-ci.yml — two jobs: 'build' (Lean proofs) and 'correspondence-tests' (atmosphere 26 + slew_rate 4327). Triggers on lean/** and tests/**.",
         "status": "passing"
     },
     "run_history": [
+        {
+            "run": 112,
+            "date": "2026-05-09T16:30 UTC",
+            "workflow_run_id": 25606007253,
+            "tasks": [
+                "Task 2 (Informal Spec): pid_informal.md — comprehensive PID controller spec with pre/postconditions, invariants, convergence spec, open questions.",
+                "Task 5 (Proof Assistance): PID.lean — 6 new theorems: pidIntegralIterate, pidIntegralIterate_in_range, updateIntegral_zero_error_id, pidIntegralIterate_zero_error, pidStateIterate, pidStateIterate_integral_in_range, pidStateIterate_equilibrium_stable, pidOutput_zero_equilibrium_iterate."
+            ],
+            "theorems_proved": 8,
+            "sorry_changes": 0,
+            "pr_branch": "run112-work",
+            "notes": "634 theorems total, 44 files, 0 sorry. PID convergence: equilibrium is a fixed point — sp=fb with zero integral → output=0 for all n steps. Key: pidStateIterate_equilibrium_stable proves the state is an exact fixed point."
+        },
         {
             "run": 111,
             "date": "2026-05-09T08:45 UTC",
             "workflow_run_id": 25596828934,
             "tasks": [
-                "Task 5 (Proof Assistance): Negate16.lean \u2014 18 theorems, 0 sorry. Key findings: not involutive for x=\u221232767, not injective (collision at \u221232767,\u221232768), not surjective (\u221232767 never in image).",
+                "Task 5 (Proof Assistance): Negate16.lean — 18 theorems, 0 sorry. Key findings: not involutive for x=−32767, not injective (collision at −32767,−32768), not surjective (−32767 never in image).",
                 "Task 4 (Implementation Extraction): merged run110 work (CountSetBits + correspondence tests)."
             ],
             "theorems_proved": 18,
             "sorry_changes": 0,
             "pr_branch": "run111-work",
-            "notes": "624 theorems total, 44 files. negate16: INT16_MAX\u2192INT16_MIN mapping causes non-injectivity and non-involutivity. Findings filed as part of PR."
-        },
-        {
-            "run": 110,
-            "date": "2026-05-09T01:07 UTC",
-            "workflow_run_id": 25587217644,
-            "tasks": [
-                "Task 5 (Proof Assistance): CountSetBits.lean \u2014 20 theorems, 0 sorry. even/odd recurrences, pos, le, zero_iff, pow2 characterisation (bidirectional).",
-                "Task 8 (Correspondence Validation Route B): tests/count_set_bits/ \u2014 871/871 tests pass."
-            ],
-            "theorems_proved": 20,
-            "sorry_changes": 0,
-            "pr_branch": "run110-work",
-            "notes": "606 theorems total, 43 files. New: countBits_eq_one_iff_pow2 fully characterises numbers with one set bit as powers of 2."
-        },
-        {
-            "run": 109,
-            "date": "2026-05-08T16:43 UTC",
-            "workflow_run_id": 25567580468,
-            "tasks": [
-                "Task 5 (Proof Assistance): GainCompression.lean \u2014 11 theorems, 0 sorry. Range invariant [gain_min,1], leakage direction, iterated invariant.",
-                "Task 3 (Formal Spec): SensorOrientation.lean \u2014 20 theorems, 0 sorry. Injectivity, range [-3,4], surjectivity, compass alias correctness, opposite-direction symmetry."
-            ],
-            "theorems_proved": 31,
-            "sorry_changes": 0,
-            "pr_branch": "run109-work",
-            "notes": "586 theorems total, 42 files. Priority for run110: lerp_half (sorry in Lerp.lean was resolved?), WrapAngle Rat sorry, Atmosphere sorry, SqrtLinear sorry."
-        },
-        {
-            "run": 108,
-            "date": "2026-05-08T08:47 UTC",
-            "workflow_run_id": 25546207702,
-            "tasks": [
-                "Task 10 (Project Report): REPORT.md updated \u2014 555 theorems, 40 files, 12 proof layers. Added Layer 12 (GoldenSection) and expanded Layer 11 (FilteredDerivative).",
-                "Task 1 (Research): TARGETS.md + RESEARCH.md \u2014 4 new targets: GainCompression::update (target 48), sensor_orientation_to_yaw_offset (target 49), lerp coverage (50), superexpo coverage (51)."
-            ],
-            "theorems_proved": 0,
-            "sorry_changes": 0,
-            "pr_branch": "run108-work",
-            "notes": "Merged run107 work (GoldenSection 13 thms + CORRESPONDENCE update). Report now 555 theorems, 40 files. Priority targets for run109: GainCompression::update (range invariant via constrain), sensor_orientation decidable proofs."
-        },
-        {
-            "run": 107,
-            "date": "2026-05-08T01:21 UTC",
-            "workflow_run_id": 25530801981,
-            "tasks": [
-                "Task 5 (Proof Assistance): GoldenSection.lean \u2014 2 sorry resolved (gsC_le_gsD + gs_midpoint_in_range). New helpers: rat_mul_sub, rat_two_mul, gs_interior_key, gs_interior_expand.",
-                "Task 6 (Correspondence Review): CORRESPONDENCE.md \u2014 Added FilteredDerivative + GoldenSection sections. Summary table +2 rows."
-            ],
-            "theorems_proved": 2,
-            "sorry_changes": -2,
-            "pr_branch": "run107-work",
-            "notes": "0 sorry now in all 41 files. Key discoveries: rat_mul_sub/rat_two_mul helpers enable ring-like Rat proofs without Mathlib. Midpoint proof: use Rat.div_def + native_decide for (2:Rat)\u207b\u00b9 = 1/2."
+            "notes": "624 theorems total, 44 files. negate16: INT16_MAX→INT16_MIN mapping causes non-injectivity and non-involutivity. Findings filed as part of PR."
         }
     ],
     "discoveries": [
         "import must come BEFORE module docblock in Lean 4",
         "INT16_MIN/MAX: use simp only [INT16_MIN, INT16_MAX] at * before omega for multi-const goals",
         "abbrev is transparent to omega; simp-unfold first is safer for multi-constant proofs",
-        "prefix is reserved in Lean 4 \u2014 use pfx/sfx",
+        "prefix is reserved in Lean 4 — use pfx/sfx",
         "CRC-32 is LSBIT-first (reflected): use >>> right-shift",
         "CRC-64-WE is MSBIT-first: use <<< left-shift, check bit 63",
         "FVSquad.lean AND Basic.lean must both import new files",
-        "Int.add_emod_right : (a + b) % b = a % b \u2014 direct periodicity lemma",
+        "Int.add_emod_right : (a + b) % b = a % b — direct periodicity lemma",
         "wrap_bin bug: bin + n < 0 iff bin <= -n-1",
         "by_contra unavailable without Mathlib 4.29; use by_cases + omega",
         "simp only [if_pos h1, if_neg h2] for case-splitting on if-then-else",
@@ -114,47 +75,40 @@
         "AlphaFilter induction: use induction n generalizing state for state-updating recursion",
         "total_T_ge_T123: rw [total_T_partition] then exact Int.le_max_left _ _",
         "linarith cannot combine equalities with max; use rw to substitute the equality first",
-        "ring, nlinarith, linarith are MATHLIB ONLY \u2014 not available in standard Lean 4 stdlib",
+        "ring, nlinarith, linarith are MATHLIB ONLY — not available in standard Lean 4 stdlib",
         "Int.mul_le_mul_of_nonneg_right : a * c <= b * c when a <= b and 0 <= c (available stdlib)",
         "simp only [def_name] beta-reduces let-bindings in goals (needed for pidOutputRaw)",
         "rw [if_neg h]; no closing tactic needed when goal is already trivially closed by rw",
-        "simp handles mul_zero/zero_mul/add_zero for Int without explicit lemma names",
-        "Rat.zero_div NOT available \u2014 use simp [Rat.div_def, Rat.mul_comm] for 0/dt = 0",
+        "simp handles mul_zero/zero_mul/add_zero for Int without easily for Int without explicit lemma names",
+        "Rat.zero_div NOT available — use simp [Rat.div_def, Rat.mul_comm] for 0/dt = 0",
         "Rat.add_sub_cancel: a + b - a = b becomes rw [Rat.add_comm, Rat.add_sub_cancel] (no ring!)",
         "Rat.sub_add_cancel : a - b + b = a (available stdlib)",
         "Rat.neg_sub : -(a - b) = b - a (available stdlib)",
         "gs: rat_mul_sub/rat_two_mul helpers enable ring-like Rat proofs without Mathlib",
-        "gs midpoint: use Rat.div_def + native_decide for (2:Rat)\u207b\u00b9 = 1/2",
-        "Rat.lt_iff_sub_pos a b : a < b \u2194 0 < b - a \u2014 use for 0 < 1 - gain from gain < 1",
-        "le_refl is unavailable \u2014 use Rat.le_refl (implicit arg); by_cases + if_pos/if_neg for constrainRat case splits",
-        "split_ifs is MATHLIB ONLY \u2014 use by_cases h: P; simp only [if_pos h]/[if_neg h] instead"
+        "gs midpoint: use Rat.div_def + native_decide for (2:Rat)⁻¹ = 1/2",
+        "Rat.lt_iff_sub_pos a b : a < b ↔ 0 < b - a — use for 0 < 1 - gain from gain < 1",
+        "le_refl is unavailable — use Rat.le_refl (implicit arg); by_cases + if_pos/if_neg for constrainRat case splits",
+        "split_ifs is MATHLIB ONLY — use by_cases h: P; simp only [if_pos h]/[if_neg h] instead",
+        "pidStateIterate: to prove fixed-point stability, first prove one_step lemma then use it in induction (avoid rw on ih)"
     ],
     "priority_targets": [
         {
-            "id": 48,
-            "name": "GainCompression::update",
-            "file": "src/lib/rate_control/gain_compression.cpp",
-            "phase": 1,
-            "notes": "Range invariant via constrain; reuses MathFunctions.lean; builds on AlphaFilter"
-        },
-        {
-            "id": 49,
-            "name": "sensor_orientation_to_yaw_offset",
-            "file": "src/lib/collision_prevention/ObstacleMath.cpp:72",
-            "phase": 1,
-            "notes": "Finite enum (8 non-CUSTOM cases); decide-provable; abstract pi as Rat param"
-        },
-        {
-            "id": "pid-convergence",
-            "name": "Multi-step PID convergence (extend PID.lean)",
-            "phase": 5,
-            "notes": "Analogous to AlphaFilter run 89; error \u2192 0 over time"
+            "id": "pid-convergence-2",
+            "name": "PID tracking convergence (error→0 over time)",
+            "phase": 3,
+            "notes": "Equilibrium stability proved. Next: prove that for non-zero constant setpoint, integral drives error toward 0 (proportional control analogue). Requires Rat arithmetic."
         },
         {
             "id": "axiom-closure",
             "name": "wrapRat/Atmosphere/SqrtLinear axiom closure",
             "phase": 3,
-            "notes": "Needs Mathlib \u2014 awaiting network/lake update"
+            "notes": "Needs Mathlib — awaiting network/lake update"
+        },
+        {
+            "id": "expo-informal",
+            "name": "expo informal spec",
+            "phase": 1,
+            "notes": "Expo.lean has 17 theorems but no expo_informal.md — write in next run"
         }
     ]
 }
