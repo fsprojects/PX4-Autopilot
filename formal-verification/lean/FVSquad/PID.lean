@@ -344,4 +344,109 @@ theorem pidOutput_mono_integral (sp fb dt gainP gainD limitO : Int)
   simp only [pidOutputRaw, hlast]
   omega
 
+-- ============================================================
+-- § 7  Multi-step iteration and convergence
+-- ============================================================
+
+/-- `pidIntegralIterate gainI error dt limitI state n` applies `updateIntegral`
+    with a fixed `error` exactly `n` times, returning the integral after `n` steps. -/
+def pidIntegralIterate (gainI error dt limitI : Int) : Int → Nat → Int
+  | acc, 0     => acc
+  | acc, n + 1 => pidIntegralIterate gainI error dt limitI
+                    (updateIntegral acc gainI error dt limitI) n
+
+/-- **Iterated integral stays in range**: after any number of steps the integral
+    remains in `[-limitI, limitI]`, provided the initial value is in range and
+    `limitI ≥ 0`. -/
+theorem pidIntegralIterate_in_range (gainI error dt limitI : Int) (h : 0 ≤ limitI)
+    (init : Int) (hinit_lo : -limitI ≤ init) (hinit_hi : init ≤ limitI)
+    (n : Nat) :
+    -limitI ≤ pidIntegralIterate gainI error dt limitI init n ∧
+    pidIntegralIterate gainI error dt limitI init n ≤ limitI := by
+  induction n generalizing init with
+  | zero => simp [pidIntegralIterate]; exact ⟨hinit_lo, hinit_hi⟩
+  | succ k ih =>
+    simp only [pidIntegralIterate]
+    apply ih
+    · exact updateIntegral_ge_neg init gainI error dt limitI h
+    · exact updateIntegral_le   init gainI error dt limitI h
+
+/-- **Zero-error iteration is identity**: when `error = 0`, `updateIntegral`
+    is the identity on any integral value (independent of `gainI`, `dt`). -/
+theorem updateIntegral_zero_error_id (integral gainI dt limitI : Int)
+    (_h : 0 ≤ limitI) (hlo : -limitI ≤ integral) (hhi : integral ≤ limitI) :
+    updateIntegral integral gainI 0 dt limitI = integral := by
+  simp only [updateIntegral, Int.mul_zero, Int.zero_mul, Int.add_zero]
+  exact clamp_of_mem integral limitI hlo hhi
+
+/-- **Iterated zero-error integral is constant**: applying `updateIntegral` any
+    number of times with `error = 0` leaves the integral unchanged. -/
+theorem pidIntegralIterate_zero_error (gainI dt limitI : Int) (h : 0 ≤ limitI)
+    (init : Int) (hinit_lo : -limitI ≤ init) (hinit_hi : init ≤ limitI)
+    (n : Nat) :
+    pidIntegralIterate gainI 0 dt limitI init n = init := by
+  induction n generalizing init with
+  | zero => simp [pidIntegralIterate]
+  | succ k ih =>
+    simp only [pidIntegralIterate]
+    rw [updateIntegral_zero_error_id init gainI dt limitI h hinit_lo hinit_hi]
+    exact ih init hinit_lo hinit_hi
+
+/-- **Multi-step state iteration**: `pidStateIterate` applies one complete PID step
+    (integral update + feedback update) `n` times with constant setpoint and
+    feedback. -/
+def pidStateIterate (sp fb dt gainI limitI : Int) : PIDState → Nat → PIDState
+  | s, 0     => s
+  | s, n + 1 => pidStateIterate sp fb dt gainI limitI (pidNextState sp fb dt gainI limitI s) n
+
+/-- The integral component of `pidStateIterate` stays in `[-limitI, limitI]`. -/
+theorem pidStateIterate_integral_in_range (sp fb dt gainI limitI : Int) (h : 0 ≤ limitI)
+    (s : PIDState) (hlo : -limitI ≤ s.integral) (hhi : s.integral ≤ limitI)
+    (n : Nat) :
+    -limitI ≤ (pidStateIterate sp fb dt gainI limitI s n).integral ∧
+    (pidStateIterate sp fb dt gainI limitI s n).integral ≤ limitI := by
+  induction n generalizing s with
+  | zero => simp [pidStateIterate]; exact ⟨hlo, hhi⟩
+  | succ k ih =>
+    simp only [pidStateIterate]
+    apply ih
+    · exact updateIntegral_ge_neg s.integral gainI (sp - fb) dt limitI h
+    · exact updateIntegral_le   s.integral gainI (sp - fb) dt limitI h
+
+/-- **Multi-step state at equilibrium is stable**: starting from the equilibrium
+    state `{integral:=0, lastFeedback:=some fb}` with `sp = fb`, iterating any
+    number of steps returns the same equilibrium state. -/
+theorem pidStateIterate_equilibrium_stable
+    (fb dt gainI limitI : Int) (hI : 0 ≤ limitI)
+    (n : Nat) :
+    pidStateIterate fb fb dt gainI limitI
+      { integral := 0, lastFeedback := some fb } n =
+      { integral := 0, lastFeedback := some fb } := by
+  -- Key lemma: one step from equilibrium returns to equilibrium
+  have one_step : pidNextState fb fb dt gainI limitI
+      { integral := 0, lastFeedback := some fb } =
+      { integral := 0, lastFeedback := some fb } := by
+    simp only [pidNextState, updateIntegral, Int.sub_self, Int.mul_zero, Int.zero_mul,
+               Int.add_zero]
+    simp only [clamp_zero limitI hI]
+  induction n with
+  | zero => simp [pidStateIterate]
+  | succ k ih =>
+    simp only [pidStateIterate]
+    rw [one_step]
+    exact ih
+
+/-- **Zero output at equilibrium after multiple steps**: when `sp = fb` and the
+    initial integral is 0 (steady state), every step of `pidOutput` returns 0. -/
+theorem pidOutput_zero_equilibrium_iterate
+    (fb dt gainP gainD limitO gainI limitI : Int)
+    (hL : 0 ≤ limitO) (hI : 0 ≤ limitI)
+    (n : Nat) :
+    let s₀ : PIDState := { integral := 0, lastFeedback := some fb }
+    let sₙ := pidStateIterate fb fb dt gainI limitI s₀ n
+    pidOutput fb fb dt gainP gainD limitO sₙ = 0 := by
+  simp only
+  rw [pidStateIterate_equilibrium_stable fb dt gainI limitI hI n]
+  exact pidOutput_zero_steady_state fb dt gainP gainD limitO hL
+
 end PX4.PID
