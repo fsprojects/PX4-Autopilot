@@ -132,3 +132,9 @@ See `RESEARCH.md §Tool Choice` for details.
 | 49 | `sensor_orientation_to_yaw_offset` (non-CUSTOM cases) | `src/lib/collision_prevention/ObstacleMath.cpp:72` | 1 | ⬜ Research | — | Finite switch on 8 `SensorOrientation` enum variants (ROTATION_YAW_0 … 315); each maps to a multiple of π/4; decidable range `|offset| ≤ π`; CUSTOM case excluded (depends on quaternion math) |
 | 50 | `math::lerp` (linear interpolation) | `src/lib/mathlib/math/Functions.hpp:245` | 1 | ⬜ Research | — | `lerp(a,b,s) = a*(1-s) + b*s`; endpoint correctness at s=0 and s=1; convex combination for `0≤s≤1`; monotone in s, a, b; already exists as `Lerp.lean` (run ~50) — review coverage and add monotonicity/affinity theorems if missing |
 | 51 | `math::superexpo` (superrate RC curve) | `src/lib/mathlib/math/Functions.hpp:103` | 1 | ⬜ Research | — | Output ∈ `[-1, 1]`; odd symmetry; fixes {−1, 0, 1}; denominator > 0 for `g < 1`; already partially covered by `SuperExpo.lean` — verify all key properties have been proved |
+
+## New Research Targets (Phase 1 — identified in run 110)
+
+| # | Name | File | Phase | Status | Lean File | Notes |
+|---|------|------|-------|--------|-----------|-------|
+| 52 | `math::countSetBits` (Hamming weight) | `src/lib/mathlib/math/Functions.hpp:266` | 5 | ✅ Proved | `lean/FVSquad/CountSetBits.lean` | 20 theorems, 0 sorry; even/odd recurrences, pos, le, zero_iff, pow2 characterisation, 64-bit concrete values; correspondence tests in `tests/count_set_bits/` (871/871 pass) |

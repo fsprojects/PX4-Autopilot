@@ -39,3 +39,5 @@ import FVSquad.Min3Max3
 import FVSquad.VelocitySmoothing
 import FVSquad.FilteredDerivative
 import FVSquad.GoldenSection
+import FVSquad.CountSetBits
+import FVSquad.Negate16
