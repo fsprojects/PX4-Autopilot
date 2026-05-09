@@ -40,3 +40,4 @@ import FVSquad.FilteredDerivative
 import FVSquad.GoldenSection
 import FVSquad.GainCompression
 import FVSquad.SensorOrientation
+import FVSquad.CountSetBits
