@@ -1,11 +1,11 @@
 {
-    "run": 112,
-    "last_updated": "2026-05-09",
+    "run": 113,
+    "last_updated": "2026-05-10",
     "lean_version": "4.29.1",
     "lake_build_status": "passed",
     "totals": {
-        "theorems": 634,
-        "theorems_proved": 634,
+        "theorems": 638,
+        "theorems_proved": 638,
         "axioms": 10,
         "sorry_count": 0,
         "lean_files": 44,
@@ -14,9 +14,7 @@
     "sorry_locations": {
         "all": "0 sorry in all 44 files. 10 axioms for irrational arithmetic."
     },
-    "open_prs": [
-        "run112-work"
-    ],
+    "open_prs": ["run113-work"],
     "bugs_found": 6,
     "correspondence_tests": {
         "atmosphere": "tests/atmosphere/ (26/26 pass, max_rel_err=1.9e-16)",
@@ -24,13 +22,27 @@
         "slew_rate": "tests/slew_rate/ (4327/4327 pass; confirms SlewRate::update exact for Rat model)",
         "hysteresis": "tests/hysteresis/ (259/259 pass)",
         "pid": "tests/pid/ (7964/7964 pass; confirms clamp/derivative/integral/output for Int model)",
-        "count_set_bits": "tests/count_set_bits/ (871/871 pass; exact Nat model; all 0-255, powers of 2, 2^k-1, 64-bit LCG)"
+        "count_set_bits": "tests/count_set_bits/ (871/871 pass; exact Nat model; all 0-255, powers of 2, 2^k-1, 64-bit LCG)",
+        "expo": "tests/expo/ (1373/1373 pass; confirms expoRat matches C++ expo<T> exactly; boundary, linear, cubic, odd-symmetry, grid)"
     },
     "ci": {
         "lean_ci": "lean-ci.yml — two jobs: 'build' (Lean proofs) and 'correspondence-tests' (atmosphere 26 + slew_rate 4327). Triggers on lean/** and tests/**.",
         "status": "passing"
     },
     "run_history": [
+        {
+            "run": 113,
+            "date": "2026-05-10T01:15 UTC",
+            "workflow_run_id": 25616322263,
+            "tasks": [
+                "Task 5 (Proof Assistance): PID.lean — 4 new convergence theorems: updateIntegral_pos_error_increases, updateIntegral_neg_error_decreases, pidIntegralIterate_pos_error_mono, pidIntegralIterate_saturates.",
+                "Task 8 (Route B): expo correspondence — 1373/1373 tests pass, expoRat matches C++ expo<T> exactly. Added expo_informal.md and Expo.lean section in CORRESPONDENCE.md."
+            ],
+            "theorems_proved": 4,
+            "sorry_changes": 0,
+            "pr_branch": "run113-work",
+            "notes": "638 theorems total, 44 files, 0 sorry. PID integral convergence: integral monotonically increases toward limitI when error>0, gainI>0, dt>0. Saturation theorem: reaches limitI in at most limitI-init steps when gainI*error*dt>=1."
+        },
         {
             "run": 112,
             "date": "2026-05-09T16:30 UTC",
@@ -42,7 +54,7 @@
             "theorems_proved": 8,
             "sorry_changes": 0,
             "pr_branch": "run112-work",
-            "notes": "634 theorems total, 44 files, 0 sorry. PID convergence: equilibrium is a fixed point — sp=fb with zero integral → output=0 for all n steps. Key: pidStateIterate_equilibrium_stable proves the state is an exact fixed point."
+            "notes": "634 theorems total, 44 files, 0 sorry. PID convergence: equilibrium is a fixed point — sp=fb with zero integral → output=0 for all n steps."
         },
         {
             "run": 111,
@@ -54,8 +66,7 @@
             ],
             "theorems_proved": 18,
             "sorry_changes": 0,
-            "pr_branch": "run111-work",
-            "notes": "624 theorems total, 44 files. negate16: INT16_MAX→INT16_MIN mapping causes non-injectivity and non-involutivity. Findings filed as part of PR."
+            "pr_branch": "run111-work"
         }
     ],
     "discoveries": [
@@ -79,7 +90,7 @@
         "Int.mul_le_mul_of_nonneg_right : a * c <= b * c when a <= b and 0 <= c (available stdlib)",
         "simp only [def_name] beta-reduces let-bindings in goals (needed for pidOutputRaw)",
         "rw [if_neg h]; no closing tactic needed when goal is already trivially closed by rw",
-        "simp handles mul_zero/zero_mul/add_zero for Int without easily for Int without explicit lemma names",
+        "simp handles mul_zero/zero_mul/add_zero for Int without explicit lemma names",
         "Rat.zero_div NOT available — use simp [Rat.div_def, Rat.mul_comm] for 0/dt = 0",
         "Rat.add_sub_cancel: a + b - a = b becomes rw [Rat.add_comm, Rat.add_sub_cancel] (no ring!)",
         "Rat.sub_add_cancel : a - b + b = a (available stdlib)",
@@ -87,16 +98,18 @@
         "gs: rat_mul_sub/rat_two_mul helpers enable ring-like Rat proofs without Mathlib",
         "gs midpoint: use Rat.div_def + native_decide for (2:Rat)⁻¹ = 1/2",
         "Rat.lt_iff_sub_pos a b : a < b ↔ 0 < b - a — use for 0 < 1 - gain from gain < 1",
-        "le_refl is unavailable — use Rat.le_refl (implicit arg); by_cases + if_pos/if_neg for constrainRat case splits",
+        "le_refl is unavailable — use Int.le_refl; by_cases + if_pos/if_neg for constrainRat case splits",
         "split_ifs is MATHLIB ONLY — use by_cases h: P; simp only [if_pos h]/[if_neg h] instead",
-        "pidStateIterate: to prove fixed-point stability, first prove one_step lemma then use it in induction (avoid rw on ih)"
+        "pidStateIterate: to prove fixed-point stability, first prove one_step lemma then use it in induction",
+        "updateIntegral convergence: Int.mul_pos (Int.mul_pos hg he) hdt for gainI*error*dt > 0",
+        "clamp saturation: rw [if_neg (by omega), if_pos (by omega)] then exact Int.le_refl _ closes limitI<=limitI"
     ],
     "priority_targets": [
         {
-            "id": "pid-convergence-2",
-            "name": "PID tracking convergence (error→0 over time)",
-            "phase": 3,
-            "notes": "Equilibrium stability proved. Next: prove that for non-zero constant setpoint, integral drives error toward 0 (proportional control analogue). Requires Rat arithmetic."
+            "id": "pid-convergence-3",
+            "name": "PID output convergence (output→0 when error→0)",
+            "phase": 4,
+            "notes": "With convergence direction proved (run113), next: prove that as integral saturates and error=0, output→0. Full tracking convergence proof."
         },
         {
             "id": "axiom-closure",
@@ -105,10 +118,10 @@
             "notes": "Needs Mathlib — awaiting network/lake update"
         },
         {
-            "id": "expo-informal",
-            "name": "expo informal spec",
-            "phase": 1,
-            "notes": "Expo.lean has 17 theorems but no expo_informal.md — write in next run"
+            "id": "expo-monotone",
+            "name": "expo monotonicity in v (open question from expo_informal.md)",
+            "phase": 3,
+            "notes": "Is expoRat v e monotone in v for e in [0,1]? Likely true; prove in Expo.lean"
         }
     ]
 }
