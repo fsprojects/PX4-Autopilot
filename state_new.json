@@ -1,106 +1,84 @@
 {
-    "run": 109,
-    "last_updated": "2026-05-08",
-    "lean_version": "4.29.0",
+    "run": 114,
+    "last_updated": "2026-05-10",
+    "lean_version": "4.29.1",
     "lake_build_status": "passed",
     "totals": {
-        "theorems": 586,
-        "theorems_proved": 586,
+        "theorems": 638,
+        "theorems_proved": 638,
         "axioms": 10,
         "sorry_count": 0,
-        "lean_files": 42,
-        "targets": 53
+        "lean_files": 44,
+        "targets": 55
     },
     "sorry_locations": {
-        "all": "0 sorry in all 40 files. 10 axioms for irrational arithmetic."
+        "all": "0 sorry in all 44 files. 10 axioms for irrational arithmetic."
     },
-    "open_prs": [],
-    "bugs_found": 3,
+    "open_prs": ["run114-work"],
+    "bugs_found": 6,
     "correspondence_tests": {
         "atmosphere": "tests/atmosphere/ (26/26 pass, max_rel_err=1.9e-16)",
         "bin_at_angle": "tests/bin_at_angle/ (334/334 pass; confirms getBinI/getOffsetBinI exact; demonstrates wrap_bin latent bug)",
         "slew_rate": "tests/slew_rate/ (4327/4327 pass; confirms SlewRate::update exact for Rat model)",
         "hysteresis": "tests/hysteresis/ (259/259 pass)",
-        "pid": "tests/pid/ (7964/7964 pass; confirms clamp/derivative/integral/output for Int model)"
+        "pid": "tests/pid/ (7964/7964 pass; confirms clamp/derivative/integral/output for Int model)",
+        "count_set_bits": "tests/count_set_bits/ (871/871 pass; exact Nat model; all 0-255, powers of 2, 2^k-1, 64-bit LCG)",
+        "expo": "tests/expo/ (1373/1373 pass; confirms expoRat matches C++ expo<T> exactly; boundary, linear, cubic, odd-symmetry, grid)"
     },
     "ci": {
-        "lean_ci": "lean-ci.yml \u2014 two jobs: 'build' (Lean proofs) and 'correspondence-tests' (atmosphere 26 + slew_rate 4327). Triggers on lean/** and tests/**.",
+        "lean_ci": "lean-ci.yml — two jobs: 'build' (Lean proofs) and 'correspondence-tests' (atmosphere 26 + slew_rate 4327). Triggers on lean/** and tests/**.",
         "status": "passing"
     },
     "run_history": [
         {
-            "run": 109,
-            "date": "2026-05-08T16:43 UTC",
-            "workflow_run_id": 25567580468,
+            "run": 114,
+            "date": "2026-05-10T08:49 UTC",
+            "workflow_run_id": 25624409252,
             "tasks": [
-                "Task 5 (Proof Assistance): GainCompression.lean \u2014 11 theorems, 0 sorry. Range invariant [gain_min,1], leakage direction, iterated invariant.",
-                "Task 3 (Formal Spec): SensorOrientation.lean \u2014 20 theorems, 0 sorry. Injectivity, range [-3,4], surjectivity, compass alias correctness, opposite-direction symmetry."
-            ],
-            "theorems_proved": 31,
-            "sorry_changes": 0,
-            "pr_branch": "run109-work",
-            "notes": "586 theorems total, 42 files. Priority for run110: lerp_half (sorry in Lerp.lean was resolved?), WrapAngle Rat sorry, Atmosphere sorry, SqrtLinear sorry."
-        },
-        {
-            "run": 108,
-            "date": "2026-05-08T08:47 UTC",
-            "workflow_run_id": 25546207702,
-            "tasks": [
-                "Task 10 (Project Report): REPORT.md updated \u2014 555 theorems, 40 files, 12 proof layers. Added Layer 12 (GoldenSection) and expanded Layer 11 (FilteredDerivative).",
-                "Task 1 (Research): TARGETS.md + RESEARCH.md \u2014 4 new targets: GainCompression::update (target 48), sensor_orientation_to_yaw_offset (target 49), lerp coverage (50), superexpo coverage (51)."
+                "Task 7 (Proof Utility Critique): CRITIQUE.md updated — 638 theorems, 44 files, 6 bugs. Added 18 new theorem table rows (GoldenSection, SensorOrientation, GainCompression, CountSetBits, Negate16, PID convergence, Expo). Added positive findings 25-27 (PID saturation liveness, expo Route B, Negate16 bugs).",
+                "Task 6 (Correspondence Review): CORRESPONDENCE.md updated — added sections for Negate16.lean (exact, 18 thms), SensorOrientation.lean (exact, 20 thms, all by decide), GainCompression.lean (abstraction, 11 thms); updated PID.lean from 22 to 32 theorems."
             ],
             "theorems_proved": 0,
             "sorry_changes": 0,
-            "pr_branch": "run108-work",
-            "notes": "Merged run107 work (GoldenSection 13 thms + CORRESPONDENCE update). Report now 555 theorems, 40 files. Priority targets for run109: GainCompression::update (range invariant via constrain), sensor_orientation decidable proofs."
+            "pr_branch": "run114-work",
+            "notes": "No new Lean proofs this run — critique and correspondence review only. Total: 638 theorems, 44 files, 0 sorry. 6 bugs confirmed."
         },
         {
-            "run": 107,
-            "date": "2026-05-08T01:21 UTC",
-            "workflow_run_id": 25530801981,
+            "run": 113,
+            "date": "2026-05-10T01:15 UTC",
+            "workflow_run_id": 25616322263,
             "tasks": [
-                "Task 5 (Proof Assistance): GoldenSection.lean \u2014 2 sorry resolved (gsC_le_gsD + gs_midpoint_in_range). New helpers: rat_mul_sub, rat_two_mul, gs_interior_key, gs_interior_expand.",
-                "Task 6 (Correspondence Review): CORRESPONDENCE.md \u2014 Added FilteredDerivative + GoldenSection sections. Summary table +2 rows."
+                "Task 5 (Proof Assistance): PID.lean — 4 new convergence theorems: updateIntegral_pos_error_increases, updateIntegral_neg_error_decreases, pidIntegralIterate_pos_error_mono, pidIntegralIterate_saturates.",
+                "Task 8 (Route B): expo correspondence — 1373/1373 tests pass, expoRat matches C++ expo<T> exactly. Added expo_informal.md and Expo.lean section in CORRESPONDENCE.md."
             ],
-            "theorems_proved": 2,
-            "sorry_changes": -2,
-            "pr_branch": "run107-work",
-            "notes": "0 sorry now in all 41 files. Key discoveries: rat_mul_sub/rat_two_mul helpers enable ring-like Rat proofs without Mathlib. Midpoint proof: use Rat.div_def + native_decide for (2:Rat)\u207b\u00b9 = 1/2."
-        },
-        {
-            "run": 106,
-            "date": "2026-05-07T16:48 UTC",
-            "workflow_run_id": 25509561227,
-            "tasks": [
-                "Task 2 (Informal Spec): goldensection_informal.md",
-                "Task 3+4+5: GoldenSection.lean \u2014 13 theorems (11 proved, 2 sorry)"
-            ],
-            "theorems_proved": 11,
-            "sorry_changes": 2,
-            "pr_branch": "lean-squad/goldensection-run106-25509561227-e6674099fdb8ac68"
-        },
-        {
-            "run": 105,
-            "date": "2026-05-07T09:30 UTC",
-            "workflow_run_id": 25486614078,
-            "tasks": [
-                "Task 5 (Proof Assistance): FilteredDerivative.lean \u2014 12 theorems, 0 sorry.",
-                "Task 7 (Proof Utility Critique): CRITIQUE.md updated."
-            ],
-            "theorems_proved": 12,
+            "theorems_proved": 4,
             "sorry_changes": 0,
-            "pr_branch": "lean-squad/critique-proof-run105-25486614078-5d92a60bd2f3d1a5"
+            "pr_branch": "run113-work",
+            "notes": "638 theorems total, 44 files, 0 sorry. PID integral convergence: integral monotonically increases toward limitI when error>0, gainI>0, dt>0. Saturation theorem: reaches limitI in at most limitI-init steps when gainI*error*dt>=1."
+        },
+        {
+            "run": 112,
+            "date": "2026-05-09T16:30 UTC",
+            "workflow_run_id": 25606007253,
+            "tasks": [
+                "Task 2 (Informal Spec): pid_informal.md — comprehensive PID controller spec with pre/postconditions, invariants, convergence spec, open questions.",
+                "Task 5 (Proof Assistance): PID.lean — 6 new theorems: pidIntegralIterate, pidIntegralIterate_in_range, updateIntegral_zero_error_id, pidIntegralIterate_zero_error, pidStateIterate, pidStateIterate_integral_in_range, pidStateIterate_equilibrium_stable, pidOutput_zero_equilibrium_iterate."
+            ],
+            "theorems_proved": 8,
+            "sorry_changes": 0,
+            "pr_branch": "run112-work",
+            "notes": "634 theorems total, 44 files, 0 sorry. PID convergence: equilibrium is a fixed point — sp=fb with zero integral → output=0 for all n steps."
         }
     ],
     "discoveries": [
         "import must come BEFORE module docblock in Lean 4",
         "INT16_MIN/MAX: use simp only [INT16_MIN, INT16_MAX] at * before omega for multi-const goals",
         "abbrev is transparent to omega; simp-unfold first is safer for multi-constant proofs",
-        "prefix is reserved in Lean 4 \u2014 use pfx/sfx",
+        "prefix is reserved in Lean 4 — use pfx/sfx",
         "CRC-32 is LSBIT-first (reflected): use >>> right-shift",
         "CRC-64-WE is MSBIT-first: use <<< left-shift, check bit 63",
         "FVSquad.lean AND Basic.lean must both import new files",
-        "Int.add_emod_right : (a + b) % b = a % b \u2014 direct periodicity lemma",
+        "Int.add_emod_right : (a + b) % b = a % b — direct periodicity lemma",
         "wrap_bin bug: bin + n < 0 iff bin <= -n-1",
         "by_contra unavailable without Mathlib 4.29; use by_cases + omega",
         "simp only [if_pos h1, if_neg h2] for case-splitting on if-then-else",
@@ -109,47 +87,42 @@
         "AlphaFilter induction: use induction n generalizing state for state-updating recursion",
         "total_T_ge_T123: rw [total_T_partition] then exact Int.le_max_left _ _",
         "linarith cannot combine equalities with max; use rw to substitute the equality first",
-        "ring, nlinarith, linarith are MATHLIB ONLY \u2014 not available in standard Lean 4 stdlib",
+        "ring, nlinarith, linarith are MATHLIB ONLY — not available in standard Lean 4 stdlib",
         "Int.mul_le_mul_of_nonneg_right : a * c <= b * c when a <= b and 0 <= c (available stdlib)",
         "simp only [def_name] beta-reduces let-bindings in goals (needed for pidOutputRaw)",
         "rw [if_neg h]; no closing tactic needed when goal is already trivially closed by rw",
         "simp handles mul_zero/zero_mul/add_zero for Int without explicit lemma names",
-        "Rat.zero_div NOT available \u2014 use simp [Rat.div_def, Rat.mul_comm] for 0/dt = 0",
+        "Rat.zero_div NOT available — use simp [Rat.div_def, Rat.mul_comm] for 0/dt = 0",
         "Rat.add_sub_cancel: a + b - a = b becomes rw [Rat.add_comm, Rat.add_sub_cancel] (no ring!)",
         "Rat.sub_add_cancel : a - b + b = a (available stdlib)",
         "Rat.neg_sub : -(a - b) = b - a (available stdlib)",
         "gs: rat_mul_sub/rat_two_mul helpers enable ring-like Rat proofs without Mathlib",
-        "gs midpoint: use Rat.div_def + native_decide for (2:Rat)\u207b\u00b9 = 1/2",
-        "Rat.lt_iff_sub_pos a b : a < b \u2194 0 < b - a \u2014 use for 0 < 1 - gain from gain < 1",
-        "le_refl is unavailable \u2014 use Rat.le_refl (implicit arg); by_cases + if_pos/if_neg for constrainRat case splits",
-        "split_ifs is MATHLIB ONLY \u2014 use by_cases h: P; simp only [if_pos h]/[if_neg h] instead"
+        "gs midpoint: use Rat.div_def + native_decide for (2:Rat)⁻¹ = 1/2",
+        "Rat.lt_iff_sub_pos a b : a < b ↔ 0 < b - a — use for 0 < 1 - gain from gain < 1",
+        "le_refl is unavailable — use Int.le_refl; by_cases + if_pos/if_neg for constrainRat case splits",
+        "split_ifs is MATHLIB ONLY — use by_cases h: P; simp only [if_pos h]/[if_neg h] instead",
+        "pidStateIterate: to prove fixed-point stability, first prove one_step lemma then use it in induction",
+        "updateIntegral convergence: Int.mul_pos (Int.mul_pos hg he) hdt for gainI*error*dt > 0",
+        "clamp saturation: rw [if_neg (by omega), if_pos (by omega)] then exact Int.le_refl _ closes limitI<=limitI"
     ],
     "priority_targets": [
         {
-            "id": 48,
-            "name": "GainCompression::update",
-            "file": "src/lib/rate_control/gain_compression.cpp",
-            "phase": 1,
-            "notes": "Range invariant via constrain; reuses MathFunctions.lean; builds on AlphaFilter"
-        },
-        {
-            "id": 49,
-            "name": "sensor_orientation_to_yaw_offset",
-            "file": "src/lib/collision_prevention/ObstacleMath.cpp:72",
-            "phase": 1,
-            "notes": "Finite enum (8 non-CUSTOM cases); decide-provable; abstract pi as Rat param"
-        },
-        {
-            "id": "pid-convergence",
-            "name": "Multi-step PID convergence (extend PID.lean)",
-            "phase": 5,
-            "notes": "Analogous to AlphaFilter run 89; error \u2192 0 over time"
+            "id": "pid-output-convergence",
+            "name": "PID output convergence (output→0 when error→0 as integral saturates)",
+            "phase": 4,
+            "notes": "With convergence direction proved (run113), next: prove that as integral saturates and error=0, output→0. Full tracking convergence proof."
         },
         {
             "id": "axiom-closure",
             "name": "wrapRat/Atmosphere/SqrtLinear axiom closure",
             "phase": 3,
-            "notes": "Needs Mathlib \u2014 awaiting network/lake update"
+            "notes": "Needs Mathlib — awaiting network/lake update"
+        },
+        {
+            "id": "expo-monotone",
+            "name": "expo monotonicity in v (open question from expo_informal.md)",
+            "phase": 3,
+            "notes": "Is expoRat v e monotone in v for e in [0,1]? Likely true; prove in Expo.lean"
         }
     ]
 }
