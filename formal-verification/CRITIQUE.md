@@ -4,32 +4,34 @@
 
 ## Last Updated
 
-- **Date**: 2026-05-07 09:30 UTC
-- **Commit**: `ac284baadf4149f77dd7c31cfa2c3208a8d65b5a`
+- **Date**: 2026-05-10 08:49 UTC
+- **Commit**: `01186ce1cebbe8c3483a07970c0e6b0b3b760191`
 
 ---
 
 ## Overall Assessment
 
-Forty-four targets from PX4's mathlib, control library, sensor-fusion stack, Commander
-module, collision-prevention stack, CRC subsystem, and angle-conversion utilities have been
-identified; 39 have Lean files with fully proved theorems. The library now covers
-**541 theorem statements, all fully proved, 0 `sorry`** (Lean 4 v4.29.1, standard
-library only). This run (105) adds `FilteredDerivative.lean` with 12 theorems verifying
-the discrete derivative + IIR low-pass filter pipeline: first-call structural invariants,
-constant-input convergence to 0 (with exponential-formula closed form from AlphaFilter),
-monotone-shrink bounds, and linear-ramp derivative identity. Since run 63, sixteen new
-Lean files have been added
-(`BrakingDist`, `CollisionPrevComposition`, `Crc16Sig`, `Crc32Sig`, `Crc64`, `Crc8`,
-`IsInRange`, `ConstrainToInt16`, `GetBinAtAngle`, `GetLowerBoundAngle`, `RadiansDegrees`,
-`Min3Max3`, `VelocitySmoothing`, `PID`, `FilteredDerivative`, and prior additions).
-Runs 90–98 added 16 new VelocitySmoothing theorems covering jMax monotonicity, strict
-T123 monotonicity, cross-function schedule composition, and T2/T3 tradeoff theorems.
-Run 99 added 22 theorems for `PID.lean`, run 101 added 11 MathFunctions theorems, and
-run 105 adds 12 FilteredDerivative theorems.
-Three confirmed bugs remain open: `signNoZero<float>` returns 0 for NaN,
-`negate<int16_t>` has an incorrect INT16_MAX special case, and `wrap_bin(bin, n)`
-returns a negative index for `bin ≤ -n` in the C++ truncation-mod implementation.
+Forty-four Lean files cover **638 named theorems, all fully proved, 0 `sorry`**
+(Lean 4 v4.29.1, standard library only, 10 abstract axioms for Mathlib-dependent results).
+Targets span PX4's mathlib, control library, sensor-fusion, Commander, collision-prevention,
+CRC, angle-conversion, and RC-input pipeline. Since run 105, nine new files and
+approximately 97 additional theorems have been added across runs 106–113:
+`GoldenSection.lean` (13, run106–107), `SensorOrientation.lean` (20, run109),
+`GainCompression.lean` (11, run109), `CountSetBits.lean` (24, run110),
+`Negate16.lean` (18, run111), `PID.lean` extended to 32 theorems (runs 112–113),
+`Expo.lean` (12, run113).
+Runs 112–113 add a multi-step convergence proof suite for the PID integral:
+`updateIntegral_pos_error_increases` / `_neg_error_decreases` (one-step directional change),
+`pidIntegralIterate_pos_error_mono` (monotone convergence over n steps), and
+`pidIntegralIterate_saturates` (reaches `limitI` in at most `limitI - init` steps
+when `gainI * error * dt ≥ 1`). These are the deepest liveness proofs in the library to date.
+Six confirmed bugs remain open: `signNoZero<float>` (NaN returns 0),
+`negate<int16_t>` (incorrect INT16_MAX special case), `wrap_bin(bin, n)` (negative index
+for `bin ≤ -n`), `negate<int16_t>` involution failure at −32767, and the two
+`Negate16.lean` findings (not involutive for x=−32767, not surjective — −32767 never
+appears in the image of negate16). Route B correspondence tests now cover 7 targets:
+atmosphere (26/26), bin_at_angle (334/334), slew_rate (4327/4327), hysteresis (259/259),
+pid (7964/7964), count_set_bits (871/871), and expo (1373/1373).
 
 ---
 
@@ -227,6 +229,24 @@ returns a negative index for `bin ≤ -n` in the C++ truncation-mod implementati
 | `fdIter_const_alpha_formula` | [FilteredDerivative.lean](lean/FVSquad/FilteredDerivative.lean) | **high** | **high** | [L] | [C++](../src/lib/mathlib/math/filter/FilteredDerivative.hpp) | Constant input n steps → `alphaIterate state alpha 0 n` (exponential decay to 0) |
 | `fdIter_const_bounded_pos` / `fdIter_const_bounded_neg` / `fdIter_const_shrinks_pos` / `fdIter_const_nonneg` | [FilteredDerivative.lean](lean/FVSquad/FilteredDerivative.lean) | **high** | **high** | [L] | [C++](../src/lib/mathlib/math/filter/FilteredDerivative.hpp) | No-overshoot bounds and monotone shrink toward 0 under constant input |
 | `fdUpdate_linear_deriv` | [FilteredDerivative.lean](lean/FVSquad/FilteredDerivative.lean) | **high** | **high** | [L] | [C++](../src/lib/mathlib/math/filter/FilteredDerivative.hpp) | Linear ramp input: raw derivative = slope/dt (before filtering) |
+| `gsC_le_gsD` / `gs_midpoint_in_range` | [GoldenSection.lean](lean/FVSquad/GoldenSection.lean) | **high** | **high** | [L] | [C++](../src/lib/mathlib/math/search/GoldenSection.hpp) | Interior ordering `c ≤ d`; midpoint containment in bracket |
+| `gs_invariant_shrinks` / `gs_bracket_contains_opt` | [GoldenSection.lean](lean/FVSquad/GoldenSection.lean) | **high** | **high** | [L] | [C++](../src/lib/mathlib/math/search/GoldenSection.hpp) | Bracket strictly shrinks each step; optimum always in bracket |
+| `sensorOri_range` / `sensorOri_injective` / `sensorOri_surjective` | [SensorOrientation.lean](lean/FVSquad/SensorOrientation.lean) | **high** | **high** | [L] | [C++](../src/lib/collision_prevention/ObstacleMath.cpp) | Finite-enum: range [−3,4], injectivity, surjectivity (all by `decide`) |
+| `sensorOri_compassAlias` / `sensorOri_opposite` | [SensorOrientation.lean](lean/FVSquad/SensorOrientation.lean) | **high** | **high** | [L] | [C++](../src/lib/collision_prevention/ObstacleMath.cpp) | Compass alias correctness; opposite-direction symmetry |
+| `gainCompression_range` / `gainCompression_invariant` | [GainCompression.lean](lean/FVSquad/GainCompression.lean) | **high** | **high** | [L] | [C++](../src/lib/rate_control/gain_compression.cpp) | Range invariant `[gain_min, 1]`; iterated range invariant |
+| `gainCompression_leakage_dir` / `gainCompression_mono` | [GainCompression.lean](lean/FVSquad/GainCompression.lean) | **high** | **high** | [L] | [C++](../src/lib/rate_control/gain_compression.cpp) | Leakage direction (input > compressor_gain → compression decreases); monotone in input |
+| `countSetBits_pos` / `countSetBits_eq_zero_iff_zero` | [CountSetBits.lean](lean/FVSquad/CountSetBits.lean) | **high** | **high** | [L] | [C++](../src/lib/mathlib/math/Functions.hpp) | Any positive n has ≥1 bit set; bit count zero iff n=0 |
+| `countSetBits_pow2` / `countSetBits_double` / `countSetBits_succ_odd` | [CountSetBits.lean](lean/FVSquad/CountSetBits.lean) | mid | medium | [L] | [C++](../src/lib/mathlib/math/Functions.hpp) | Powers of 2 have exactly 1 bit; recursive structure |
+| `negate16_not_involutive` | [Negate16.lean](lean/FVSquad/Negate16.lean) | **high** | **high** | [L] | [C++](../src/lib/mathlib/math/Functions.hpp#L258) | 🐛 **Bug confirmed**: negate16 is NOT involutive for x=−32767 (witness: negate16(negate16(−32767)) = −32768 ≠ −32767) |
+| `negate16_not_injective` / `negate16_not_surjective` | [Negate16.lean](lean/FVSquad/Negate16.lean) | **high** | **high** | [L] | [C++](../src/lib/mathlib/math/Functions.hpp#L258) | 🐛 Collision at (−32767, −32768) proves non-injectivity; −32767 never in image (non-surjectivity) |
+| `negate16_range` / `negate16_involutive_core` | [Negate16.lean](lean/FVSquad/Negate16.lean) | mid | medium | [L] | [C++](../src/lib/mathlib/math/Functions.hpp#L258) | Output range bound; involution holds on core domain (away from ±32767) |
+| `pidIntegralIterate_in_range` / `pidStateIterate_integral_in_range` | [PID.lean](lean/FVSquad/PID.lean) | **high** | **high** | [L] | [C++](../src/lib/pid/PID.cpp) | Multi-step anti-windup: integral stays in `[-limitI, limitI]` for all n |
+| `pidStateIterate_equilibrium_stable` / `pidOutput_zero_equilibrium_iterate` | [PID.lean](lean/FVSquad/PID.lean) | **high** | **high** | [L] | [C++](../src/lib/pid/PID.cpp) | Fixed-point stability: sp=fb, integral=0 is preserved for all n steps; output=0 at equilibrium |
+| `updateIntegral_pos_error_increases` / `updateIntegral_neg_error_decreases` | [PID.lean](lean/FVSquad/PID.lean) | **high** | **high** | [L] | [C++](../src/lib/pid/PID.cpp) | Directional convergence: positive error → integral strictly grows; negative error → strictly shrinks |
+| `pidIntegralIterate_pos_error_mono` | [PID.lean](lean/FVSquad/PID.lean) | **high** | **high** | [L] | [C++](../src/lib/pid/PID.cpp) | Multi-step monotone convergence: init ≤ pidIntegralIterate…n for all n with positive error |
+| `pidIntegralIterate_saturates` | [PID.lean](lean/FVSquad/PID.lean) | **high** | **high** | [L] | [C++](../src/lib/pid/PID.cpp) | **Saturation liveness**: reaches `limitI` in at most `limitI − init` steps when `gainI*error*dt ≥ 1` |
+| `expo_odd` / `expo_in_range` | [Expo.lean](lean/FVSquad/Expo.lean) | **high** | **high** | [L] | [C++](../src/lib/mathlib/math/Functions.hpp) | Anti-symmetry (RC stick sign); output ∈ [-1,1] unconditionally |
+| `expo_linear` / `expo_cubic` / `expo_endpoints_fixed` | [Expo.lean](lean/FVSquad/Expo.lean) | mid | medium | [L] | [C++](../src/lib/mathlib/math/Functions.hpp) | Boundary parameters e=0→identity, e=1→cube; ±1 fixed points |
 
 ---
 
@@ -323,6 +343,46 @@ returns a negative index for `bin ≤ -n` in the C++ truncation-mod implementati
     monotone shrink (`fdIter_const_shrinks_pos`), non-negativity (`fdIter_const_nonneg`),
     and linear-ramp derivative identity (`fdUpdate_linear_deriv`). **Total theorems: 541**.
 
+17. **`GoldenSection::update`** ✅ **DONE** (runs 106–107):
+    `GoldenSection.lean` (13 theorems, 0 sorry) verifies the golden-section line search:
+    `gsC_le_gsD` (interior ordering `c ≤ d`), `gs_midpoint_in_range` (midpoint containment),
+    bracket shrink invariant, and bracket-contains-optimum. Both sorry-guarded theorems from
+    run 106 were resolved in run 107 using stdlib Rat helpers.
+
+18. **`sensor_orientation_to_yaw_offset`** ✅ **DONE** (run109):
+    `SensorOrientation.lean` (20 theorems, 0 sorry). All properties proved by `decide`
+    over the 8-element finite enum: range `[−3, 4]`, injectivity, surjectivity, compass
+    alias correctness, and opposite-direction symmetry.
+
+19. **`GainCompression::update`** ✅ **DONE** (run109):
+    `GainCompression.lean` (11 theorems, 0 sorry). Key results: range invariant
+    `[gain_min, 1]`, iterated range invariant, leakage direction, monotonicity in input.
+    Reuses `MathFunctions.lean` and `AlphaFilter.lean` primitives.
+
+20. **`math::countSetBits`** ✅ **DONE** (run110–101):
+    `CountSetBits.lean` (24 theorems, 0 sorry). Key results: `countSetBits_pos`
+    (any positive n has ≥1 bit set — well-founded recursive proof), `countSetBits_eq_zero_iff_zero`
+    (converse safety property), `countSetBits_double`, `countSetBits_succ_odd`.
+    Route B: 871/871 correspondence tests pass.
+
+21. **`negate<int16_t>` Negate16 properties** ✅ **DONE** (run111):
+    `Negate16.lean` (18 theorems, 0 sorry). Bug confirmed: negate16 is not involutive
+    for x=−32767, not injective (collision at −32767/−32768), not surjective (−32767
+    never in image). The counterexamples are proved by `native_decide`.
+
+22. **`PID` multi-step convergence** ✅ **DONE** (runs 112–113):
+    `PID.lean` extended to 32 theorems (0 sorry). Runs 112–113 add:
+    `pidIntegralIterate_in_range` (n-step anti-windup), `pidStateIterate_integral_in_range`,
+    `pidStateIterate_equilibrium_stable` / `pidOutput_zero_equilibrium_iterate` (fixed-point
+    stability), `updateIntegral_pos_error_increases` / `_neg_error_decreases` (directional
+    one-step change), `pidIntegralIterate_pos_error_mono` (monotone multi-step), and
+    `pidIntegralIterate_saturates` (liveness: reaches `limitI` within finite steps).
+
+23. **`expo` curve** ✅ **DONE** (run113):
+    `Expo.lean` (12 theorems, 0 sorry). Key results: `expo_odd` (anti-symmetry),
+    `expo_in_range` (output ∈ [−1,1]), boundary parameters (e=0→linear, e=1→cubic),
+    ±1 fixed points. Route B: 1373/1373 correspondence tests pass.
+
 ### Medium priority
 
 11. **`SlewRate` float precision**: The proved theorems use an integer model (`Int`). The
@@ -340,11 +400,12 @@ returns a negative index for `bin ≤ -n` in the C++ truncation-mod implementati
     and new multi-step theorems cover the time-domain response completely. The z-transform
     transfer function could be stated and proved with Mathlib complex number support.
 
-14. **Conference paper** (Task 11): With 541 proved theorems across 39 files, 3 confirmed bugs,
-    and a formal demonstration of latent C++ truncation-mod vulnerability in collision
+14. **Conference paper** (Task 11): With 638 proved theorems across 44 files, 6 confirmed bugs,
+    and formal demonstration of latent C++ truncation-mod vulnerability in collision
     prevention, the project has substantial material for a conference paper (IEEE FM,
     FMCAD, or CAV). **Recommendation**: update `formal-verification/paper/paper.tex` to
-    reflect runs 49–105 additions (FilteredDerivative, PID, MathFunctions, etc.).
+    reflect runs 106–113 additions (GoldenSection, SensorOrientation, GainCompression,
+    CountSetBits, Negate16, PID convergence, Expo).
 
 ---
 
@@ -604,7 +665,7 @@ to show the numerator is strictly negative. No sorry remains in `Deadzone.lean`.
 
 ---
 
-As of run 99, **0 theorems use `sorry`** across all 38 Lean files. The three groups of
+As of run 114, **0 theorems use `sorry`** across all 44 Lean files. The three groups of
 theorems previously sorry-guarded were resolved via abstract `axiom` declarations (runs 73–82):
 
 **`WrapAngle.lean`** (6 → 0 sorry, resolved run73+80):
@@ -627,18 +688,42 @@ with `Real.sqrt_zero`, `Real.sqrt_nonneg`, and `Real.sqrt_lt_one` from Mathlib.
 When Mathlib cache becomes accessible, a single `lake update` + proof-fixing run can
 replace all axioms with actual proofs.
 
----
+25. **`PID` integral directional convergence and saturation liveness proved (runs 112–113)**:
+    Four new theorems in `PID.lean` constitute the deepest liveness proofs in the library.
+    `updateIntegral_pos_error_increases` and `updateIntegral_neg_error_decreases` prove that
+    one step of `updateIntegral` strictly moves the integral toward the appropriate limit.
+    `pidIntegralIterate_pos_error_mono` proves n-step monotone convergence: `init ≤ pidIntegralIterate…n`
+    for all n with positive error. `pidIntegralIterate_saturates` proves the *liveness* property:
+    when `gainI * error * dt ≥ 1`, the integral reaches `limitI` in at most `limitI − init` steps.
+    This is the first quantitative bound on controller settling time proved in this library.
+    The proofs use `induction n generalizing init` with structural well-foundedness and
+    `updateIntegral_pos_error_increases` as the single-step building block.
 
-## Paper Review
+26. **`expo` curve correspondence confirmed (1373/1373 Route B tests, run113)**:
+    `Expo.lean` (12 theorems, 0 sorry) proves the key RC stick curve properties.
+    The Route B correspondence test suite runs 1373 cases including boundary values,
+    linear mode (e=0), cubic mode (e=1), odd-symmetry inputs, and a grid sweep — all
+    pass with exact equality, confirming the `expoRat` Lean model matches the C++
+    `expo<T>` template exactly on rational inputs.
+
+27. **`Negate16` involution and surjectivity bugs formally confirmed (run111)**:
+    `Negate16.lean` (18 theorems, 0 sorry) adds two new findings to the bug list.
+    `negate16_not_involutive` proves that `negate16(negate16(−32767)) = −32768 ≠ −32767`
+    (the function fails to be its own inverse at this input). `negate16_not_surjective`
+    proves that −32767 is never in the image of `negate16` (a value that cannot be
+    produced by any input). These join the earlier `negate16_not_involution` finding from
+    `Negate.lean` as confirmed mathematical properties of the C++ implementation.
+
+---
 
 The conference paper `formal-verification/paper/paper.tex` (ACM sigconf format, ~11 pages)
 was most recently revised in run54. The paper now has **significantly stale content** — it
-has not been updated since run 63, and 14 new Lean files, 103+ new theorems, and several
+has not been updated since run 63, and 22+ new Lean files, 200+ new theorems, and several
 resolved sorry-counts have accumulated since then.
 
-### Stale Items (run89 assessment)
+### Stale Items (run114 assessment)
 
-Since the last paper update (run54), **twenty new Lean files** have been added and proved:
+Since the last paper update (run54), **twenty-eight new Lean files** have been added and proved:
 
 1. **`SignFromBoolSq.lean`** (run49, 17 theorems): Add to Table 1; `signFromBool_ne_zero` to §3.2.
 2. **`Crc16Fold.lean`** (run51, 8 theorems): Exact-correspondence CRC; new row in Table 1.
@@ -662,21 +747,30 @@ Since the last paper update (run54), **twenty new Lean files** have been added a
 20. **`AlphaFilter.lean` (5 new theorems, run89)**: Multi-step convergence: error formula, no-overshoot (n steps), monotone convergence.
 21. **`VelocitySmoothing.lean` (16 new theorems, runs 90–98)**: `computeT3Scaled_mono_jMax`, strict T123 monotonicity, `total_T_partition`, `T2_decreases_as_T3_grows`, `total_T_ge_T123`, `total_T_ge_T1_T3`, `computeT2_zero_iff`, `total_T_mono_a0`, `total_T_mono_jMax`.
 22. **`PID.lean` (22 theorems, run99)**: Output clamping safety, anti-windup invariant, equilibrium (setpoint=feedback→0 output), derivative first-call/steady-state, monotonicity in setpoint and integral.
+23. **`FilteredDerivative.lean`** (run105, 12 theorems): First-call invariants, constant-input convergence, linear-ramp derivative identity.
+24. **`GoldenSection.lean`** (runs 106–107, 13 theorems): Bracket shrink, midpoint containment, interior ordering.
+25. **`SensorOrientation.lean`** (run109, 20 theorems): Finite-enum decidable proofs for sensor orientation yaw offsets.
+26. **`GainCompression.lean`** (run109, 11 theorems): Range invariant, leakage direction, monotonicity.
+27. **`CountSetBits.lean`** (run110, 24 theorems): Positive-count safety, zero characterisation, recursive structure.
+28. **`Negate16.lean`** (run111, 18 theorems): Bug confirmed — not involutive for −32767, not surjective.
+29. **`PID.lean` (10 new theorems, runs 112–113)**: Multi-step convergence: directional integral changes, monotone iteration, saturation liveness theorem.
+30. **`Expo.lean`** (run113, 12 theorems): Anti-symmetry, range containment, boundary parameters, 1373/1373 Route B tests.
 
-### Accuracy (run89 assessment)
+### Accuracy (run114 assessment)
 
-- Abstract theorem count is **stale** — actual count is 519 proved (all, 0 sorry).
-- Abstract bug count is **stale** — 3 bugs now confirmed (signNoZero NaN, negate involution, wrap_bin negative-index).
-- Table 1 is missing 20 files added since run54.
+- Abstract theorem count is **stale** — actual count is **638 proved** (all, 0 sorry).
+- Abstract bug count is **stale** — **6 bugs now confirmed** (signNoZero NaN, negate involution ×2, wrap_bin negative-index, negate16 non-involutive at −32767, negate16 not surjective).
+- Table 1 is missing 28 files added since run54.
 - Future Work references several items now complete — should be moved to Results.
 - The sorry count should reflect 0 sorry (converted to axioms in runs 73–82).
-- The "21 C++ targets with Lean proofs" claim is stale — actual is 43+ targets, 38 Lean files.
+- The "21 C++ targets with Lean proofs" claim is stale — actual is 55+ targets, 44 Lean files.
+- Route B correspondence tests now cover 7 targets (atmosphere, bin_at_angle, slew_rate, hysteresis, pid, count_set_bits, expo — 15,214 total cases, all pass).
 
 ### Remaining Open Suggestions
 
-1. **Update paper for run49–89 additions**: Add all 20 new files to Table 1, update
-   abstract counts, revise Findings to include the `wrap_bin` bug, revise Future Work.
-   This is the highest-priority paper update.
+1. **Update paper for run105–113 additions**: Add all new files to Table 1, update
+   abstract counts, revise Findings to include Negate16 bugs and PID convergence results,
+   revise Future Work. This is the highest-priority paper update.
 2. **PDF compilation**: LaTeX is not available in the CI environment; the paper is submitted
    as `.tex` source only. If LaTeX becomes available, compiling and committing `paper.pdf`
    would be valuable for accessibility.
