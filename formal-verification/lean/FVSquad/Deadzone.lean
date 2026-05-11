@@ -298,6 +298,96 @@ theorem deadzone_odd (x dz : Rat) (hdz : 0 ≤ dz) :
       rw [deadzone_in_dz x dz hin, deadzone_in_dz (-x) dz (by rwa [Rat.abs_neg]),
           Rat.neg_zero]
 
+/-! ## Monotonicity -/
+
+-- Private helpers used only by `deadzone_mono_val`
+private theorem dz_le_abs (v : Rat) : v ≤ v.abs := by
+  by_cases h : 0 ≤ v
+  · rw [Rat.abs_of_nonneg h]; exact @Rat.le_refl v
+  · exact Rat.le_trans (Rat.le_of_lt (Rat.not_le.mp h)) Rat.abs_nonneg
+
+private theorem dz_neg_abs_le (v : Rat) : -v.abs ≤ v := by
+  by_cases h : 0 ≤ v
+  · rw [Rat.abs_of_nonneg h]; exact Rat.le_trans (Rat.neg_le_iff.mpr h) h
+  · have hv : v < 0 := Rat.not_le.mp h
+    rw [Rat.abs_of_nonpos (Rat.le_of_lt hv), Rat.neg_neg]; exact @Rat.le_refl v
+
+private theorem dz_abs_le_left (v dz : Rat) (h : v.abs ≤ dz) : -dz ≤ v :=
+  Rat.le_trans (Rat.neg_le_neg h) (dz_neg_abs_le v)
+
+private theorem dz_one_sub_pos (dz : Rat) (h : dz < 1) : (0 : Rat) < 1 - dz := by
+  have := Rat.add_lt_add_right (a := dz) (b := 1) (c := -dz) |>.mpr h
+  rwa [Rat.add_neg_cancel, ← Rat.sub_eq_add_neg] at this
+
+private theorem dz_div_le (a b c : Rat) (h : a ≤ b) (hc : 0 < c) : a / c ≤ b / c := by
+  rw [Rat.div_def, Rat.div_def]
+  exact Rat.mul_le_mul_of_nonneg_right h (Rat.le_of_lt (Rat.inv_pos.mpr hc))
+
+private theorem dz_sub_le (a b k : Rat) (h : a ≤ b) : a - k ≤ b - k := by
+  rw [Rat.sub_eq_add_neg, Rat.sub_eq_add_neg]; exact (Rat.add_le_add_right (c := -k)).mpr h
+
+private theorem dz_abs_out_neg (x dz : Rat) (hxneg : x < 0) (hxabs : x.abs > dz) : x < -dz := by
+  rw [Rat.abs_of_nonpos (Rat.le_of_lt hxneg)] at hxabs
+  have h := Rat.neg_lt_neg hxabs; rwa [Rat.neg_neg] at h
+
+/-- **Monotonicity in the input value**: `deadzone` is non-decreasing in `v`.
+
+    If `v₁ ≤ v₂` then `deadzone v₁ dz ≤ deadzone v₂ dz`.
+
+    This is a key correctness property for RC stick processing: a larger stick
+    deflection always produces a larger (or equal) output, preserving the
+    direction of input changes across the deadzone boundary. -/
+theorem deadzone_mono_val (v1 v2 dz : Rat) (hv : v1 ≤ v2) (hdz0 : 0 ≤ dz) (hdz1 : dz < 1) :
+    deadzone v1 dz ≤ deadzone v2 dz := by
+  have h1mdz : (0 : Rat) < 1 - dz := dz_one_sub_pos dz hdz1
+  by_cases h1 : v1.abs > dz
+  · -- v1 outside deadzone
+    by_cases h2 : v2.abs > dz
+    · -- Both outside: monotone on each branch, or neg→pos gives neg<0<pos
+      by_cases hv1pos : (0 : Rat) ≤ v1
+      · -- Both positive (v1 ≤ v2, v1 ≥ 0 → v2 ≥ 0)
+        have hv2pos : (0 : Rat) ≤ v2 := Rat.le_trans hv1pos hv
+        rw [deadzone_pos_eq v1 dz (by rwa [Rat.abs_of_nonneg hv1pos] at h1) hdz0,
+            deadzone_pos_eq v2 dz (by rwa [Rat.abs_of_nonneg hv2pos] at h2) hdz0]
+        exact dz_div_le _ _ _ (dz_sub_le v1 v2 dz hv) h1mdz
+      · -- v1 negative
+        have hv1neg : v1 < 0 := Rat.not_le.mp hv1pos
+        have hv1dz : v1 < -dz := dz_abs_out_neg v1 dz hv1neg h1
+        by_cases hv2pos : (0 : Rat) ≤ v2
+        · -- v1 negative, v2 non-negative
+          have hv2dz : dz < v2 := by rwa [Rat.abs_of_nonneg hv2pos] at h2
+          exact Rat.le_of_lt (Std.lt_trans (deadzone_neg v1 dz hv1dz hdz0 hdz1)
+                                           (deadzone_pos v2 dz hv2dz hdz0 hdz1))
+        · -- Both negative
+          have hv2neg : v2 < 0 := Rat.not_le.mp hv2pos
+          have hv2dz : v2 < -dz := dz_abs_out_neg v2 dz hv2neg h2
+          rw [deadzone_neg_eq v1 dz hv1dz hdz0, deadzone_neg_eq v2 dz hv2dz hdz0]
+          exact dz_div_le _ _ _ ((Rat.add_le_add_right (c := dz)).mpr hv) h1mdz
+    · -- v1 outside, v2 inside: v1 must be negative (since v1 ≤ v2 ≤ dz < |v1|)
+      have hin2 : v2.abs ≤ dz := Rat.not_lt.mp h2
+      have hv1neg : v1 < 0 := by
+        apply Classical.byContradiction; intro hv1pos
+        have hv1nn : 0 ≤ v1 := Rat.not_lt.mp hv1pos
+        rw [Rat.abs_of_nonneg hv1nn] at h1
+        exact absurd (Rat.le_trans hv (Rat.le_trans (dz_le_abs v2) hin2)) (Rat.not_le.mpr h1)
+      have hv1dz : v1 < -dz := dz_abs_out_neg v1 dz hv1neg h1
+      rw [deadzone_in_dz v2 dz hin2]
+      exact Rat.le_of_lt (deadzone_neg v1 dz hv1dz hdz0 hdz1)
+  · -- v1 inside deadzone
+    have hin1 : v1.abs ≤ dz := Rat.not_lt.mp h1
+    rw [deadzone_in_dz v1 dz hin1]
+    by_cases h2 : v2.abs > dz
+    · -- v2 outside: v2 ≥ v1 ≥ -dz, so v2 must be positive (cannot be < -dz)
+      have hv2dz : dz < v2 := by
+        apply Classical.byContradiction; intro hv2neg_dz
+        have hv2nn : ¬(0 ≤ v2) := fun hv2nn =>
+          absurd (by rwa [Rat.abs_of_nonneg hv2nn] at h2) hv2neg_dz
+        exact absurd (Rat.le_trans (dz_abs_le_left v1 dz hin1) hv)
+                     (Rat.not_le.mpr (dz_abs_out_neg v2 dz (Rat.not_le.mp hv2nn) h2))
+      exact Rat.le_of_lt (deadzone_pos v2 dz hv2dz hdz0 hdz1)
+    · -- Both inside: 0 ≤ 0
+      rw [deadzone_in_dz v2 dz (Rat.not_lt.mp h2)]; exact Rat.le_refl
+
 /-! ## Summary of proved properties
 
   | Theorem                 | Statement                                             | Status  |
@@ -315,6 +405,7 @@ theorem deadzone_odd (x dz : Rat) (hdz : 0 ≤ dz) :
   | `deadzone_le_one`       | `x ≤ 1, 0 ≤ dz < 1 → deadzone x dz ≤ 1`             | ✅ Proved |
   | `deadzone_ge_neg_one`   | `-1 ≤ x, 0 ≤ dz < 1 → -1 ≤ deadzone x dz`           | ✅ Proved |
   | `deadzone_odd`          | `dz ≥ 0 → deadzone (-x) dz = -(deadzone x dz)`       | ✅ Proved |
+  | `deadzone_mono_val`     | `v₁ ≤ v₂ → deadzone v₁ dz ≤ deadzone v₂ dz`         | ✅ Proved |
 -/
 
 end PX4.Deadzone
