@@ -15,7 +15,7 @@
     "all": "0 sorry in all 44 files. 10 axioms for irrational arithmetic."
   },
   "open_prs": [
-    "run117-fv-mono"
+    "run118-fv-deadzone-mono-proved"
   ],
   "bugs_found": 6,
   "correspondence_tests": {
@@ -69,6 +69,22 @@
       "theorems_proved": 18,
       "sorry_changes": 0,
       "pr_branch": "run111-work"
+    },
+    {
+      "run": "run118",
+      "tasks": [
+        "Task 5 (Proof Assistance)",
+        "Task 8 (Correspondence Validation)"
+      ],
+      "work": [
+        "Proved deadzone_mono_dz_pos: wider deadzone \u2192 smaller output (stdlib-only proof, no ring/Mathlib)",
+        "Added dz_inv_anti, dz_div_rewrite, dz_sub_le_sub_l private helpers",
+        "Created formal-verification/tests/deadzone/ with 1221 correspondence tests (all pass)",
+        "lake build passes with 0 sorry"
+      ],
+      "theorem_count": 723,
+      "sorry_count": 0,
+      "lean_version": "4.29.1"
     }
   ],
   "discoveries": [
@@ -136,5 +152,9 @@
       "expodz_mono_val (ExpoDeadzone.lean): non-decreasing in v, composes deadzone+expo mono"
     ],
     "pr": "run117-fv-mono"
-  }
+  },
+  "last_run": "run118",
+  "theorem_count": 723,
+  "sorry_count": 0,
+  "targets": []
 }
