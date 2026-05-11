@@ -388,6 +388,112 @@ theorem deadzone_mono_val (v1 v2 dz : Rat) (hv : v1 ≤ v2) (hdz0 : 0 ≤ dz) (h
     · -- Both inside: 0 ≤ 0
       rw [deadzone_in_dz v2 dz (Rat.not_lt.mp h2)]; exact Rat.le_refl
 
+/-! ## No-deadzone identity (general) -/
+
+/-- The negative case of the no-deadzone identity: when `dz = 0`, `deadzone x 0 = x` for `x < 0`. -/
+theorem deadzone_no_dz_neg (x : Rat) (hx : x < 0) : deadzone x 0 = x := by
+  rw [deadzone_neg_eq x 0 (by rw [Rat.neg_zero]; exact hx) (Rat.le_refl)]
+  rw [Rat.add_zero, Rat.sub_eq_add_neg, Rat.neg_zero, Rat.add_zero,
+      Rat.div_def, Rat.inv_eq_of_mul_eq_one (Rat.mul_one 1), Rat.mul_one]
+
+/-- **Identity with no deadzone** (all cases): when `dz = 0`, `deadzone x 0 = x` for all `x`.
+
+    Combining `deadzone_no_dz_pos`, `deadzone_no_dz_neg`, and the zero case (which is in the
+    deadzone since `|0| = 0 = dz`), we get the full identity. -/
+theorem deadzone_no_dz (x : Rat) : deadzone x 0 = x := by
+  by_cases h1 : 0 < x
+  · exact deadzone_no_dz_pos x h1
+  · by_cases h2 : x = 0
+    · subst h2
+      simp [deadzone]
+    · exact deadzone_no_dz_neg x (Rat.lt_of_le_of_ne (Rat.not_lt.mp h1) h2)
+
+/-! ## Monotonicity in the deadzone width -/
+
+-- Private helpers for `deadzone_mono_dz_pos`
+
+/-- Inverse anti-monotonicity: larger positive denominators give smaller inverses. -/
+private theorem dz_inv_anti (a b : Rat) (hba : b ≤ a) (ha : 0 < a) (hb : 0 < b) : a⁻¹ ≤ b⁻¹ := by
+  have ha_ne : a ≠ 0 := Rat.ne_of_gt ha
+  have hb_ne : b ≠ 0 := Rat.ne_of_gt hb
+  rw [Rat.le_iff_sub_nonneg]
+  have key : b⁻¹ - a⁻¹ = (a - b) * (a⁻¹ * b⁻¹) := by
+    simp only [Rat.sub_eq_add_neg, Rat.add_mul, Rat.neg_mul]
+    rw [show a * (a⁻¹ * b⁻¹) = b⁻¹ by
+          rw [← Rat.mul_assoc a a⁻¹ b⁻¹, Rat.mul_inv_cancel a ha_ne, Rat.one_mul]]
+    rw [show b * (a⁻¹ * b⁻¹) = a⁻¹ by
+          rw [Rat.mul_comm a⁻¹ b⁻¹, ← Rat.mul_assoc b b⁻¹ a⁻¹,
+              Rat.mul_inv_cancel b hb_ne, Rat.one_mul]]
+  rw [key]
+  exact Rat.mul_nonneg ((Rat.le_iff_sub_nonneg b a).mp hba)
+    (Rat.mul_nonneg (Rat.le_of_lt (Rat.inv_pos.mpr ha)) (Rat.le_of_lt (Rat.inv_pos.mpr hb)))
+
+/-- Rewrite `(x - dz) / (1 - dz)` as `1 - (1 - x) / (1 - dz)`. -/
+private theorem dz_div_rewrite (x dz : Rat) (h1mdz : 0 < 1 - dz) :
+    (x - dz) / (1 - dz) = 1 - (1 - x) / (1 - dz) := by
+  rw [Rat.div_def, Rat.div_def]
+  have h1mdz_ne : (1 - dz) ≠ 0 := Rat.ne_of_gt h1mdz
+  have hn : (1 - dz) - (1 - x) = x - dz := by
+    simp only [Rat.sub_eq_add_neg, Rat.neg_add, Rat.neg_neg]
+    rw [Rat.add_assoc, ← Rat.add_assoc (-dz) (-1) x, Rat.add_comm (-dz) (-1),
+        Rat.add_assoc (-1) (-dz) x, ← Rat.add_assoc 1 (-1) (-dz + x),
+        show (1:Rat) + -1 = 0 from Rat.add_neg_cancel 1, Rat.zero_add, Rat.add_comm (-dz) x]
+  rw [show (x - dz) * (1 - dz)⁻¹ = ((1 - dz) - (1 - x)) * (1 - dz)⁻¹ from by rw [hn]]
+  rw [show ((1 - dz) - (1 - x)) * (1 - dz)⁻¹ = (1 - dz) * (1 - dz)⁻¹ - (1 - x) * (1 - dz)⁻¹
+      from by simp only [Rat.sub_eq_add_neg, Rat.add_mul, Rat.neg_mul]]
+  rw [Rat.mul_inv_cancel _ h1mdz_ne]
+
+/-- `c - b ≤ c - a` when `a ≤ b`. -/
+private theorem dz_sub_le_sub_l (a b c : Rat) (h : a ≤ b) : c - b ≤ c - a := by
+  rw [Rat.le_iff_sub_nonneg (c - b) (c - a)]
+  have key : (c - a) - (c - b) = b - a := by
+    simp only [Rat.sub_eq_add_neg, Rat.neg_add, Rat.neg_neg]
+    rw [Rat.add_assoc c (-a) (-c + b), ← Rat.add_assoc (-a) (-c) b, Rat.add_comm (-a) (-c),
+        Rat.add_assoc (-c) (-a) b, ← Rat.add_assoc c (-c) (-a + b),
+        show c + -c = (0:Rat) from Rat.add_neg_cancel c, Rat.zero_add, Rat.add_comm (-a) b]
+  rw [key]; exact (Rat.le_iff_sub_nonneg a b).mp h
+
+/-- **Monotonicity in `dz`** (positive branch): for a fixed input `x`,
+    increasing the deadzone width `dz` weakly decreases the output.
+
+    Statement: `dz₁ ≤ dz₂ < x ≤ 1`, `0 ≤ dz₁`, `dz₂ < 1` →
+    `deadzone x dz₂ ≤ deadzone x dz₁`.
+
+    Proof: rewrite `(x - dz) / (1 - dz) = 1 - (1 - x) / (1 - dz)`. Since `dz₁ ≤ dz₂`,
+    we have `1 - dz₂ ≤ 1 - dz₁`, so `(1 - dz₁)⁻¹ ≤ (1 - dz₂)⁻¹` by inverse anti-monotonicity.
+    Multiplying by `1 - x ≥ 0` gives `(1 - x)/(1 - dz₁) ≤ (1 - x)/(1 - dz₂)`, hence the
+    subtraction from 1 reverses the inequality. -/
+theorem deadzone_mono_dz_pos (x dz1 dz2 : Rat)
+    (hx : 0 < x) (hx1 : x ≤ 1)
+    (h12 : dz1 ≤ dz2) (hdz0 : 0 ≤ dz1) (hdz1 : dz2 < 1) (hout : dz2 < x) :
+    deadzone x dz2 ≤ deadzone x dz1 := by
+  have hout1 : dz1 < x := Std.lt_of_le_of_lt h12 hout
+  rw [deadzone_pos_eq x dz1 hout1 hdz0,
+      deadzone_pos_eq x dz2 hout (Rat.le_trans hdz0 h12)]
+  have hd1 : (0:Rat) < 1 - dz1 := dz_one_sub_pos dz1 (Std.lt_of_le_of_lt h12 hdz1)
+  have hd2 : (0:Rat) < 1 - dz2 := dz_one_sub_pos dz2 hdz1
+  -- Rewrite both sides: (x - dz) / (1 - dz) = 1 - (1 - x) / (1 - dz)
+  rw [dz_div_rewrite x dz1 hd1, dz_div_rewrite x dz2 hd2]
+  -- Goal: 1 - (1 - x) / (1 - dz2) ≤ 1 - (1 - x) / (1 - dz1)
+  apply dz_sub_le_sub_l
+  -- Goal: (1 - x) / (1 - dz1) ≤ (1 - x) / (1 - dz2)
+  rw [Rat.div_def, Rat.div_def]
+  have h1mx : (0:Rat) ≤ 1 - x := (Rat.le_iff_sub_nonneg x 1).mp hx1
+  -- 1 - dz2 ≤ 1 - dz1 (because dz1 ≤ dz2)
+  have hdz12 : (1:Rat) - dz2 ≤ 1 - dz1 := by
+    rw [Rat.le_iff_sub_nonneg]
+    have key : (1 - dz1) - (1 - dz2) = dz2 - dz1 := by
+      simp only [Rat.sub_eq_add_neg, Rat.neg_add, Rat.neg_neg]
+      rw [Rat.add_assoc 1 (-dz1) (-1 + dz2), ← Rat.add_assoc (-dz1) (-1) dz2,
+          Rat.add_comm (-dz1) (-1), Rat.add_assoc (-1) (-dz1) dz2,
+          ← Rat.add_assoc 1 (-1) (-dz1 + dz2),
+          show (1:Rat) + -1 = 0 from Rat.add_neg_cancel 1,
+          Rat.zero_add, Rat.add_comm (-dz1) dz2]
+    rw [key]; exact (Rat.le_iff_sub_nonneg dz1 dz2).mp h12
+  -- (1 - dz1)⁻¹ ≤ (1 - dz2)⁻¹ by inverse anti-monotonicity
+  have hinv : (1 - dz1)⁻¹ ≤ (1 - dz2)⁻¹ := dz_inv_anti (1 - dz1) (1 - dz2) hdz12 hd1 hd2
+  exact Rat.mul_le_mul_of_nonneg_left hinv h1mx
+
 /-! ## Summary of proved properties
 
   | Theorem                 | Statement                                             | Status  |
@@ -400,12 +506,15 @@ theorem deadzone_mono_val (v1 v2 dz : Rat) (hv : v1 ≤ v2) (hdz0 : 0 ≤ dz) (h
   | `deadzone_pos`          | `x > dz ≥ 0, dz < 1 → deadzone x dz > 0`            | ✅ Proved |
   | `deadzone_neg`          | `x < -dz ≤ 0, dz < 1 → deadzone x dz < 0`           | ✅ Proved |
   | `deadzone_no_dz_pos`    | `deadzone x 0 = x` (identity, positive case)         | ✅ Proved |
+  | `deadzone_no_dz_neg`    | `deadzone x 0 = x` (identity, negative case)         | ✅ Proved |
+  | `deadzone_no_dz`        | `deadzone x 0 = x` (identity, all inputs)            | ✅ Proved |
   | `deadzone_at_max`       | `deadzone 1 dz = 1` (for `dz < 1`)                   | ✅ Proved |
   | `deadzone_at_min`       | `deadzone (-1) dz = -1` (for `dz < 1`)               | ✅ Proved |
   | `deadzone_le_one`       | `x ≤ 1, 0 ≤ dz < 1 → deadzone x dz ≤ 1`             | ✅ Proved |
   | `deadzone_ge_neg_one`   | `-1 ≤ x, 0 ≤ dz < 1 → -1 ≤ deadzone x dz`           | ✅ Proved |
   | `deadzone_odd`          | `dz ≥ 0 → deadzone (-x) dz = -(deadzone x dz)`       | ✅ Proved |
   | `deadzone_mono_val`     | `v₁ ≤ v₂ → deadzone v₁ dz ≤ deadzone v₂ dz`         | ✅ Proved |
+  | `deadzone_mono_dz_pos`  | `dz₁ ≤ dz₂ < x ≤ 1 → deadzone x dz₂ ≤ deadzone x dz₁` | ✅ Proved |
 -/
 
 end PX4.Deadzone
