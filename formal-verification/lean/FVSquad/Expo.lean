@@ -28,6 +28,8 @@ inline float expo(float value, float e)
 | `expo_in_range` | ✅ | output in [-1,1] for inputs in [-1,1] |
 | `expo_eq_linear_at_zero` | ✅ | derivative at 0 is (1-e) |
 | `expo_endpoints_fixed` | ✅ | ±1 are fixed points |
+| `constrain_mono` | ✅ | constrainRat is monotone in v |
+| `expo_mono_val` | ✅ | larger stick input → larger output (monotone in v) |
 
 ## Modelling Notes
 - All arithmetic is over `Rat` (exact rationals), avoiding floating-point issues.
@@ -231,3 +233,103 @@ theorem expo_eq_linear_at_zero (e : Rat) (_h : 0 < e) (_he : e ≤ 1) :
 /-- Both `1` and `-1` are fixed points of expo. -/
 theorem expo_endpoints_fixed (e : Rat) : expoRat 1 e = 1 ∧ expoRat (-1) e = -1 :=
   ⟨expo_at_pos_one e, expo_at_neg_one e⟩
+
+/-- `constrainRat` is monotone in its first argument:
+    if `v1 ≤ v2` then the clamped value of `v1` is at most the clamped value of `v2`.
+    This is a key helper for the monotonicity of `expoRat`. -/
+theorem constrain_mono (v1 v2 lo hi : Rat) (h : v1 ≤ v2) (hlohi : lo ≤ hi) :
+    constrainRat v1 lo hi ≤ constrainRat v2 lo hi := by
+  simp only [constrainRat]
+  by_cases h1 : v1 < lo
+  · simp only [if_pos h1]
+    by_cases h2 : v2 < lo
+    · simp [h2]
+    · by_cases h3 : v2 > hi
+      · simp [h2, h3]; exact hlohi
+      · simp [h2, h3]; exact Rat.not_lt.mp h2
+  · have hv1lo := Rat.not_lt.mp h1
+    by_cases h3 : v1 > hi
+    · have hv2hi : v2 > hi := by
+        by_cases h4 : hi < v2; · exact h4
+        · exact absurd (Rat.le_trans h (Rat.not_lt.mp h4)) (Rat.not_le.mpr h3)
+      have hv2lo : ¬ v2 < lo := Rat.not_lt.mpr (Rat.le_trans hlohi (Rat.le_of_lt hv2hi))
+      simp [h1, h3, hv2hi, hv2lo]
+    · have hv1hi := Rat.not_lt.mp h3
+      simp only [if_neg h1, if_neg h3]
+      by_cases h4 : v2 > hi
+      · have hv2lo : ¬ v2 < lo := Rat.not_lt.mpr (Rat.le_trans hv1lo h)
+        simp [h4, hv2lo]; exact hv1hi
+      · have hv2lo : ¬ v2 < lo := Rat.not_lt.mpr (Rat.le_trans hv1lo h)
+        simp [h4, hv2lo]; exact h
+
+/-- Helper: cube is monotone over rationals (follows from the sign-case analysis). -/
+private theorem cube_mono_rat (v1 v2 : Rat) (h : v1 ≤ v2) :
+    v1 * v1 * v1 ≤ v2 * v2 * v2 := by
+  by_cases hv2 : 0 ≤ v2
+  · by_cases hv1 : 0 ≤ v1
+    · have hsq : v1 * v1 ≤ v2 * v2 :=
+        calc v1 * v1 ≤ v2 * v1 := Rat.mul_le_mul_of_nonneg_right h hv1
+          _ ≤ v2 * v2 := Rat.mul_le_mul_of_nonneg_left h hv2
+      calc v1 * v1 * v1 ≤ v2 * v2 * v1 := Rat.mul_le_mul_of_nonneg_right hsq hv1
+        _ ≤ v2 * v2 * v2 := Rat.mul_le_mul_of_nonneg_left h (Rat.mul_nonneg hv2 hv2)
+    · have hv1n : v1 ≤ 0 := Rat.le_of_lt (Rat.not_le.mp hv1)
+      have hnn : 0 ≤ v1 * v1 := by
+        have hn : 0 ≤ -v1 := by
+          have := Rat.neg_le_neg hv1n; rw [Rat.neg_zero] at this; exact this
+        have := Rat.mul_nonneg hn hn
+        rw [Rat.neg_mul, Rat.mul_neg, Rat.neg_neg] at this; exact this
+      have h1 : v1 * v1 * v1 ≤ 0 := by
+        have hmul : v1 * v1 * v1 ≤ v1 * v1 * 0 := Rat.mul_le_mul_of_nonneg_left hv1n hnn
+        simp [Rat.mul_zero] at hmul; exact hmul
+      exact Rat.le_trans h1 (Rat.mul_nonneg (Rat.mul_nonneg hv2 hv2) hv2)
+  · have hv2n : v2 ≤ 0 := Rat.le_of_lt (Rat.not_le.mp hv2)
+    have hv1n : v1 ≤ 0 := Rat.le_trans h hv2n
+    have hn1 : 0 ≤ -v1 := by
+      have := Rat.neg_le_neg hv1n; rw [Rat.neg_zero] at this; exact this
+    have hn2 : 0 ≤ -v2 := by
+      have := Rat.neg_le_neg hv2n; rw [Rat.neg_zero] at this; exact this
+    have hn12 : -v2 ≤ -v1 := Rat.neg_le_neg h
+    have hsq : (-v2) * (-v2) ≤ (-v1) * (-v1) :=
+      calc (-v2) * (-v2) ≤ (-v1) * (-v2) := Rat.mul_le_mul_of_nonneg_right hn12 hn2
+        _ ≤ (-v1) * (-v1) := Rat.mul_le_mul_of_nonneg_left hn12 hn1
+    have hcube : (-v2) * (-v2) * (-v2) ≤ (-v1) * (-v1) * (-v1) :=
+      calc (-v2) * (-v2) * (-v2) ≤ (-v1) * (-v1) * (-v2) :=
+            Rat.mul_le_mul_of_nonneg_right hsq hn2
+        _ ≤ (-v1) * (-v1) * (-v1) :=
+            Rat.mul_le_mul_of_nonneg_left hn12 (Rat.mul_nonneg hn1 hn1)
+    simp [Rat.neg_mul, Rat.mul_neg, Rat.neg_neg] at hcube; exact hcube
+
+/-- `expoRat` is monotone in its value parameter:
+    a larger stick deflection produces a larger (or equal) output.
+    This property is essential for pilot usability — equal input magnitudes on
+    opposite sticks produce equal-magnitude but opposite outputs, and increasing
+    deflection always increases output. -/
+theorem expo_mono_val (v1 v2 e : Rat) (hv : v1 ≤ v2) :
+    expoRat v1 e ≤ expoRat v2 e := by
+  simp only [expoRat]
+  have hcv : constrainRat v1 (-1) 1 ≤ constrainRat v2 (-1) 1 :=
+    constrain_mono v1 v2 (-1) 1 hv (by native_decide)
+  have hec_lo : (0 : Rat) ≤ constrainRat e 0 1 := constrainRat_ge_lo e 0 1 (by native_decide)
+  have hec_hi : constrainRat e 0 1 ≤ 1 := constrainRat_le_hi e 0 1 (by native_decide)
+  have hec1_nn : (0 : Rat) ≤ 1 - constrainRat e 0 1 := by
+    rw [Rat.sub_eq_add_neg]
+    have := (Rat.add_le_add_left (c := 1)).mpr (Rat.neg_le_neg hec_hi)
+    rw [show (1:Rat) + -1 = 0 from by native_decide] at this; exact this
+  have hcube := cube_mono_rat (constrainRat v1 (-1) 1) (constrainRat v2 (-1) 1) hcv
+  have h1 : (1 - constrainRat e 0 1) * constrainRat v1 (-1) 1 ≤
+            (1 - constrainRat e 0 1) * constrainRat v2 (-1) 1 :=
+    Rat.mul_le_mul_of_nonneg_left hcv hec1_nn
+  have h2 : constrainRat e 0 1 * constrainRat v1 (-1) 1 * constrainRat v1 (-1) 1 * constrainRat v1 (-1) 1 ≤
+            constrainRat e 0 1 * constrainRat v2 (-1) 1 * constrainRat v2 (-1) 1 * constrainRat v2 (-1) 1 := by
+    have ha : constrainRat e 0 1 * (constrainRat v1 (-1) 1 * constrainRat v1 (-1) 1 * constrainRat v1 (-1) 1) ≤
+              constrainRat e 0 1 * (constrainRat v2 (-1) 1 * constrainRat v2 (-1) 1 * constrainRat v2 (-1) 1) :=
+      Rat.mul_le_mul_of_nonneg_left hcube hec_lo
+    simp [Rat.mul_assoc] at ha ⊢; exact ha
+  calc (1 - constrainRat e 0 1) * constrainRat v1 (-1) 1 +
+       constrainRat e 0 1 * constrainRat v1 (-1) 1 * constrainRat v1 (-1) 1 * constrainRat v1 (-1) 1
+      ≤ (1 - constrainRat e 0 1) * constrainRat v2 (-1) 1 +
+        constrainRat e 0 1 * constrainRat v1 (-1) 1 * constrainRat v1 (-1) 1 * constrainRat v1 (-1) 1 :=
+          (Rat.add_le_add_right (b := _)).mpr h1
+    _ ≤ (1 - constrainRat e 0 1) * constrainRat v2 (-1) 1 +
+        constrainRat e 0 1 * constrainRat v2 (-1) 1 * constrainRat v2 (-1) 1 * constrainRat v2 (-1) 1 :=
+          (Rat.add_le_add_left (c := _)).mpr h2
