@@ -30,6 +30,8 @@ inline float expo(float value, float e)
 | `expo_endpoints_fixed` | ✅ | ±1 are fixed points |
 | `constrain_mono` | ✅ | constrainRat is monotone in v |
 | `expo_mono_val` | ✅ | larger stick input → larger output (monotone in v) |
+| `expo_mono_e_pos_v` | ✅ | for v ≥ 0: larger expo → smaller output (decreasing in e) |
+| `expo_mono_e_neg_v` | ✅ | for v ≤ 0: larger expo → larger output (increasing in e) |
 
 ## Modelling Notes
 - All arithmetic is over `Rat` (exact rationals), avoiding floating-point issues.
@@ -333,3 +335,89 @@ theorem expo_mono_val (v1 v2 e : Rat) (hv : v1 ≤ v2) :
     _ ≤ (1 - constrainRat e 0 1) * constrainRat v2 (-1) 1 +
         constrainRat e 0 1 * constrainRat v2 (-1) 1 * constrainRat v2 (-1) 1 * constrainRat v2 (-1) 1 :=
           (Rat.add_le_add_left (c := _)).mpr h2
+
+/-- Helper: the expo formula equals `cv + ec*(cv³ - cv)`, revealing it as a
+    centre-biased shift: when `cv³ - cv ≤ 0` (which holds for `cv ∈ [0,1]`),
+    increasing `ec` pulls the output toward zero. -/
+private theorem expo_as_correction (ec cv : Rat) :
+    (1 - ec) * cv + ec * cv * cv * cv = cv + ec * (cv * cv * cv - cv) := by
+  have h2 : (1 - ec) * cv = cv - ec * cv := by
+    rw [Rat.sub_eq_add_neg, Rat.add_mul, Rat.one_mul, Rat.neg_mul, ← Rat.sub_eq_add_neg]
+  have h3 : ec * (cv * cv * cv - cv) = ec * (cv * cv * cv) - ec * cv := by
+    rw [Rat.sub_eq_add_neg, Rat.mul_add, Rat.mul_neg, ← Rat.sub_eq_add_neg]
+  rw [h2, h3, show ec * cv * cv * cv = ec * (cv * cv * cv) from by simp [Rat.mul_assoc]]
+  simp only [Rat.sub_eq_add_neg]
+  rw [Rat.add_assoc, Rat.add_comm (-(ec * cv))]
+
+/-- Helper: `constrainRat v (-1) 1 ≥ 0` when `v ≥ 0`. -/
+private theorem cv_nonneg_of_nonneg (v : Rat) (h : 0 ≤ v) : (0 : Rat) ≤ constrainRat v (-1) 1 := by
+  simp only [constrainRat]
+  have hn1 : ¬(v < -1) := Rat.not_lt.mpr (Rat.le_trans (by native_decide : (-1:Rat) ≤ 0) h)
+  simp only [hn1, ↓reduceIte]
+  by_cases h2 : v > 1
+  · simp only [h2, ↓reduceIte]; native_decide
+  · simp only [h2, ↓reduceIte]; exact h
+
+/-- Helper: `cv³ ≤ cv` when `0 ≤ cv ≤ 1`. -/
+private theorem cv_cube_le_cv (cv : Rat) (hlo : 0 ≤ cv) (hhi : cv ≤ 1) : cv * cv * cv ≤ cv := by
+  have hcvsq : cv * cv ≤ 1 := by
+    calc cv * cv ≤ 1 * cv := Rat.mul_le_mul_of_nonneg_right hhi hlo
+         _ = cv := Rat.one_mul cv
+         _ ≤ 1 := hhi
+  calc cv * cv * cv ≤ 1 * cv := Rat.mul_le_mul_of_nonneg_right hcvsq hlo
+       _ = cv := Rat.one_mul cv
+
+/-- Helper: `0 ≤ cv - cv³` when `0 ≤ cv ≤ 1`. -/
+private theorem cv_diff_nonneg (cv : Rat) (hlo : 0 ≤ cv) (hhi : cv ≤ 1) :
+    0 ≤ cv - cv * cv * cv := by
+  have h2 := (Rat.add_le_add_right (c := -(cv * cv * cv))).mpr (cv_cube_le_cv cv hlo hhi)
+  rw [Rat.add_neg_cancel] at h2; rwa [← Rat.sub_eq_add_neg] at h2
+
+/-- Helper: `ec2*(cv³ - cv) ≤ ec1*(cv³ - cv)` when `ec1 ≤ ec2` and `cv ∈ [0,1]`.
+    Since `cv³ - cv ≤ 0`, multiplying by a larger `ec` makes the result more negative. -/
+private theorem mono_e_ineq (ec1 ec2 cv : Rat) (hec_le : ec1 ≤ ec2)
+    (hcv_lo : 0 ≤ cv) (hcv_hi : cv ≤ 1) :
+    ec2 * (cv * cv * cv - cv) ≤ ec1 * (cv * cv * cv - cv) := by
+  have h1 := Rat.mul_le_mul_of_nonneg_right hec_le (cv_diff_nonneg cv hcv_lo hcv_hi)
+  have hflip : cv * cv * cv - cv = -(cv - cv * cv * cv) := by
+    rw [Rat.sub_eq_add_neg, Rat.sub_eq_add_neg, Rat.neg_add, Rat.neg_neg, Rat.add_comm]
+  rw [hflip, Rat.mul_neg, Rat.mul_neg]; exact Rat.neg_le_neg h1
+
+/-- **`expoRat` is decreasing in the expo parameter `e` for non-negative stick inputs.**
+
+    When the stick deflection `v ≥ 0`, a higher expo value `e` reduces the output:
+    less linear sensitivity at the centre, more "dead" feel.  This is the defining
+    purpose of the expo parameter — it allows pilots to dial in centre-stick softness
+    without changing the maximum deflection.
+
+    Formally: `e₁ ≤ e₂ → 0 ≤ v → expoRat v e₂ ≤ expoRat v e₁`. -/
+theorem expo_mono_e_pos_v (v e1 e2 : Rat) (hv : 0 ≤ v) (he : e1 ≤ e2) :
+    expoRat v e2 ≤ expoRat v e1 := by
+  simp only [expoRat]
+  have hcv_nn : (0:Rat) ≤ constrainRat v (-1) 1 := cv_nonneg_of_nonneg v hv
+  have hcv_hi : constrainRat v (-1) 1 ≤ 1 := constrainRat_le_hi v (-1) 1 (by native_decide)
+  have hec_le : constrainRat e1 0 1 ≤ constrainRat e2 0 1 :=
+    constrain_mono e1 e2 0 1 he (by native_decide)
+  rw [expo_as_correction (constrainRat e2 0 1) (constrainRat v (-1) 1),
+      expo_as_correction (constrainRat e1 0 1) (constrainRat v (-1) 1)]
+  exact (Rat.add_le_add_left (c := constrainRat v (-1) 1)).mpr
+    (mono_e_ineq (constrainRat e1 0 1) (constrainRat e2 0 1) (constrainRat v (-1) 1)
+      hec_le hcv_nn hcv_hi)
+
+/-- **`expoRat` is increasing in the expo parameter `e` for non-positive stick inputs.**
+
+    By odd-symmetry of `expoRat`, the `v ≤ 0` case follows directly from the
+    `v ≥ 0` decreasing result: increasing `e` makes negative deflections more
+    negative (i.e., larger in the negative direction). -/
+theorem expo_mono_e_neg_v (v e1 e2 : Rat) (hv : v ≤ 0) (he : e1 ≤ e2) :
+    expoRat v e1 ≤ expoRat v e2 := by
+  -- -v ≥ 0, so expo is decreasing in e for (-v)
+  have hw : (0:Rat) ≤ -v := by
+    have := Rat.neg_le_neg hv; rw [Rat.neg_zero] at this; exact this
+  have h := expo_mono_e_pos_v (-v) e1 e2 hw he
+  -- h : expoRat (-v) e2 ≤ expoRat (-v) e1
+  -- expo_odd v e : expoRat (-v) e = -expoRat v e
+  rw [expo_odd v e2, expo_odd v e1] at h
+  -- h : -expoRat v e2 ≤ -expoRat v e1  →  expoRat v e1 ≤ expoRat v e2
+  have := Rat.neg_le_neg h
+  rwa [Rat.neg_neg, Rat.neg_neg] at this
