@@ -35,6 +35,7 @@ float expo_deadzone(float value, float e, float dz) {
 | `expodz_cubic`      | ✅ | e=1: deadzone output cubed |
 | `expodz_no_dz`      | ✅ | dz=0: reduces to pure expo |
 | `expodz_odd`        | ✅ | Odd symmetry: `expodz(-v, e, dz) = -expodz(v, e, dz)` |
+| `expodz_mono_val`   | ✅ | Monotone in `v`: `v₁ ≤ v₂ → expodz v₁ e dz ≤ expodz v₂ e dz` |
 
 ## Modelling Notes
 
@@ -182,5 +183,23 @@ theorem expodz_odd (v e dz : Rat) (hdz : 0 ≤ dz) :
     expodz (-v) e dz = -(expodz v e dz) := by
   simp only [expodz]
   rw [deadzone_odd v dz hdz, expo_odd (deadzone v dz) e]
+
+/-!
+## Monotonicity
+-/
+
+/-- **Monotonicity in the input value**: `expodz` is non-decreasing in `v`.
+
+    If `v₁ ≤ v₂` then `expodz v₁ e dz ≤ expodz v₂ e dz`.
+
+    This follows by composing the two monotonicity theorems:
+    - `deadzone_mono_val`: deadzone is non-decreasing in `v`
+    - `expo_mono_val`: `expoRat` is non-decreasing in its value argument
+
+    Together they ensure the full RC input pipeline preserves input ordering. -/
+theorem expodz_mono_val (v1 v2 e dz : Rat) (hv : v1 ≤ v2) (hdz0 : 0 ≤ dz) (hdz1 : dz < 1) :
+    expodz v1 e dz ≤ expodz v2 e dz := by
+  simp only [expodz]
+  exact expo_mono_val _ _ e (deadzone_mono_val v1 v2 dz hv hdz0 hdz1)
 
 end PX4.ExpoDeadzone
