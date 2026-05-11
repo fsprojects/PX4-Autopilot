@@ -449,4 +449,135 @@ theorem pidOutput_zero_equilibrium_iterate
   rw [pidStateIterate_equilibrium_stable fb dt gainI limitI hI n]
   exact pidOutput_zero_steady_state fb dt gainP gainD limitO hL
 
+-- ============================================================
+-- ============================================================
+-- § 8  Integral growth direction — convergence skeleton
+-- ============================================================
+
+/-- **Integral increases with positive error**: when `error > 0`, `gainI > 0`,
+    `dt > 0`, and the current integral is strictly below the limit, one step of
+    `updateIntegral` strictly increases the integral.
+
+    Intuition: the PID integrator accumulates positive error, driving the output
+    upward until the setpoint is reached. -/
+theorem updateIntegral_pos_error_increases
+    (integral gainI error dt limitI : Int)
+    (hI   : 0 < limitI)
+    (hlo  : -limitI ≤ integral)
+    (hg   : 0 < gainI)
+    (he   : 0 < error)
+    (hdt  : 0 < dt)
+    (hlt  : integral < limitI) :
+    integral < updateIntegral integral gainI error dt limitI := by
+  simp only [updateIntegral]
+  have hpos : 0 < gainI * error * dt :=
+    Int.mul_pos (Int.mul_pos hg he) hdt
+  by_cases hcl : integral + gainI * error * dt > limitI
+  · simp only [clamp]
+    rw [if_neg (by omega), if_pos hcl]; omega
+  · simp only [clamp]
+    rw [if_neg (by omega), if_neg hcl]; omega
+
+/-- **Integral decreases with negative error**: when `error < 0`, `gainI > 0`,
+    `dt > 0`, and the current integral is strictly above `-limitI`, one step of
+    `updateIntegral` strictly decreases the integral. -/
+theorem updateIntegral_neg_error_decreases
+    (integral gainI error dt limitI : Int)
+    (hI   : 0 < limitI)
+    (hhi  : integral ≤ limitI)
+    (hg   : 0 < gainI)
+    (he   : error < 0)
+    (hdt  : 0 < dt)
+    (hgt  : -limitI < integral) :
+    updateIntegral integral gainI error dt limitI < integral := by
+  simp only [updateIntegral]
+  have hneg : gainI * error * dt < 0 :=
+    Int.mul_neg_of_neg_of_pos (Int.mul_neg_of_pos_of_neg hg he) hdt
+  by_cases hcl : integral + gainI * error * dt < -limitI
+  · simp only [clamp, if_pos hcl]; omega
+  · simp only [clamp]
+    rw [if_neg hcl, if_neg (by omega)]; omega
+
+/-- **Integral non-decreasing over multiple steps with constant positive error**:
+    `pidIntegralIterate` with `error > 0`, `gainI > 0`, `dt > 0` is
+    non-decreasing in the number of steps.
+
+    This is a partial convergence result: the integral moves in the direction
+    that reduces a positive tracking error. -/
+theorem pidIntegralIterate_pos_error_mono
+    (gainI error dt limitI : Int)
+    (hI   : 0 < limitI)
+    (hg   : 0 < gainI)
+    (he   : 0 < error)
+    (hdt  : 0 < dt)
+    (init : Int)
+    (hinit_lo : -limitI ≤ init)
+    (hinit_hi : init ≤ limitI)
+    (n : Nat) :
+    init ≤ pidIntegralIterate gainI error dt limitI init n := by
+  induction n generalizing init with
+  | zero => simp [pidIntegralIterate]
+  | succ k ih =>
+    simp only [pidIntegralIterate]
+    have hstep_lo : -limitI ≤ updateIntegral init gainI error dt limitI :=
+      updateIntegral_ge_neg init gainI error dt limitI (by omega)
+    have hstep_hi : updateIntegral init gainI error dt limitI ≤ limitI :=
+      updateIntegral_le init gainI error dt limitI (by omega)
+    have hone : init ≤ updateIntegral init gainI error dt limitI := by
+      by_cases hlt : init < limitI
+      · exact Int.le_of_lt
+          (updateIntegral_pos_error_increases init gainI error dt limitI hI hinit_lo hg he hdt hlt)
+      · -- already at limit: updateIntegral limitI ... = limitI = init
+        have heq : init = limitI := Int.le_antisymm hinit_hi (by omega)
+        have hpos : 0 < gainI * error * dt := Int.mul_pos (Int.mul_pos hg he) hdt
+        simp only [heq, updateIntegral, clamp]
+        rw [if_neg (by omega), if_pos (by omega)]
+        exact Int.le_refl _
+    exact Int.le_trans hone (ih (updateIntegral init gainI error dt limitI) hstep_lo hstep_hi)
+
+/-- **Iterated integral eventually saturates**: when `error > 0`, `gainI > 0`,
+    `dt > 0`, and each step increases by at least 1 (`gainI * error * dt ≥ 1`),
+    after at most `limitI - init` steps the integral reaches `limitI`. -/
+theorem pidIntegralIterate_saturates
+    (gainI error dt limitI : Int)
+    (hI   : 0 < limitI)
+    (hg   : 0 < gainI)
+    (he   : 0 < error)
+    (hdt  : 0 < dt)
+    (hinc : 1 ≤ gainI * error * dt)
+    (init : Int)
+    (hinit_lo : -limitI ≤ init)
+    (hinit_hi : init ≤ limitI)
+    (n : Nat)
+    (hn : limitI - init ≤ n) :
+    pidIntegralIterate gainI error dt limitI init n = limitI := by
+  induction n generalizing init with
+  | zero =>
+    simp [pidIntegralIterate]; omega
+  | succ k ih =>
+    simp only [pidIntegralIterate]
+    by_cases hsat : init = limitI
+    · -- already saturated: one step clamps back to limitI
+      rw [hsat]
+      have hkeep : updateIntegral limitI gainI error dt limitI = limitI := by
+        simp only [updateIntegral, clamp]
+        rw [if_neg (by omega), if_pos (by omega)]
+      rw [hkeep]
+      exact ih limitI (by omega) (Int.le_refl _) (by omega)
+    · -- not yet saturated: one step brings us closer
+      have hlt : init < limitI := by omega
+      have hstep_lo : -limitI ≤ updateIntegral init gainI error dt limitI :=
+        updateIntegral_ge_neg init gainI error dt limitI (by omega)
+      have hstep_hi : updateIntegral init gainI error dt limitI ≤ limitI :=
+        updateIntegral_le init gainI error dt limitI (by omega)
+      have hdist : limitI - updateIntegral init gainI error dt limitI ≤ k := by
+        simp only [updateIntegral, clamp]
+        by_cases h1 : init + gainI * error * dt < -limitI
+        · rw [if_pos h1]; omega
+        · rw [if_neg h1]
+          by_cases h2 : init + gainI * error * dt > limitI
+          · rw [if_pos h2]; omega
+          · rw [if_neg h2]; omega
+      exact ih (updateIntegral init gainI error dt limitI) hstep_lo hstep_hi hdist
+
 end PX4.PID
