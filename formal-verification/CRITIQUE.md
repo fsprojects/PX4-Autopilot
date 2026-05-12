@@ -4,27 +4,24 @@
 
 ## Last Updated
 
-- **Date**: 2026-05-10 08:49 UTC
-- **Commit**: `01186ce1cebbe8c3483a07970c0e6b0b3b760191`
+- **Date**: 2026-05-10 (run 122)
+- **Commit**: run122-work-34d2aa9b
 
 ---
 
 ## Overall Assessment
 
-Forty-four Lean files cover **638 named theorems, all fully proved, 0 `sorry`**
+**Forty-seven Lean files cover ~690 named theorems, all fully proved, 0 `sorry`**
 (Lean 4 v4.29.1, standard library only, 10 abstract axioms for Mathlib-dependent results).
-Targets span PX4's mathlib, control library, sensor-fusion, Commander, collision-prevention,
-CRC, angle-conversion, and RC-input pipeline. Since run 105, nine new files and
-approximately 97 additional theorems have been added across runs 106–113:
-`GoldenSection.lean` (13, run106–107), `SensorOrientation.lean` (20, run109),
-`GainCompression.lean` (11, run109), `CountSetBits.lean` (24, run110),
-`Negate16.lean` (18, run111), `PID.lean` extended to 32 theorems (runs 112–113),
-`Expo.lean` (12, run113).
-Runs 112–113 add a multi-step convergence proof suite for the PID integral:
-`updateIntegral_pos_error_increases` / `_neg_error_decreases` (one-step directional change),
-`pidIntegralIterate_pos_error_mono` (monotone convergence over n steps), and
-`pidIntegralIterate_saturates` (reaches `limitI` in at most `limitI - init` steps
-when `gainI * error * dt ≥ 1`). These are the deepest liveness proofs in the library to date.
+
+Since run 113, ten new files have been added across runs 114–122:
+`LowPassFilter2p.lean` (13 theorems, Direct Form II biquad IIR, run121),
+`FilteredDerivative.lean` (run 114–115), `RadiansDegrees.lean` (run 114),
+`VelocitySmoothing.lean` (run 115), `Min3Max3.lean` (run 116),
+`HighPass.lean` (14 theorems, IIR high-pass, run 119),
+`Crc16Sig.lean`, `Crc32Sig.lean`, `Crc64.lean`, `Crc8.lean` (run 116–118),
+and `BlockIntegralTrap.lean` (16 theorems, trapezoidal integrator, run 122).
+
 Six confirmed bugs remain open: `signNoZero<float>` (NaN returns 0),
 `negate<int16_t>` (incorrect INT16_MAX special case), `wrap_bin(bin, n)` (negative index
 for `bin ≤ -n`), `negate<int16_t>` involution failure at −32767, and the two
@@ -32,6 +29,35 @@ for `bin ≤ -n`), `negate<int16_t>` involution failure at −32767, and the two
 appears in the image of negate16). Route B correspondence tests now cover 7 targets:
 atmosphere (26/26), bin_at_angle (334/334), slew_rate (4327/4327), hysteresis (259/259),
 pid (7964/7964), count_set_bits (871/871), and expo (1373/1373).
+
+### Run 122 additions: `BlockIntegralTrap.lean`
+
+**New file**: `lean/FVSquad/BlockIntegralTrap.lean` (16 theorems, 0 sorry).
+
+Models `BlockIntegralTrap::update` (trapezoidal integrator with symmetric saturation):
+```
+y_new = constrain(y_old + (u_prev + input)/2 * dt, -limit, limit)
+u_new = input
+```
+
+**Proved properties:**
+- `itUpdate_y_bounded`: output always in `[-limit, limit]` (core safety invariant)
+- `itUpdate_y_exact`: exact trapezoidal formula when accumulation stays in range
+- `itUpdate_increment_formula`: `y_new - y_old = (u_prev + input)/2 * dt` (no clamping)
+- `itUpdate_zero_state_zero_input`: zero initialisation + zero input → zero output
+- `itFold_y_in_range`: **inductive invariant** — output remains in range over all fold steps
+- `itUpdate_trap_mono_input`: larger input → larger trapezoidal sum (when `dt ≥ 0`)
+- `itUpdate_y_mono_input_in_range`: monotone output (both sums in range case)
+- `itUpdate_saturated_pos` / `itUpdate_saturated_neg`: correct clamping behaviour
+
+**Assessment**: Good structural coverage. The bounded-output invariant is the highest-value
+theorem (safety-critical: prevents runaway integration). The inductive `itFold_y_in_range`
+theorem is a clean liveness proof showing the integrator never escapes bounds over time.
+
+**Gaps to address in future runs:**
+- Full monotonicity (when one or both sums are saturated) requires more case analysis
+- BIBO stability analysis (gain/phase analysis) requires Mathlib or a Real-number model
+- Correspondence test harness (C++ vs Lean) not yet written
 
 ---
 
