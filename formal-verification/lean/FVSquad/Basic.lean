@@ -42,3 +42,4 @@ import FVSquad.GainCompression
 import FVSquad.SensorOrientation
 import FVSquad.CountSetBits
 import FVSquad.HighPass
+import FVSquad.LowPassFilter2p
