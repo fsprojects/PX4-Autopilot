@@ -144,3 +144,4 @@ See `RESEARCH.md §Tool Choice` for details.
 | # | Name | File | Phase | Status | Lean File | Notes |
 |---|------|------|-------|--------|-----------|-------|
 | 53 | `BlockHighPass::update` | `src/lib/controllib/BlockHighPass.cpp` | 5 | ✅ Proved | `lean/FVSquad/HighPass.lean` | IIR high-pass filter; 14 theorems, 0 sorry; coefficient bounds (0 < a < 1), DC blocking (constant input → geometric decay a^n * y0), non-negativity, monotone decay, upper bound; informal spec in `specs/highpass_informal.md` |
+| 54 | `BlockIntegralTrap::update` | `src/lib/controllib/BlockIntegralTrap.cpp` | 5 | ✅ Proved | `lean/FVSquad/BlockIntegralTrap.lean` | Trapezoidal integrator with symmetric saturation; 16 theorems, 0 sorry; bounded output, exact trapezoidal formula when in range, increment formula, zero-state/zero-input, iterated bound inductive invariant, monotone trap sum, pos/neg saturation; run 122 |
