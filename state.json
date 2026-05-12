@@ -1,21 +1,21 @@
 {
-  "run": 117,
-  "last_updated": "2026-05-25",
+  "run": 119,
+  "last_updated": "2026-05-12",
   "lean_version": "4.29.1",
   "lake_build_status": "passed",
   "totals": {
-    "theorems": 820,
-    "theorems_proved": 820,
+    "theorems": 834,
+    "theorems_proved": 834,
     "axioms": 10,
     "sorry_count": 0,
-    "lean_files": 44,
-    "targets": 55
+    "lean_files": 45,
+    "targets": 56
   },
   "sorry_locations": {
     "all": "0 sorry in all 44 files. 10 axioms for irrational arithmetic."
   },
   "open_prs": [
-    "run118-fv-deadzone-mono-proved"
+    "run119-highpass-lean-spec"
   ],
   "bugs_found": 6,
   "correspondence_tests": {
@@ -85,6 +85,19 @@
       "theorem_count": 723,
       "sorry_count": 0,
       "lean_version": "4.29.1"
+    },
+    {
+      "run": 119,
+      "date": "2026-05-12T01:07 UTC",
+      "workflow_run_id": 25706862235,
+      "tasks": [
+        "Task 3 (Formal Spec Writing): HighPass.lean \u2014 14 theorems for BlockHighPass::update IIR filter",
+        "Task 5 (Proof Assistance): All 14 theorems proved, 0 sorry. DC blocking, coefficient bounds, monotone decay, non-negativity, closed form a^n*y0."
+      ],
+      "theorems_proved": 14,
+      "sorry_changes": 0,
+      "pr_branch": "run119-highpass-lean-spec",
+      "notes": "834 theorems total, 45 files, 0 sorry. New target: BlockHighPass::update (IIR high-pass filter, src/lib/controllib/BlockHighPass.cpp). Key theorems: hpf_coeff_in_range, hpfIterConst_pow (DC blocking), hpfIterConst_strict_mono_n."
     }
   ],
   "discoveries": [
