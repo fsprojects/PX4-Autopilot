@@ -1,12 +1,12 @@
 {
-  "last_run": 121,
-  "total_theorems": 847,
-  "total_files": 46,
+  "last_run": 122,
+  "total_theorems": 690,
+  "total_files": 47,
   "total_sorry": 0,
   "lean_version": "4.29.1",
   "lake_build": "passed",
-  "last_target": "LowPassFilter2p",
-  "notes": "Run 121: added LowPassFilter2p.lean with 13 theorems (all proved, 0 sorry). Run 120: expodz_informal.md + CORRESPONDENCE.md.",
+  "last_target": "BlockIntegralTrap",
+  "notes": "Run 122: added BlockIntegralTrap.lean (16 theorems, 0 sorry). Updated CRITIQUE.md. lake build passed 49 jobs. No bugs found this run.",
   "targets": {
     "LowPassFilter2p": {
       "phase": 4,
