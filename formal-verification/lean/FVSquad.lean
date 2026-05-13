@@ -41,3 +41,6 @@ import FVSquad.FilteredDerivative
 import FVSquad.GoldenSection
 import FVSquad.CountSetBits
 import FVSquad.Negate16
+import FVSquad.LowPassFilter2p
+import FVSquad.BlockIntegralTrap
+import FVSquad.SecondOrderReferenceModel
