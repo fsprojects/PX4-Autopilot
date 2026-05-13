@@ -1,12 +1,12 @@
 {
-  "last_run": 124,
-  "total_theorems": 690,
-  "total_files": 47,
+  "last_run": 125,
+  "total_theorems": 696,
+  "total_files": 48,
   "total_sorry": 0,
   "lean_version": "4.29.1",
-  "lake_build": "passed (no Lean changes this run)",
-  "last_target": "CRITIQUE.md update + Research (targets 51-54)",
-  "notes": "Run 124: Task 7 (Proof Utility Critique) — updated CRITIQUE.md with run 123 LowPassFilter2p section, corrected Last Updated header. Task 1 (Research) — identified 4 new targets: NotchFilter::apply (51), SecondOrderReferenceModel forward-Euler (52), WelfordMeanVector (53), PurePursuit lookahead (54). Added to RESEARCH.md and TARGETS.md. 47 files, 690 theorems, 0 sorry. Gap: correspondence tests missing for LowPassFilter2p and BlockIntegralTrap. Paper stale (not updated since run 63).",
+  "lake_build": "passed (51 jobs)",
+  "last_target": "SecondOrderReferenceModel (forward-Euler) proofs + NotchFilter informal spec",
+  "notes": "Run 125: Task 5 (Proof Assistance) — SecondOrderReferenceModel.lean: 7 theorems (reset, update formulas, equilibrium fixed point, zero-rate state). Task 2 (Informal Spec) — notchfilter_informal.md written. Merged run124 PR (CRITIQUE+RESEARCH+TARGETS for targets 51-54). 48 files, 696 theorems, 0 sorry.",
   "targets": {
     "LowPassFilter2p": {
       "phase": 5,
@@ -15,7 +15,7 @@
       "theorems": 13,
       "sorry": 0,
       "correspondence": "CORRESPONDENCE.md run 123 section",
-      "notes": "Direct Form II biquad IIR Butterworth filter. 13 theorems: passthrough, linearity, zero-state, delay updates, Butterworth symmetry, DC steady state, DC gain=1. Informal spec written run 123. Correspondence test harness NOT YET written."
+      "notes": "Direct Form II biquad IIR Butterworth filter. 13 theorems. Correspondence test harness NOT YET written."
     },
     "BlockIntegralTrap": {
       "phase": 5,
@@ -23,40 +23,46 @@
       "theorems": 16,
       "sorry": 0,
       "correspondence": "CORRESPONDENCE.md run 123 section",
-      "notes": "Trapezoidal integrator with symmetric saturation. 16 theorems: saturation bounds, monotonicity, fold invariance, anti-windup boundary. Correspondence test harness NOT YET written."
-    },
-    "NotchFilter": {
-      "phase": 1,
-      "file": null,
-      "notes": "Target 51. Direct Form I IIR notch filter. apply() method: output = b0*sample + b1*x1 + b2*x2 - a1*y1 - a2*y2. Key theorems: passthrough, zero-state, delay updates. Reuses LowPassFilter2p patterns. Tractable with ring/simp."
+      "notes": "Trapezoidal integrator with symmetric saturation. 16 theorems. Correspondence test harness NOT YET written."
     },
     "SecondOrderReferenceModel": {
-      "phase": 1,
+      "phase": 5,
+      "file": "formal-verification/lean/FVSquad/SecondOrderReferenceModel.lean",
+      "informal_spec": null,
+      "theorems": 7,
+      "sorry": 0,
+      "notes": "Run 125. Forward-Euler discretization. 7 theorems: reset postconditions (rfl), update formulas (rfl), equilibrium fixed point (proved via Rat arithmetic), zero-rate-at-target. PR: run125-sorm-notchfilter-informal."
+    },
+    "NotchFilter": {
+      "phase": 2,
       "file": null,
-      "notes": "Target 52. Forward-Euler state transition. Key theorems: reset_state, reset_rate, equilibrium fixed point. ring-provable. Used in setpoint smoothing/trajectory following."
+      "informal_spec": "formal-verification/specs/notchfilter_informal.md",
+      "notes": "Run 125: informal spec written. Direct Form I IIR notch filter applyInternal(). Passthrough, zero-state, linearity, delay update, reset. Open: DC gain invariant, stability guarantee, symmetric numerator in setCoefficients. Ready for Task 3 (Lean spec)."
     },
     "WelfordMeanVector": {
       "phase": 1,
       "file": null,
-      "notes": "Target 53. Vector WelfordMean. Extends WelfordMean.lean. 2-component model. mean = sum/count invariant. Induction on update count."
+      "notes": "Target 53. Vector WelfordMean. Extends WelfordMean.lean. 2-component model. mean = sum/count invariant."
     },
     "PurePursuit": {
       "phase": 1,
       "file": null,
-      "notes": "Target 54. Lookahead distance = constrain(v*k, min, max). One theorem: lookahead_in_range via constrain_range. Trivial. Safety-critical."
+      "notes": "Target 54. Lookahead distance = constrain(v*k, min, max). One theorem: lookahead_in_range via constrain_range. Safety-critical."
     }
   },
   "priority_queue": [
-    "NotchFilter (target 51) — Direct Form I, passthrough/linearity",
-    "SecondOrderReferenceModel (target 52) — reset + equilibrium invariants",
+    "NotchFilter (target 51) — Lean spec + implementation + proofs (informal spec done run 125)",
+    "PurePursuit lookahead (target 54) — trivial constrain_range theorem",
     "WelfordMeanVector (target 53) — componentwise mean",
-    "PurePursuit lookahead (target 54) — trivial constrain_range",
     "BlockIntegralTrap correspondence tests (Route B)",
     "LowPassFilter2p correspondence tests (Route B)",
+    "SecondOrderReferenceModel informal spec (still missing)",
     "Paper + REPORT.md update (stale since run 63)"
   ],
   "bugs_found": 6,
-  "open_prs": ["run124-critique-research-work"],
+  "open_prs": [
+    "run125-sorm-notchfilter-informal"
+  ],
   "ci": {
     "lean_ci": "lean-ci.yml — passing",
     "status": "passing"
