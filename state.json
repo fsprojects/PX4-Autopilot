@@ -1,19 +1,29 @@
 {
-  "last_run": 122,
-  "total_theorems": 690,
+  "last_run": 123,
+  "total_theorems": 705,
   "total_files": 47,
   "total_sorry": 0,
   "lean_version": "4.29.1",
   "lake_build": "passed",
-  "last_target": "BlockIntegralTrap",
-  "notes": "Run 122: added BlockIntegralTrap.lean (16 theorems, 0 sorry). Updated CRITIQUE.md. lake build passed 49 jobs. No bugs found this run.",
+  "last_target": "LowPassFilter2p (correspondence) + BlockIntegralTrap (correspondence)",
+  "notes": "Run 123: Task 6 (Correspondence Review) — added CORRESPONDENCE.md sections for LowPassFilter2p.lean (run121, 13 theorems) and BlockIntegralTrap.lean (run122, 16 theorems). Task 2 (Informal Spec) — wrote lowpassfilter2p_informal.md. No Lean files modified; no lake build run. 0 sorry throughout.",
   "targets": {
     "LowPassFilter2p": {
-      "phase": 4,
+      "phase": 5,
       "file": "formal-verification/lean/FVSquad/LowPassFilter2p.lean",
+      "informal_spec": "formal-verification/specs/lowpassfilter2p_informal.md",
       "theorems": 13,
       "sorry": 0,
-      "notes": "Direct Form II biquad IIR filter. Proved: passthrough, linearity, zero-state, delay updates, Butterworth symmetry, DC steady state, DC gain=1, Butterworth DC balance."
+      "correspondence": "CORRESPONDENCE.md run 123 section",
+      "notes": "Direct Form II biquad IIR Butterworth filter. 13 theorems: passthrough, linearity, zero-state, delay updates, Butterworth symmetry, DC steady state, DC gain=1. Informal spec written run 123."
+    },
+    "BlockIntegralTrap": {
+      "phase": 5,
+      "file": "formal-verification/lean/FVSquad/BlockIntegralTrap.lean",
+      "theorems": 16,
+      "sorry": 0,
+      "correspondence": "CORRESPONDENCE.md run 123 section",
+      "notes": "Trapezoidal integrator with symmetric saturation. 16 theorems: saturation bounds, monotonicity, fold invariance, anti-windup boundary. Correspondence reviewed run 123."
     }
   }
 }
