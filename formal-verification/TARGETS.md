@@ -145,3 +145,12 @@ See `RESEARCH.md §Tool Choice` for details.
 |---|------|------|-------|--------|-----------|-------|
 | 53 | `BlockHighPass::update` | `src/lib/controllib/BlockHighPass.cpp` | 5 | ✅ Proved | `lean/FVSquad/HighPass.lean` | IIR high-pass filter; 14 theorems, 0 sorry; coefficient bounds (0 < a < 1), DC blocking (constant input → geometric decay a^n * y0), non-negativity, monotone decay, upper bound; informal spec in `specs/highpass_informal.md` |
 | 54 | `BlockIntegralTrap::update` | `src/lib/controllib/BlockIntegralTrap.cpp` | 5 | ✅ Proved | `lean/FVSquad/BlockIntegralTrap.lean` | Trapezoidal integrator with symmetric saturation; 16 theorems, 0 sorry; bounded output, exact trapezoidal formula when in range, increment formula, zero-state/zero-input, iterated bound inductive invariant, monotone trap sum, pos/neg saturation; run 122 |
+
+## New Research Targets (Phase 1 — identified in run 124)
+
+| # | Name | File | Phase | Status | Lean File | Notes |
+|---|------|------|-------|--------|-----------|-------|
+| 51 | `NotchFilter::apply` | `src/lib/mathlib/math/filter/NotchFilter.hpp` | 1 | ⬜ Research | — | Direct Form I IIR notch filter; passthrough, zero-state, delay update; reuses LowPassFilter2p patterns |
+| 52 | `SecondOrderReferenceModel` forward-Euler | `src/lib/mathlib/math/filter/second_order_reference_model.hpp` | 1 | ⬜ Research | — | State-space model; reset invariant, equilibrium fixed point; `ring`-provable |
+| 53 | `WelfordMeanVector` | `src/lib/mathlib/math/WelfordMeanVector.hpp` | 1 | ⬜ Research | — | Vector online mean; extends WelfordMean.lean; componentwise invariant |
+| 54 | `PurePursuit` lookahead distance | `src/lib/pure_pursuit/PurePursuit.hpp` | 1 | ⬜ Research | — | `constrain(v*k, min, max)` range safety; trivial via `constrain_range` |

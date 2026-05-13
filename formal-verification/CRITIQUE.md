@@ -4,23 +4,29 @@
 
 ## Last Updated
 
-- **Date**: 2026-05-10 (run 122)
-- **Commit**: run122-work-34d2aa9b
+- **Date**: 2026-05-13 10:42 UTC (run 124)
+- **Commit**: `aee95cf2c4043cdbdc1c7506aa5d3a1adcc2ed83`
 
 ---
 
 ## Overall Assessment
 
-**Forty-seven Lean files cover ~690 named theorems, all fully proved, 0 `sorry`**
+**Forty-seven Lean files cover 690 named theorems, all fully proved, 0 `sorry`**
 (Lean 4 v4.29.1, standard library only, 10 abstract axioms for Mathlib-dependent results).
 
-Since run 113, ten new files have been added across runs 114–122:
-`LowPassFilter2p.lean` (13 theorems, Direct Form II biquad IIR, run121),
-`FilteredDerivative.lean` (run 114–115), `RadiansDegrees.lean` (run 114),
-`VelocitySmoothing.lean` (run 115), `Min3Max3.lean` (run 116),
-`HighPass.lean` (14 theorems, IIR high-pass, run 119),
-`Crc16Sig.lean`, `Crc32Sig.lean`, `Crc64.lean`, `Crc8.lean` (run 116–118),
-and `BlockIntegralTrap.lean` (16 theorems, trapezoidal integrator, run 122).
+The library has reached a high level of maturity. Across runs 114–123, ten new files were
+added covering IIR filters (LowPassFilter2p, HighPass, FilteredDerivative), motion planning
+(VelocitySmoothing, BrakingDist), safety-critical control (BlockIntegralTrap, PID), and
+utility math (RadiansDegrees, Min3Max3, CountSetBits). The proved theorem count grew from
+~638 (run 113) to 690 (run 123), and Route B correspondence tests now validate 7 targets
+against 15,214 total cases, all passing.
+
+**Run 124 assessment (Task 7 + Task 1)**:
+- Critique updated with run 123 additions (LowPassFilter2p + BlockIntegralTrap + correspondence).
+- New FV research targets identified: `NotchFilter`, `SecondOrderReferenceModel`,
+  `WelfordMeanVector`, and `PurePursuit` — see RESEARCH.md and TARGETS.md.
+- The conference paper and REPORT.md remain the most stale artifacts
+  (not updated since runs 53–63); updating them is the highest-priority documentation gap.
 
 Six confirmed bugs remain open: `signNoZero<float>` (NaN returns 0),
 `negate<int16_t>` (incorrect INT16_MAX special case), `wrap_bin(bin, n)` (negative index
@@ -29,6 +35,31 @@ for `bin ≤ -n`), `negate<int16_t>` involution failure at −32767, and the two
 appears in the image of negate16). Route B correspondence tests now cover 7 targets:
 atmosphere (26/26), bin_at_angle (334/334), slew_rate (4327/4327), hysteresis (259/259),
 pid (7964/7964), count_set_bits (871/871), and expo (1373/1373).
+
+### Run 123 additions: `LowPassFilter2p.lean` and correspondence review
+
+**New file**: `lean/FVSquad/LowPassFilter2p.lean` (13 theorems, 0 sorry).
+
+Models the Direct Form II biquad IIR Butterworth low-pass filter's `apply` method.
+Key state: `(d1, d2)` delay values; output computed from coefficients `b0,b1,b2,a1,a2`.
+
+**Proved properties:**
+- `lpf2_passthrough`: zero coefficients → input passes through unchanged
+- `lpf2_linearity_d1d2`: linear in delay state for fixed input
+- `lpf2_zero_state`: zero state + zero input → zero output
+- `lpf2_d1_update` / `lpf2_d2_update`: correct delay update formulas
+- `lpf2_butterworth_a1_symm`: Butterworth symmetry `a1 = b1 - 2*b0`
+- `lpf2_dc_steady_state_output`: DC steady state formula for output
+- `lpf2_dc_gain_one_condition`: `b0+b1+b2 = 1 - a1 - a2` → DC gain = 1
+
+**Assessment**: Solid structural coverage of the biquad update. DC gain=1 at steady state
+is the highest-value property (confirms the filter converges to DC input). Linearity in
+delay state enables compositional analysis.
+
+**Gaps to address in future runs:**
+- BIBO stability (‖y‖ ≤ K·‖x‖ for bounded input) requires Mathlib `Real` analysis
+- Frequency response properties require transcendental arithmetic
+- Correspondence test harness not yet written
 
 ### Run 122 additions: `BlockIntegralTrap.lean`
 

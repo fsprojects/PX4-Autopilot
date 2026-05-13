@@ -1711,3 +1711,141 @@ long, gain will eventually settle at 1 (full gain), restoring normal control aut
 | 4 | `wrapRat` Mathlib sorry closure | 🔄 Phase 3 | 10 axioms; needs Mathlib `Int.floor` — awaiting network access |
 | 5 | `Atmosphere` sorry closure | 🔄 Phase 3 | Needs Mathlib |
 | 6 | `SqrtLinear` sqrt branch sorry closure | 🔄 Phase 3 | Needs Mathlib `Real.sqrt` |
+
+---
+
+## Run 124 Research: New Target Candidates
+
+*Date: 2026-05-13 UTC | Commit: aee95cf2c4*
+
+The following targets were identified in run 124 (Task 1) by surveying uncovered modules.
+
+---
+
+### Target 51: `NotchFilter::apply` — IIR notch filter update
+
+**File**: `src/lib/mathlib/math/filter/NotchFilter.hpp`
+**Phase**: 1 — Research
+
+Direct Form I IIR notch filter. The `applyInternal` method computes:
+```
+output = b0*sample + b1*x1 + b2*x2 - a1*y1 - a2*y2
+x2 = x1; x1 = sample
+y2 = y1; y1 = output
+```
+
+**Benefit**: Notch filters attenuate specific frequencies (e.g., motor vibrations) used
+in gyroscope data processing. Verifying passthrough (all-zero coefficients → output=input),
+zero-state (zero delays + zero input → zero output), and linearity in delay state gives
+confidence in the filter's structural correctness. The Direct Form I structure is simpler
+than Direct Form II and may allow more complete stdlib-only proofs.
+
+**Specification size**: ~20–25 Lean lines. Define a `Rat`-valued state record `(x1, x2, y1, y2)`,
+a `notchApply` function, and 6–8 structural theorems.
+
+**Proof tractability**: Passthrough, zero-state, and delay update formulas provable by `ring`
+or `simp` with `omega`. Linearity in delays: `ring`. All fully decidable for `Rat`.
+
+**Approximations needed**: `Rat` in place of `Float`; `b0,b1,b2,a1,a2` treated as abstract
+`Rat` parameters (the `setParameters` computation is not modelled — too many `sqrtf/cosf`
+calls). Direct Form I (not Direct Form II as in LowPassFilter2p).
+
+**Approach**: Pure equational proofs with `ring`/`simp`; reuse `MathFunctions.lean` patterns.
+
+---
+
+### Target 52: `SecondOrderReferenceModel::update` — forward-Euler step invariants
+
+**File**: `src/lib/mathlib/math/filter/second_order_reference_model.hpp`
+**Phase**: 1 — Research
+
+The forward-Euler state transition computes:
+```
+new_state = (1)*state + T*rate + 0*state_sample + 0*rate_sample
+new_rate  = -Kx*T*state + (1-Kv*T)*rate + Kx*T*state_sample + Kv*T*rate_sample
+```
+(simplified from the state matrix multiplication in `transitionStates`).
+
+**Benefit**: Second-order reference models are used for setpoint smoothing and trajectory
+following. Verifying that at equilibrium (input=state, rate=rate_sample) the state
+is unchanged is a critical correctness property. The reset invariant (after reset,
+state=initial, rate=initial_rate) is trivially verifiable.
+
+**Specification size**: ~30 Lean lines. Model forward-Euler transition over `Rat`
+(abstracting floating-point). Key theorems: reset_state, reset_rate, equilibrium_fixed_point.
+
+**Proof tractability**: Reset invariants: `rfl`. Equilibrium (input=state, rate=rate_sample
+→ state unchanged): `ring`. Linear algebra over `Rat` is fully stdlib-provable.
+
+**Approximations needed**: `Rat` in place of `Float`; `Kx, Kv, T` as abstract parameters;
+bilinear method omitted (forward Euler only in the initial model); `max_time_step` check
+abstracted away.
+
+**Approach**: Equational proofs; `ring` closes most goals.
+
+---
+
+### Target 53: `WelfordMeanVector` — running mean invariant
+
+**File**: `src/lib/mathlib/math/WelfordMeanVector.hpp`
+**Phase**: 1 — Research
+
+Vector generalisation of Welford's online mean: each `update` call tracks count
+and running sum per-component. The mean is `sum / count`.
+
+**Benefit**: WelfordMean is already proved for scalar inputs (`WelfordMean.lean`, 7 theorems).
+The vector case (`WelfordMeanVector`) shares the same invariant — `mean = sum / count` —
+but applies componentwise. Verifying this via a `List`-based model gives an independent
+check on the scalar proof.
+
+**Specification size**: ~15–20 Lean lines. Define a 2-component model (avoids `n`-dim
+vector genericity). Prove `welfordVec_mean_def` and `welfordVec_count_pos` as inductive
+invariants.
+
+**Proof tractability**: Follows the exact same structure as `WelfordMean.lean`. Induction on
+update count, `ring` for algebraic steps.
+
+**Approximations needed**: 2-component model (fixed dimension); `Rat` arithmetic;
+`NaN` and `Float` precision ignored.
+
+**Approach**: Adapt the existing `WelfordMean.lean` proof pattern directly.
+
+---
+
+### Target 54: `PurePursuit` lookahead distance invariant
+
+**File**: `src/lib/pure_pursuit/PurePursuit.hpp`
+**Phase**: 1 — Research
+
+The `calcDesiredHeading` method computes a lookahead distance `l_d = constrain(v*k, min, max)`
+and then solves for the heading to the lookahead intersection point.
+
+**Benefit**: The lookahead distance must satisfy `min_ld ≤ l_d ≤ max_ld` at all times —
+any violation causes discontinuous heading commands, potentially inducing oscillation.
+This follows immediately from `constrain_range` but is worth proving as part of a
+safety specification for the pure pursuit controller.
+
+**Specification size**: ~10 Lean lines. Prove `lookahead_in_range` by importing
+`MathFunctions.lean::constrainRat_range`.
+
+**Proof tractability**: Trivial — one application of `constrain_range`. The rest of the
+algorithm (intersection point computation) requires trigonometry and is deferred.
+
+**Approximations needed**: `Rat` model; only the `constrain` step is modelled; vehicle
+geometry and intersection math omitted.
+
+**Approach**: Single theorem; proves in one step via `constrain_range` from `MathFunctions.lean`.
+
+---
+
+## Updated Priority Order (run 124)
+
+| Priority | Target | Phase | Rationale |
+|----------|--------|-------|-----------|
+| 1 | `NotchFilter::apply` (target 51) | ⬜ Research | Direct Form I IIR; passthrough/linearity; reuses LowPassFilter2p patterns |
+| 2 | `SecondOrderReferenceModel` forward-Euler step (target 52) | ⬜ Research | Reset + equilibrium invariants; `ring`-provable; used in setpoint smoothing |
+| 3 | `WelfordMeanVector` (target 53) | ⬜ Research | Extends existing WelfordMean.lean; componentwise mean invariant |
+| 4 | `PurePursuit` lookahead range (target 54) | ⬜ Research | Trivial; 1 theorem; safety-critical lookahead bound |
+| 5 | `BlockIntegralTrap` correspondence tests | 🔄 Phase 5 | Route B tests not yet written; harness should be small |
+| 6 | `LowPassFilter2p` correspondence tests | 🔄 Phase 5 | Route B tests not yet written; biquad IIR |
+| 7 | Paper + REPORT.md update | 🔄 Phase 5 | Most stale documentation artifact; 28+ new files since last paper update |
