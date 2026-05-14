@@ -4,8 +4,8 @@
 
 ## Last Updated
 
-- **Date**: 2026-04-30 16:45 UTC
-- **Commit**: `056a219d63`
+- **Date**: 2026-05-14 18:00 UTC
+- **Commit**: `28eed6f573`
 
 ## Overview
 
@@ -1849,3 +1849,86 @@ geometry and intersection math omitted.
 | 5 | `BlockIntegralTrap` correspondence tests | 🔄 Phase 5 | Route B tests not yet written; harness should be small |
 | 6 | `LowPassFilter2p` correspondence tests | 🔄 Phase 5 | Route B tests not yet written; biquad IIR |
 | 7 | Paper + REPORT.md update | 🔄 Phase 5 | Most stale documentation artifact; 28+ new files since last paper update |
+
+---
+
+## New Target Survey — Run 127 (2026-05-14)
+
+### Critique-Driven Adjustments
+
+The latest CRITIQUE.md (run 114) flagged that:
+1. The conference paper and REPORT.md are significantly stale (28+ new files since last update).
+2. `LowPassFilter2p` and `BlockIntegralTrap` lack correspondence tests.
+3. WelfordMeanVector, PurePursuit, and the BlockStats family are natural next targets.
+4. No target currently covers symmetric clamping (`BlockLimitSym`) despite it being trivially provable.
+
+### New Targets Identified (Targets 55–57)
+
+#### Target 55: `control::BlockLimitSym::update`
+
+**File**: `src/lib/controllib/BlockLimitSym.cpp`
+
+**What it does**: Clamps a float to `[−max, max]`. Body:
+```cpp
+if (input > getMax())  input = max;
+else if (input < -getMax()) input = -getMax();
+return input;
+```
+
+**Benefit**: Output-in-range invariant (`|output| ≤ max`), idempotence (`limitSym(limitSym(x)) = limitSym(x)`), odd-symmetry (`limitSym(−x) = −limitSym(x)`), monotonicity in `x`. Mirrors `math::constrain` but always symmetric.
+
+**Specification size**: ~6 theorems.
+
+**Proof tractability**: All `omega` or `by_cases + simp`. Trivial — can reuse `MathFunctions.lean` constrain lemmas.
+
+**Approximations**: Model uses `Int` (same as all other controllib targets).
+
+**Approach**: Direct definitional proofs.
+
+#### Target 56: `computeMaxSpeedFromDistance`
+
+**File**: `src/lib/mathlib/math/TrajMath.hpp:61`
+
+**What it does**: Solves for max approach speed given braking constraints using a quadratic formula:
+```cpp
+float b = 4*sqr(accel)/jerk;
+float c = -2*accel*braking_distance - sqr(final_speed);
+float max_speed = 0.5*(-b + sqrt(sqr(b) - 4*c));
+```
+
+**Benefit**: Non-negativity of result when discriminant ≥ 0; builds on `BrakingDist.lean`; trajectory safety.
+
+**Specification size**: ~5 theorems with explicit discriminant precondition.
+
+**Proof tractability**: Medium — needs careful handling of the square root. Rational model with abstract `sqrtBranch` axiom (same pattern as `SqrtLinear.lean`).
+
+**Approximations**: Abstract `sqrt` as axiom (same as SqrtLinear/Atmosphere targets).
+
+**Approach**: Parameterise on `sqrtBranch` axiom; prove non-negativity, monotone-in-distance properties.
+
+#### Target 57: `control::BlockStats` running accumulator
+
+**File**: `src/lib/controllib/BlockStats.hpp`
+
+**What it does**: Accumulates `sum`, `sumSq`, and `count`. `getMean()` returns `sum / count`.
+
+**Benefit**: Mean invariant (`getMean() * count = sum`); non-negativity of `sumSq`; monotone count growth.
+
+**Specification size**: ~8 theorems.
+
+**Proof tractability**: All `omega` or `simp` on integer model. Very tractable.
+
+**Approximations**: Integer model; no overflow or floating-point modelling.
+
+**Approach**: Inductive invariant on `(sum, count)` pair.
+
+### Priority Queue (Run 127)
+
+| Priority | Target | Rationale |
+|----------|--------|-----------|
+| 1 | `PurePursuit` lookahead_in_range (target 54) | Informal spec done; 1 theorem; trivial safety property |
+| 2 | `WelfordMeanVector` informal spec (target 53) | Builds on WelfordMean.lean; componentwise invariant |
+| 3 | `BlockLimitSym` Lean spec + proofs (target 55) | Trivial; fills gap in controllib coverage |
+| 4 | `BlockStats` informal spec (target 57) | Small, tractable, natural next controllib target |
+| 5 | `LowPassFilter2p` correspondence tests | Route B; biquad IIR; harness should be small |
+| 6 | Paper + REPORT.md update | Stale; 28+ new files since last update |
