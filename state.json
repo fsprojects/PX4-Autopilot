@@ -1,12 +1,12 @@
 {
-  "last_run": 125,
+  "last_run": 126,
   "total_theorems": 696,
   "total_files": 48,
   "total_sorry": 0,
   "lean_version": "4.29.1",
   "lake_build": "passed (51 jobs)",
-  "last_target": "SecondOrderReferenceModel (forward-Euler) proofs + NotchFilter informal spec",
-  "notes": "Run 125: Task 5 (Proof Assistance) — SecondOrderReferenceModel.lean: 7 theorems (reset, update formulas, equilibrium fixed point, zero-rate state). Task 2 (Informal Spec) — notchfilter_informal.md written. Merged run124 PR (CRITIQUE+RESEARCH+TARGETS for targets 51-54). 48 files, 696 theorems, 0 sorry.",
+  "last_target": "BlockIntegralTrap correspondence tests (Route B) + PurePursuit informal spec",
+  "notes": "Run 126: Task 8 (Route B) — BlockIntegralTrap 120/120 correspondence tests pass (formal-verification/tests/BlockIntegralTrap/). Task 2 — purepursuit_informal.md written. CORRESPONDENCE.md updated. 48 files, 696 theorems, 0 sorry.",
   "targets": {
     "LowPassFilter2p": {
       "phase": 5,
@@ -15,53 +15,52 @@
       "theorems": 13,
       "sorry": 0,
       "correspondence": "CORRESPONDENCE.md run 123 section",
-      "notes": "Direct Form II biquad IIR Butterworth filter. 13 theorems. Correspondence test harness NOT YET written."
+      "notes": "Correspondence test harness NOT YET written."
     },
     "BlockIntegralTrap": {
       "phase": 5,
       "file": "formal-verification/lean/FVSquad/BlockIntegralTrap.lean",
       "theorems": 16,
       "sorry": 0,
-      "correspondence": "CORRESPONDENCE.md run 123 section",
-      "notes": "Trapezoidal integrator with symmetric saturation. 16 theorems. Correspondence test harness NOT YET written."
+      "correspondence": "CORRESPONDENCE.md run 126 section",
+      "correspondence_tests": "formal-verification/tests/BlockIntegralTrap/test_correspondence.py",
+      "notes": "Run 126: Route B correspondence tests added. 120/120 pass. 16 theorems proved."
     },
     "SecondOrderReferenceModel": {
       "phase": 5,
       "file": "formal-verification/lean/FVSquad/SecondOrderReferenceModel.lean",
-      "informal_spec": null,
       "theorems": 7,
       "sorry": 0,
-      "notes": "Run 125. Forward-Euler discretization. 7 theorems: reset postconditions (rfl), update formulas (rfl), equilibrium fixed point (proved via Rat arithmetic), zero-rate-at-target. PR: run125-sorm-notchfilter-informal."
+      "notes": "Run 125. Forward-Euler discretization. 7 theorems: reset postconditions (rfl), update formulas (rfl), equilibrium fixed point (proved via Rat arithmetic), zero-rate-at-target."
     },
     "NotchFilter": {
       "phase": 2,
       "file": null,
       "informal_spec": "formal-verification/specs/notchfilter_informal.md",
-      "notes": "Run 125: informal spec written. Direct Form I IIR notch filter applyInternal(). Passthrough, zero-state, linearity, delay update, reset. Open: DC gain invariant, stability guarantee, symmetric numerator in setCoefficients. Ready for Task 3 (Lean spec)."
+      "notes": "Run 125: informal spec written. Ready for Task 3 (Lean spec)."
+    },
+    "PurePursuit": {
+      "phase": 2,
+      "file": null,
+      "informal_spec": "formal-verification/specs/purepursuit_informal.md",
+      "notes": "Run 126: informal spec written. Key FV target: lookahead_in_range safety theorem. Complex algorithm with 4-branch geometry — start with lookahead constrain theorem only."
     },
     "WelfordMeanVector": {
       "phase": 1,
       "file": null,
-      "notes": "Target 53. Vector WelfordMean. Extends WelfordMean.lean. 2-component model. mean = sum/count invariant."
-    },
-    "PurePursuit": {
-      "phase": 1,
-      "file": null,
-      "notes": "Target 54. Lookahead distance = constrain(v*k, min, max). One theorem: lookahead_in_range via constrain_range. Safety-critical."
+      "notes": "Target 53. Vector WelfordMean. 2-component model. mean = sum/count invariant."
     }
   },
   "priority_queue": [
     "NotchFilter (target 51) — Lean spec + implementation + proofs (informal spec done run 125)",
-    "PurePursuit lookahead (target 54) — trivial constrain_range theorem",
-    "WelfordMeanVector (target 53) — componentwise mean",
-    "BlockIntegralTrap correspondence tests (Route B)",
+    "PurePursuit lookahead_in_range — trivial Lean spec + proof (informal spec done run 126)",
     "LowPassFilter2p correspondence tests (Route B)",
-    "SecondOrderReferenceModel informal spec (still missing)",
+    "WelfordMeanVector (target 53) — informal spec + componentwise mean",
     "Paper + REPORT.md update (stale since run 63)"
   ],
   "bugs_found": 6,
   "open_prs": [
-    "run125-sorm-notchfilter-informal"
+    "lean-squad/blockintegraltrap-corr-tests-purepursuit-run126-25855193330-6a06a2c4cf"
   ],
   "ci": {
     "lean_ci": "lean-ci.yml — passing",
