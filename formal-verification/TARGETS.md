@@ -150,7 +150,15 @@ See `RESEARCH.md §Tool Choice` for details.
 
 | # | Name | File | Phase | Status | Lean File | Notes |
 |---|------|------|-------|--------|-----------|-------|
-| 51 | `NotchFilter::apply` | `src/lib/mathlib/math/filter/NotchFilter.hpp` | 1 | ⬜ Research | — | Direct Form I IIR notch filter; passthrough, zero-state, delay update; reuses LowPassFilter2p patterns |
-| 52 | `SecondOrderReferenceModel` forward-Euler | `src/lib/mathlib/math/filter/second_order_reference_model.hpp` | 1 | ⬜ Research | — | State-space model; reset invariant, equilibrium fixed point; `ring`-provable |
-| 53 | `WelfordMeanVector` | `src/lib/mathlib/math/WelfordMeanVector.hpp` | 1 | ⬜ Research | — | Vector online mean; extends WelfordMean.lean; componentwise invariant |
-| 54 | `PurePursuit` lookahead distance | `src/lib/pure_pursuit/PurePursuit.hpp` | 1 | ⬜ Research | — | `constrain(v*k, min, max)` range safety; trivial via `constrain_range` |
+| 51 | `NotchFilter::applyInternal` | `src/lib/mathlib/math/filter/NotchFilter.hpp` | 5 | ✅ Proved | `lean/FVSquad/NotchFilter.lean` | Direct Form I IIR notch filter; 15 theorems, 0 sorry; bypass, DC steady-state, zero-input, superposition, two-step formula; run 126 |
+| 52 | `SecondOrderReferenceModel` forward-Euler | `src/lib/mathlib/math/filter/second_order_reference_model.hpp` | 5 | ✅ Proved | `lean/FVSquad/SecondOrderReferenceModel.lean` | State-space model; 7 theorems, 0 sorry; reset postconditions, update formulas, equilibrium fixed point; run 125 |
+| 53 | `WelfordMeanVector` | `src/lib/mathlib/math/WelfordMeanVector.hpp` | 1 | ⬜ Research | — | Vector online mean with Kahan summation; extends WelfordMean.lean; componentwise `mean = sum/count` invariant; 2-component model tractable |
+| 54 | `PurePursuit` lookahead distance | `src/lib/pure_pursuit/PurePursuit.hpp` | 2 | 🔄 Informal Spec | — | Informal spec written in run 126; `constrain(v*k, min, max)` range safety; lookahead_in_range theorem trivially provable via `constrain_range` |
+
+## New Research Targets (Phase 1 — identified in run 127)
+
+| # | Name | File | Phase | Status | Lean File | Notes |
+|---|------|------|-------|--------|-----------|-------|
+| 55 | `control::BlockLimitSym::update` | `src/lib/controllib/BlockLimitSym.cpp` | 1 | ⬜ Research | — | Symmetric clamp to `[−max, max]`; output-in-range invariant; idempotence; monotonicity; mirrors `math::constrain` but symmetric; ~6 theorems, all `omega`-provable |
+| 56 | `computeMaxSpeedFromDistance` | `src/lib/mathlib/math/TrajMath.hpp:61` | 1 | ⬜ Research | — | Quadratic formula for max speed given jerk, accel, braking distance, final speed; non-negativity when discriminant ≥ 0; builds on `BrakingDist.lean`; needs careful discriminant pre-condition |
+| 57 | `control::BlockStats` running sum | `src/lib/controllib/BlockStats.hpp` | 1 | ⬜ Research | — | Accumulator: `sum`, `sumSq`, `count`; key invariant `getMean() = sum/count`; similar to WelfordMean but simpler (no online variance update); ~8 theorems; all `omega`/`ring`-provable on Int model |

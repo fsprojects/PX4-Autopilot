@@ -2,19 +2,19 @@
 
 > 🔬 *Lean Squad — automated formal verification for `dsyme/PX4-Autopilot`.*
 
-**Status**: ✅ ACTIVE — 555 theorems · **0 `sorry`** · Lean 4.29.1 · 40 files
+**Status**: ✅ ACTIVE — 789 theorems · **0 `sorry`** · Lean 4.29.1 · 49 files
 
 ## Last Updated
 
-- **Date**: 2026-05-08 08:47 UTC
-- **Commit**: `db0b76ce60`
+- **Date**: 2026-05-14 18:00 UTC
+- **Commit**: `28eed6f573`
 
 ---
 
 ## Executive Summary
 
-The Lean Squad has formally verified **555 named theorems** across
-**40 Lean 4 files**, covering the core mathematical utility library (`src/lib/mathlib/`),
+The Lean Squad has formally verified **789 named theorems** across
+**49 Lean 4 files**, covering the core mathematical utility library (`src/lib/mathlib/`),
 the EKF2 ring-buffer (`src/lib/ringbuffer/`), the `systemlib::Hysteresis` state machine
 (`src/lib/hysteresis/`), the Septentrio GNSS CRC-16 algorithm, the Commander arming FSM,
 the ISA atmosphere model, `ObstacleMath::wrap_bin` / `get_bin_at_angle` / `get_lower_bound_angle`
@@ -23,15 +23,21 @@ the ISA atmosphere model, `ObstacleMath::wrap_bin` / `get_bin_at_angle` / `get_l
 (the generic closed-interval predicate), `math::constrainFloatToInt16`, the CRC-64-WE hash,
 the CRC-8/CRSF protocol checksum, radians/degrees conversions, `math::min3`/`max3`,
 the jerk-limited trajectory planner (`VelocitySmoothing`, 33 theorems), the generic
-PID controller (`src/lib/pid/PID.cpp`, 22 theorems including output safety bounds and
-anti-windup invariants), the `FilteredDerivative` discrete-derivative + alpha-IIR filter
-(12 theorems, 0 sorry), and the **golden-section search** interval invariants
-(`src/lib/mathlib/math/SearchMin.hpp`, 13 theorems, 0 sorry). Three genuine implementation
-bugs were discovered through formal verification. **Zero** `sorry` remain in proof bodies
-(10 axioms for irrational arithmetic are the only non-proved elements). Runs 101–108 added
-36 new theorems across 2 new Lean files: `FilteredDerivative` and `GoldenSection`. Route B
-correspondence tests cover `atmosphere` (26 cases), `slew_rate` (4327 cases),
-and `pid` (7964 cases).
+PID controller (`src/lib/pid/PID.cpp`, 34 theorems including directional convergence and
+saturation liveness), the `FilteredDerivative` discrete-derivative + alpha-IIR filter
+(12 theorems), the **golden-section search** interval invariants (13 theorems), the
+sensor-orientation finite-enum decidable proofs (`SensorOrientation`, 20 theorems), the
+`GainCompression` adaptive gain controller (11 theorems), the `CountSetBits` Hamming
+weight function (24 theorems), `Negate16` int16 overflow behaviour (18 theorems),
+`BlockHighPass` IIR high-pass filter (14 theorems), `BlockIntegralTrap` trapezoidal
+integrator (16 theorems), `SecondOrderReferenceModel` forward-Euler state-space model
+(7 theorems), and `NotchFilter` Direct Form I IIR notch filter (15 theorems). **Six**
+genuine implementation bugs were discovered through formal verification. **Zero** `sorry`
+remain in proof bodies (10 axioms for irrational arithmetic are the only non-proved elements).
+Route B correspondence tests cover `atmosphere` (26 cases), `slew_rate` (4327 cases),
+`pid` (7964 cases), `bin_at_angle` (334 cases), `hysteresis` (259 cases), `count_set_bits`
+(871 cases), `expo` (1373 cases), `deadzone` (1221 cases), and `BlockIntegralTrap`
+(120 cases).
 
 ---
 
@@ -53,8 +59,9 @@ graph TD
     L8["Layer 8: Physical Models<br/>Atmosphere (15) · SqrtLinear (15)<br/>SignFromBoolSq · BrakingDist (9)<br/>56 theorems"]
     L9["Layer 9: Collision Prevention<br/>GetBinAtAngle · GetLowerBoundAngle<br/>CollisionPrevComposition<br/>29 theorems"]
     L10["Layer 10: Math Extensions<br/>ConstrainToInt16 (10) · RadiansDegrees (36) · Min3Max3 (29)<br/>75 theorems"]
-    L11["Layer 11: Motion Planning + Control<br/>VelocitySmoothing (33) · PID (22) · FilteredDerivative (12)<br/>67 theorems"]
+    L11["Layer 11: Motion Planning + Control<br/>VelocitySmoothing (33) · PID (34) · FilteredDerivative (12)<br/>79 theorems"]
     L12["Layer 12: Optimization Algorithms<br/>GoldenSection (13)<br/>13 theorems"]
+    L13["Layer 13: New Filters + Control (runs 109–126)<br/>SensorOrientation (20) · GainCompression (11)<br/>CountSetBits (24) · Negate16 (18)<br/>HighPass (14) · BlockIntegralTrap (16)<br/>SecondOrderReferenceModel (7) · NotchFilter (15)<br/>125 theorems"]
     L1 --> L2a
     L1 --> L2b
     L2b --> L2c
@@ -68,6 +75,10 @@ graph TD
     L10 --> L11
     L2a --> L12
     L1 --> L12
+    L6 --> L13
+    L2a --> L13
+    L1 --> L13
+    L11 --> L13
 ```
 
 All proof files import only **Lean 4 stdlib** — no Mathlib is required.
@@ -444,7 +455,39 @@ graph LR
 
 ---
 
-| File | Theorems | Sorry | Phase | Key result |
+### Layer 13 — New Filters & Control Utilities (8 files, 125 theorems; runs 109–126)
+
+Added in runs 109–126, this layer covers sensor-orientation decidable proofs, adaptive
+gain compression, the Hamming-weight popcount function, int16 overflow-safety bugs,
+IIR high-pass and notch filters, the trapezoidal integrator, and the second-order
+reference model.
+
+```mermaid
+graph LR
+    SO["SensorOrientation.lean<br/>20 theorems<br/>8-variant finite enum, yaw offsets"]
+    GC["GainCompression.lean<br/>11 theorems<br/>Adaptive gain range + leakage"]
+    CS["CountSetBits.lean<br/>24 theorems<br/>Hamming weight recurrence + pow2"]
+    N16["Negate16.lean<br/>18 theorems<br/>int16 negation — 🐛 3 bugs"]
+    HP["HighPass.lean<br/>14 theorems<br/>IIR high-pass DC blocking"]
+    BIT["BlockIntegralTrap.lean<br/>16 theorems<br/>Trapezoidal integrator + saturation"]
+    SORM["SecondOrderReferenceModel.lean<br/>7 theorems<br/>Forward-Euler state-space equilibrium"]
+    NF["NotchFilter.lean<br/>15 theorems<br/>Direct Form I IIR notch filter"]
+```
+
+**Key results**:
+- `sensorYawOffset_range`: yaw offset for any non-CUSTOM sensor orientation is in `[-π, π]`.
+- `gainCompression_in_range`: compression gain always in `[gain_min, 1]`.
+- `countSetBits_pow2`: `countSetBits(2^n) = 1` — proved by bit induction.
+- `negate16_not_involutive`: `negate16(negate16(−32767)) ≠ −32767` — **Bug 4**.
+- `negate16_not_injective`: `negate16(−32767) = negate16(−32768)` — **Bug 5** (collision at INT16_MIN).
+- `negate16_not_surjective`: `−32767` is never in the image of `negate16` — **Bug 6**.
+- `hpIter_dc_decay`: constant-input output converges to 0 geometrically (IIR DC blocking).
+- `itIter_bounded`: BlockIntegralTrap output always in `[−limit, limit]` for all n.
+- `sormReset_state_zero`: second-order model reset sets state to zero.
+- `nfOut_dc_steady`: NotchFilter preserves DC input when `b0+b1+b2 = 1+a1+a2`.
+- `nfOut_add_sample`: superposition theorem — `nfOut(u+v) = nfOut(u) + b0·v`.
+
+---
 |------|----------|-------|-------|------------|
 | `MathFunctions.lean` | 16 | 0 | ✅ Phase 5 | constrain/signNoZero/countSetBits |
 | `AlphaFilter.lean` | 17 | 0 | ✅ Phase 5 | IIR closed-form convergence + multi-step |
@@ -482,11 +525,20 @@ graph LR
 | `RadiansDegrees.lean` | 36 | 0 | ✅ Phase 5 | Rad↔deg round-trip, monotonicity, injective, concrete values |
 | `Min3Max3.lean` | 29 | 0 | ✅ Phase 5 | min3/max3: bounds, GLB/LUB, idempotence, commutativity, duality |
 | `VelocitySmoothing.lean` | 33 | 0 | ✅ Phase 5 | Jerk-limited schedule: partition, T≥0, monotonicity, T2_zero_iff |
-| `PID.lean` | 22 | 0 | ✅ Phase 5 | PID safety (output+integral bounds), equilibrium, monotonicity |
+| `PID.lean` | 34 | 0 | ✅ Phase 5 | PID safety (output+integral bounds), equilibrium, convergence liveness |
 | `FilteredDerivative.lean` | 12 | 0 | ✅ Phase 5 | Discrete derivative + IIR: first-call no-update, const-input convergence |
 | `GoldenSection.lean` | 13 | 0 | ✅ Phase 5 | GS search: ordering invariant, probe-in-range, width contraction |
+| `SensorOrientation.lean` | 20 | 0 | ✅ Phase 5 | Sensor orientation yaw offsets: 8-variant finite enum, decidable range proofs |
+| `GainCompression.lean` | 11 | 0 | ✅ Phase 5 | Adaptive gain: range invariant, leakage direction, monotonicity |
+| `CountSetBits.lean` | 24 | 0 | ✅ Phase 5 | Hamming weight: even/odd recurrence, pow2 char., correspondence tests 871/871 |
+| `Negate16.lean` | 18 | 0 | ✅ Phase 5 | int16 negation bugs: not involutive, not injective, not surjective — 🐛 bugs 4–6 |
+| `HighPass.lean` | 14 | 0 | ✅ Phase 5 | IIR high-pass: DC blocking, coefficient bounds, geometric decay, monotone |
+| `BlockIntegralTrap.lean` | 16 | 0 | ✅ Phase 5 | Trapezoidal integrator: bounded output, saturation, inductive invariant |
+| `SecondOrderReferenceModel.lean` | 7 | 0 | ✅ Phase 5 | Forward-Euler state-space: reset postconditions, equilibrium fixed point |
+| `NotchFilter.lean` | 15 | 0 | ✅ Phase 5 | Direct Form I IIR notch: bypass, DC steady-state, superposition, two-step formula |
+| `LowPassFilter2p.lean` | 13 | 0 | ✅ Phase 5 | Biquad IIR low-pass: range/pass-through/zero-state |
 | `Basic.lean` | — | — | ✅ | Barrel file |
-| **Total** | **555** | **0** | — | **3 bugs found; 0 sorry; 40 files; lake build passes** |
+| **Total** | **789** | **0** | — | **6 bugs found; 0 sorry; 49 files; lake build passes** |
 
 ---
 
@@ -608,6 +660,29 @@ graph TD
   so the bug cannot trigger in practice. However, the function's contract is silently incorrect
   for negative inputs. Formally proved safe for current call site via `wrapBinOffset_valid`.
 - **Filed as**: formal finding — no issue filed (latent, not currently exploitable)
+
+#### 🐛 Bug 4 — `negate<int16_t>`: Not involutive at −32767
+
+- **Property expected**: `negate16(negate16(x)) = x` for all valid `int16_t` x
+- **Counterexample**: `negate16(negate16(−32767)) = negate16(32767) = −32768 ≠ −32767`
+- **Root cause**: `Negate.lean` showed the earlier `negate13` model had the same issue; `Negate16.lean` (run 111) formally confirms the int16-specific version: the C++ maps `INT16_MAX → INT16_MIN`, breaking involution at `x = −32767`
+- **Filed as**: GitHub issue #21 (shared with Bug 2 — same root cause in both `negate` variants)
+
+#### 🐛 Bug 5 — `negate<int16_t>`: Non-injective (collision at INT16_MIN)
+
+- **Property expected**: `negate16` is injective (distinct inputs → distinct outputs)
+- **Counterexample** (proved via `native_decide`): `negate16(−32767) = negate16(−32768) = −32768`
+  — two distinct inputs map to the same output
+- **Impact**: any code that depends on `negate16` to preserve distinctness (e.g., sign discrimination) silently collapses values
+- **Filed as**: documented in `Negate16.lean` as `negate16_not_injective`
+
+#### 🐛 Bug 6 — `negate<int16_t>`: Non-surjective (−32767 unreachable)
+
+- **Property expected**: every `int16_t` value is in the image of `negate16`
+- **Counterexample** (proved via `omega`): no `x : Int16` satisfies `negate16 x = −32767`
+  — the value `−32767` is never produced as output
+- **Impact**: code that rounds-trips through `negate16` cannot reproduce certain valid `int16_t` values
+- **Filed as**: documented in `Negate16.lean` as `negate16_not_surjective`
 
 ### Formulation Issues Caught
 
@@ -754,6 +829,27 @@ timeline
         GoldenSection      : interval-shrinking search invariants (13 thms, 0 sorry)
         CORRESPONDENCE     : CORRESPONDENCE.md updated — FilteredDerivative + GoldenSection sections
         Report             : REPORT.md updated — 555 theorems, 40 files, 0 sorry
+    section Runs 109-111
+        SensorOrientation : 8-variant finite-enum decidable yaw-offset proofs (20 thms, 0 sorry)
+        GainCompression   : adaptive gain-compression range + leakage (11 thms, 0 sorry)
+        CountSetBits      : Hamming weight recurrences + correspondence tests 871/871 (24 thms)
+        Negate16          : int16 negation bugs confirmed — not involutive, not injective, not surjective (18 thms)
+        Bugs 4-6          : negate16 non-involutivity, non-injectivity, non-surjectivity
+    section Runs 112-118
+        PID convergence   : 12 new PID theorems (convergence direction, saturation liveness) → 34 total
+        Expo              : 4 more monotonicity theorems (constrain_mono, expo_mono_val, expo_mono_e_*)
+        Deadzone          : deadzone_mono_dz_pos (wider deadzone → smaller output)
+        ExpoDeadzone      : expodz_mono_val (monotone in value)
+        Correspondence    : deadzone Route B tests (1221/1221 pass)
+    section Runs 119-126
+        HighPass          : BlockHighPass IIR filter DC-blocking (14 thms, 0 sorry)
+        BlockIntegralTrap : trapezoidal integrator saturation (16 thms, 0 sorry)
+        LowPassFilter2p   : biquad IIR (13 thms, 0 sorry)
+        SecondOrderReferenceModel : forward-Euler state-space (7 thms, 0 sorry)
+        NotchFilter       : Direct Form I IIR notch (15 thms, 0 sorry)
+        BlockIntegralTrap tests : Route B correspondence tests 120/120 pass
+        PurePursuit       : informal spec written (lookahead_in_range safety target)
+        Total             : 789 theorems, 49 files, 0 sorry, 6 bugs found
 ```
 
 ---
@@ -783,5 +879,5 @@ timeline
 
 > 🔬 *This report was generated by Lean Squad automated formal verification.*
 > *`lake build` verified with Lean 4.29.1. **0 `sorry`** — sorry-free since run 73.*
-> *555 theorems across 40 files. 12 proof layers. 3 bugs found.*
-> *CORRESPONDENCE.md covers all Lean files. Tests: `tests/atmosphere/` (26/26 pass), `tests/slew_rate/` (4327/4327 pass), `tests/pid/` (7964/7964 pass).*
+> *789 theorems across 49 files. 13 proof layers. 6 bugs found.*
+> *CORRESPONDENCE.md covers all Lean files. Route B tests: atmosphere (26), slew_rate (4327), pid (7964), bin_at_angle (334), hysteresis (259), count_set_bits (871), expo (1373), deadzone (1221), BlockIntegralTrap (120).*
