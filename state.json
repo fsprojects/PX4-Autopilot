@@ -1,12 +1,12 @@
 {
-  "last_run": 126,
-  "total_theorems": 696,
-  "total_files": 48,
+  "last_run": 127,
+  "total_theorems": 789,
+  "total_files": 49,
   "total_sorry": 0,
   "lean_version": "4.29.1",
-  "lake_build": "passed (51 jobs)",
-  "last_target": "BlockIntegralTrap correspondence tests (Route B) + PurePursuit informal spec",
-  "notes": "Run 126: Task 8 (Route B) — BlockIntegralTrap 120/120 correspondence tests pass (formal-verification/tests/BlockIntegralTrap/). Task 2 — purepursuit_informal.md written. CORRESPONDENCE.md updated. 48 files, 696 theorems, 0 sorry.",
+  "lake_build": "passed (last verified run 126)",
+  "last_target": "Research update (targets 55-57) + REPORT.md update",
+  "notes": "Run 127: Task 1 — RESEARCH.md updated with 3 new targets (BlockLimitSym, computeMaxSpeedFromDistance, BlockStats). TARGETS.md updated (run-124 targets advanced, new section run-127). Task 10 — REPORT.md updated: 789 theorems, 49 files, 0 sorry, 6 bugs, Layer 13 added.",
   "targets": {
     "LowPassFilter2p": {
       "phase": 5,
@@ -14,8 +14,7 @@
       "informal_spec": "formal-verification/specs/lowpassfilter2p_informal.md",
       "theorems": 13,
       "sorry": 0,
-      "correspondence": "CORRESPONDENCE.md run 123 section",
-      "notes": "Correspondence test harness NOT YET written."
+      "notes": "Correspondence test harness NOT YET written (priority 5)."
     },
     "BlockIntegralTrap": {
       "phase": 5,
@@ -31,37 +30,46 @@
       "file": "formal-verification/lean/FVSquad/SecondOrderReferenceModel.lean",
       "theorems": 7,
       "sorry": 0,
-      "notes": "Run 125. Forward-Euler discretization. 7 theorems: reset postconditions (rfl), update formulas (rfl), equilibrium fixed point (proved via Rat arithmetic), zero-rate-at-target."
+      "notes": "Run 125. Forward-Euler discretization. 7 theorems."
     },
     "NotchFilter": {
-      "phase": 2,
-      "file": null,
-      "informal_spec": "formal-verification/specs/notchfilter_informal.md",
-      "notes": "Run 125: informal spec written. Ready for Task 3 (Lean spec)."
+      "phase": 5,
+      "file": "formal-verification/lean/FVSquad/NotchFilter.lean",
+      "theorems": 15,
+      "sorry": 0,
+      "notes": "Run 126. Direct Form I IIR. 15 theorems: bypass, DC steady-state, superposition, two-step formula."
     },
     "PurePursuit": {
       "phase": 2,
       "file": null,
       "informal_spec": "formal-verification/specs/purepursuit_informal.md",
-      "notes": "Run 126: informal spec written. Key FV target: lookahead_in_range safety theorem. Complex algorithm with 4-branch geometry — start with lookahead constrain theorem only."
+      "notes": "Run 126: informal spec written. Key FV target: lookahead_in_range safety theorem. Priority 1 for next run."
     },
-    "WelfordMeanVector": {
+    "BlockLimitSym": {
       "phase": 1,
       "file": null,
-      "notes": "Target 53. Vector WelfordMean. 2-component model. mean = sum/count invariant."
+      "notes": "Run 127: new target identified. Symmetric clamp to [-max,max]. ~6 theorems, all omega. Very tractable."
+    },
+    "computeMaxSpeedFromDistance": {
+      "phase": 1,
+      "file": null,
+      "notes": "Run 127: new target identified. TrajMath.hpp:61. Quadratic formula for max speed given braking constraints. Needs sqrtBranch axiom like SqrtLinear."
+    },
+    "BlockStats": {
+      "phase": 1,
+      "file": null,
+      "notes": "Run 127: new target identified. Running sum/count accumulator. ~8 theorems. getMean()=sum/count invariant."
     }
   },
   "priority_queue": [
-    "NotchFilter (target 51) — Lean spec + implementation + proofs (informal spec done run 125)",
-    "PurePursuit lookahead_in_range — trivial Lean spec + proof (informal spec done run 126)",
-    "LowPassFilter2p correspondence tests (Route B)",
+    "PurePursuit lookahead_in_range (target 54) — trivial safety theorem from informal spec",
+    "BlockLimitSym (target 55) — symmetric clamp, ~6 omega theorems",
     "WelfordMeanVector (target 53) — informal spec + componentwise mean",
-    "Paper + REPORT.md update (stale since run 63)"
+    "LowPassFilter2p correspondence tests (Route B)",
+    "BlockStats informal spec (target 57)"
   ],
   "bugs_found": 6,
-  "open_prs": [
-    "lean-squad/blockintegraltrap-corr-tests-purepursuit-run126-25855193330-6a06a2c4cf"
-  ],
+  "open_prs": [],
   "ci": {
     "lean_ci": "lean-ci.yml — passing",
     "status": "passing"
