@@ -1,20 +1,21 @@
 {
-  "last_run": 127,
-  "total_theorems": 789,
+  "last_run": 128,
+  "total_theorems": 711,
   "total_files": 49,
   "total_sorry": 0,
   "lean_version": "4.29.1",
   "lake_build": "passed (last verified run 126)",
-  "last_target": "Research update (targets 55-57) + REPORT.md update",
-  "notes": "Run 127: Task 1 — RESEARCH.md updated with 3 new targets (BlockLimitSym, computeMaxSpeedFromDistance, BlockStats). TARGETS.md updated (run-124 targets advanced, new section run-127). Task 10 — REPORT.md updated: 789 theorems, 49 files, 0 sorry, 6 bugs, Layer 13 added.",
+  "last_target": "LowPassFilter2p Route B correspondence tests + REPORT.md update",
+  "notes": "Run 128: Task 8 (Route B) — LowPassFilter2p correspondence tests, 28/28 pass. Task 10 — REPORT.md updated: 711 theorems, 49 files, 0 sorry.",
   "targets": {
     "LowPassFilter2p": {
       "phase": 5,
       "file": "formal-verification/lean/FVSquad/LowPassFilter2p.lean",
-      "informal_spec": "formal-verification/specs/lowpassfilter2p_informal.md",
+      "informal_spec": null,
       "theorems": 13,
       "sorry": 0,
-      "notes": "Correspondence test harness NOT YET written (priority 5)."
+      "correspondence_tests": "formal-verification/tests/LowPassFilter2p/test_correspondence.py",
+      "notes": "Run 128: Route B correspondence tests 28/28 pass. DC-unity, disabled pass-through, Butterworth-like, zero-input decay."
     },
     "BlockIntegralTrap": {
       "phase": 5,
@@ -37,7 +38,7 @@
       "file": "formal-verification/lean/FVSquad/NotchFilter.lean",
       "theorems": 15,
       "sorry": 0,
-      "notes": "Run 126. Direct Form I IIR. 15 theorems: bypass, DC steady-state, superposition, two-step formula."
+      "notes": "Run 126. Direct Form I IIR. 15 theorems."
     },
     "PurePursuit": {
       "phase": 2,
@@ -53,7 +54,7 @@
     "computeMaxSpeedFromDistance": {
       "phase": 1,
       "file": null,
-      "notes": "Run 127: new target identified. TrajMath.hpp:61. Quadratic formula for max speed given braking constraints. Needs sqrtBranch axiom like SqrtLinear."
+      "notes": "Run 127: new target identified. TrajMath.hpp:61. Quadratic formula for max speed given braking constraints."
     },
     "BlockStats": {
       "phase": 1,
@@ -64,8 +65,6 @@
   "priority_queue": [
     "PurePursuit lookahead_in_range (target 54) — trivial safety theorem from informal spec",
     "BlockLimitSym (target 55) — symmetric clamp, ~6 omega theorems",
-    "WelfordMeanVector (target 53) — informal spec + componentwise mean",
-    "LowPassFilter2p correspondence tests (Route B)",
     "BlockStats informal spec (target 57)"
   ],
   "bugs_found": 6,
@@ -73,5 +72,17 @@
   "ci": {
     "lean_ci": "lean-ci.yml — passing",
     "status": "passing"
+  },
+  "correspondence_tests": {
+    "atmosphere": "tests/atmosphere/ (26/26 pass)",
+    "bin_at_angle": "tests/bin_at_angle/ (334/334 pass)",
+    "slew_rate": "tests/slew_rate/ (4327/4327 pass)",
+    "hysteresis": "tests/hysteresis/ (259/259 pass)",
+    "pid": "tests/pid/ (7964/7964 pass)",
+    "count_set_bits": "tests/count_set_bits/ (871/871 pass)",
+    "expo": "tests/expo/ (1373/1373 pass)",
+    "deadzone": "tests/deadzone/ (1221/1221 pass)",
+    "BlockIntegralTrap": "tests/BlockIntegralTrap/ (120/120 pass)",
+    "LowPassFilter2p": "tests/LowPassFilter2p/ (28/28 pass)"
   }
 }
