@@ -1,12 +1,12 @@
 {
-  "last_run": 128,
-  "total_theorems": 711,
-  "total_files": 49,
+  "last_run": 129,
+  "total_theorems": 720,
+  "total_files": 50,
   "total_sorry": 0,
-  "lean_version": "4.29.1",
-  "lake_build": "passed (last verified run 126)",
-  "last_target": "LowPassFilter2p Route B correspondence tests + REPORT.md update",
-  "notes": "Run 128: Task 8 (Route B) — LowPassFilter2p correspondence tests, 28/28 pass. Task 10 — REPORT.md updated: 711 theorems, 49 files, 0 sorry.",
+  "lean_version": "4.29.0",
+  "lake_build": "passed (run 129)",
+  "last_target": "BlockLimitSym proofs + paper update",
+  "notes": "Run 129: Task 5 — BlockLimitSym 10 theorems proved (range, idempotent, odd, mono). Task 11 — paper updated 640→720 theorems, 44→50 modules.",
   "targets": {
     "LowPassFilter2p": {
       "phase": 5,
@@ -15,16 +15,15 @@
       "theorems": 13,
       "sorry": 0,
       "correspondence_tests": "formal-verification/tests/LowPassFilter2p/test_correspondence.py",
-      "notes": "Run 128: Route B correspondence tests 28/28 pass. DC-unity, disabled pass-through, Butterworth-like, zero-input decay."
+      "notes": "Run 128: Route B correspondence tests 28/28 pass."
     },
     "BlockIntegralTrap": {
       "phase": 5,
       "file": "formal-verification/lean/FVSquad/BlockIntegralTrap.lean",
       "theorems": 16,
       "sorry": 0,
-      "correspondence": "CORRESPONDENCE.md run 126 section",
       "correspondence_tests": "formal-verification/tests/BlockIntegralTrap/test_correspondence.py",
-      "notes": "Run 126: Route B correspondence tests added. 120/120 pass. 16 theorems proved."
+      "notes": "Run 126: Route B correspondence tests added. 120/120 pass. 16 theorems."
     },
     "SecondOrderReferenceModel": {
       "phase": 5,
@@ -40,35 +39,37 @@
       "sorry": 0,
       "notes": "Run 126. Direct Form I IIR. 15 theorems."
     },
+    "BlockLimitSym": {
+      "phase": 5,
+      "file": "formal-verification/lean/FVSquad/BlockLimitSym.lean",
+      "theorems": 10,
+      "sorry": 0,
+      "notes": "Run 129. Symmetric clamp to [-max,max]. 10 theorems: range, idempotent, zero, odd, mono. All require max>=0 for bound/symmetry/mono theorems."
+    },
     "PurePursuit": {
       "phase": 2,
       "file": null,
       "informal_spec": "formal-verification/specs/purepursuit_informal.md",
       "notes": "Run 126: informal spec written. Key FV target: lookahead_in_range safety theorem. Priority 1 for next run."
     },
-    "BlockLimitSym": {
-      "phase": 1,
-      "file": null,
-      "notes": "Run 127: new target identified. Symmetric clamp to [-max,max]. ~6 theorems, all omega. Very tractable."
-    },
     "computeMaxSpeedFromDistance": {
       "phase": 1,
       "file": null,
-      "notes": "Run 127: new target identified. TrajMath.hpp:61. Quadratic formula for max speed given braking constraints."
+      "notes": "Run 127: new target identified. TrajMath.hpp:61. Quadratic formula for max speed."
     },
     "BlockStats": {
       "phase": 1,
       "file": null,
-      "notes": "Run 127: new target identified. Running sum/count accumulator. ~8 theorems. getMean()=sum/count invariant."
+      "notes": "Run 127: new target identified. Running sum/count accumulator. getMean()=sum/count invariant."
     }
   },
   "priority_queue": [
-    "PurePursuit lookahead_in_range (target 54) — trivial safety theorem from informal spec",
-    "BlockLimitSym (target 55) — symmetric clamp, ~6 omega theorems",
-    "BlockStats informal spec (target 57)"
+    "PurePursuit lookahead_in_range (target 54) — has informal spec, needs Lean spec (Task 3)",
+    "BlockStats informal spec (Task 2)",
+    "computeMaxSpeedFromDistance informal spec (Task 2)"
   ],
   "bugs_found": 6,
-  "open_prs": [],
+  "open_prs": ["lean-squad/run-129-blocklimitsym"],
   "ci": {
     "lean_ci": "lean-ci.yml — passing",
     "status": "passing"
