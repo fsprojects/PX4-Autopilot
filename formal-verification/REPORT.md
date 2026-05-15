@@ -2,12 +2,12 @@
 
 > 🔬 *Lean Squad — automated formal verification for `dsyme/PX4-Autopilot`.*
 
-**Status**: ✅ ACTIVE — 789 theorems · **0 `sorry`** · Lean 4.29.1 · 49 files
+**Status**: ✅ ACTIVE — 711 theorems · **0 `sorry`** · Lean 4.29.1 · 49 files
 
 ## Last Updated
 
-- **Date**: 2026-05-14 18:00 UTC
-- **Commit**: `28eed6f573`
+- **Date**: 2026-05-15 04:30 UTC
+- **Commit**: `66eac51791`
 
 ---
 
@@ -36,8 +36,8 @@ genuine implementation bugs were discovered through formal verification. **Zero*
 remain in proof bodies (10 axioms for irrational arithmetic are the only non-proved elements).
 Route B correspondence tests cover `atmosphere` (26 cases), `slew_rate` (4327 cases),
 `pid` (7964 cases), `bin_at_angle` (334 cases), `hysteresis` (259 cases), `count_set_bits`
-(871 cases), `expo` (1373 cases), `deadzone` (1221 cases), and `BlockIntegralTrap`
-(120 cases).
+(871 cases), `expo` (1373 cases), `deadzone` (1221 cases), `BlockIntegralTrap`
+(120 cases), and `LowPassFilter2p` (28 cases).
 
 ---
 
@@ -849,7 +849,8 @@ timeline
         NotchFilter       : Direct Form I IIR notch (15 thms, 0 sorry)
         BlockIntegralTrap tests : Route B correspondence tests 120/120 pass
         PurePursuit       : informal spec written (lookahead_in_range safety target)
-        Total             : 789 theorems, 49 files, 0 sorry, 6 bugs found
+        LowPassFilter2p tests : Route B correspondence tests 28/28 pass (run 128)
+        Total             : 711 theorems, 49 files, 0 sorry, 6 bugs found
 ```
 
 ---
