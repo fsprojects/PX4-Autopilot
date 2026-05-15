@@ -43,3 +43,8 @@ import FVSquad.SensorOrientation
 import FVSquad.CountSetBits
 import FVSquad.HighPass
 import FVSquad.LowPassFilter2p
+import FVSquad.NotchFilter
+import FVSquad.SecondOrderReferenceModel
+import FVSquad.BlockIntegralTrap
+import FVSquad.BlockLimitSym
+import FVSquad.PurePursuit
