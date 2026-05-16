@@ -1,6 +1,6 @@
 {
-  "run": 130,
-  "last_updated": "2026-05-22",
+  "run": 131,
+  "last_updated": "2026-05-16",
   "lean_version": "4.29.1",
   "lake_build_status": "passed",
   "totals": {
@@ -9,7 +9,7 @@
     "axioms": 10,
     "sorry_count": 0,
     "lean_files": 51,
-    "targets": 56
+    "targets": 57
   },
   "sorry_locations": {
     "all": "0 sorry in all 44 files. 10 axioms for irrational arithmetic."
@@ -28,10 +28,23 @@
     "expo": "tests/expo/ (1373/1373 pass; confirms expoRat matches C++ expo<T> exactly; boundary, linear, cubic, odd-symmetry, grid)"
   },
   "ci": {
-    "lean_ci": "lean-ci.yml \u2014 two jobs: 'build' (Lean proofs) and 'correspondence-tests' (atmosphere 26 + slew_rate 4327). Triggers on lean/** and tests/**.",
+    "lean_ci": "lean-ci.yml \u2014 two jobs: build (Lean proofs) and correspondence-tests (all 8 suites: atmosphere 26 + slew_rate 4327 + count_set_bits 871 + expo 1373 + pid 7964 + deadzone 1221 + BlockIntegralTrap 120 + LowPassFilter2p 28 = 15930 total). Triggers on lean/** and tests/**.",
     "status": "passing"
   },
   "run_history": [
+    {
+      "run": 131,
+      "date": "2026-05-16T04:00 UTC",
+      "workflow_run_id": 25952146900,
+      "tasks": [
+        "Task 6 (Correspondence Review): added correspondence sections for BlockLimitSym.lean (run 129, 10 theorems, exact model) and PurePursuit.lean (run 130, 10 theorems, abstraction of lookahead distance).",
+        "Task 9 (CI Automation): expanded correspondence-tests CI job from 2 to 8 test suites (15930 total cases); extended trigger paths to include tests/**."
+      ],
+      "theorems_proved": 0,
+      "sorry_changes": 0,
+      "pr_branch": "run131-correspondence-ci-updates",
+      "notes": "730 theorems total, 51 files, 0 sorry. CI now covers all 8 correspondence test suites."
+    },
     {
       "run": 126,
       "date": "2026-05-14T04:30 UTC",
@@ -70,34 +83,6 @@
       "sorry_changes": 0,
       "pr_branch": "run112-work",
       "notes": "634 theorems total, 44 files, 0 sorry. PID convergence: equilibrium is a fixed point \u2014 sp=fb with zero integral \u2192 output=0 for all n steps."
-    },
-    {
-      "run": 111,
-      "date": "2026-05-09T08:45 UTC",
-      "workflow_run_id": 25596828934,
-      "tasks": [
-        "Task 5 (Proof Assistance): Negate16.lean \u2014 18 theorems, 0 sorry. Key findings: not involutive for x=\u221232767, not injective (collision at \u221232767,\u221232768), not surjective (\u221232767 never in image).",
-        "Task 4 (Implementation Extraction): merged run110 work (CountSetBits + correspondence tests)."
-      ],
-      "theorems_proved": 18,
-      "sorry_changes": 0,
-      "pr_branch": "run111-work"
-    },
-    {
-      "run": "run118",
-      "tasks": [
-        "Task 5 (Proof Assistance)",
-        "Task 8 (Correspondence Validation)"
-      ],
-      "work": [
-        "Proved deadzone_mono_dz_pos: wider deadzone \u2192 smaller output (stdlib-only proof, no ring/Mathlib)",
-        "Added dz_inv_anti, dz_div_rewrite, dz_sub_le_sub_l private helpers",
-        "Created formal-verification/tests/deadzone/ with 1221 correspondence tests (all pass)",
-        "lake build passes with 0 sorry"
-      ],
-      "theorem_count": 723,
-      "sorry_count": 0,
-      "lean_version": "4.29.1"
     }
   ],
   "discoveries": [
