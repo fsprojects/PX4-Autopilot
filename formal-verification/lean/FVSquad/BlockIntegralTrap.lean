@@ -280,4 +280,136 @@ example : -5 <= (itFold { dt := 1, limit := 5 } { y := 0, u := 0 } [3, 4, 3]).y 
 example : (itUpdate { dt := 1, limit := 10 } { y := -10, u := -3 } (-8)).y = -10 := by
   native_decide
 
+-- ─── 3.11  New theorems (run 131) ──────────────────────────────────────────
+
+/-- After `itFold`, the stored `u` equals the last element of the input list.
+
+    This confirms that the "previous input" register is always up to date
+    regardless of saturation. -/
+theorem itFold_u_eq_last (p : ITParams) (s₀ : ITState) (inputs : List Rat)
+    (h : inputs ≠ []) :
+    (itFold p s₀ inputs).u = inputs.getLast h := by
+  induction inputs generalizing s₀ with
+  | nil => exact absurd rfl h
+  | cons x xs ih =>
+    simp only [itFold]
+    by_cases hxs : xs = []
+    · subst hxs
+      simp [itFold, itUpdate]
+    · have : (x :: xs).getLast (by simp) = xs.getLast hxs := by
+        simp [List.getLast_cons hxs]
+      rw [this]
+      exact ih (itUpdate p s₀ x) hxs
+
+/-- `rConstrain v 0 0 = 0` for any `v`.
+
+    Helper for `itUpdate_zero_limit`. -/
+private theorem rConstrain_zero_zero (v : Rat) : rConstrain v 0 0 = 0 := by
+  simp only [rConstrain]
+  by_cases h1 : v < 0
+  · simp only [if_pos h1]
+  · by_cases h2 : v > 0
+    · simp only [if_neg h1, if_pos h2]
+    · have hle : v ≤ 0 := Rat.not_lt.mp h2
+      have hge : 0 ≤ v := Rat.not_lt.mp h1
+      have heq : v = 0 := Rat.le_antisymm hle hge
+      simp only [if_neg h1, if_neg h2, heq]
+      rfl
+
+/-- When `limit = 0`, every update produces `y = 0` regardless of input.
+
+    Confirms that `max = 0` implies permanent zero output (full saturation). -/
+theorem itUpdate_zero_limit (p : ITParams) (s : ITState) (input : Rat)
+    (hlim : p.limit = 0) :
+    (itUpdate p s input).y = 0 := by
+  simp only [itUpdate, hlim, Rat.neg_zero]
+  exact rConstrain_zero_zero _
+
+/-- When the state is in range and inputs are non-negative (`input ≥ 0`, `u ≥ 0`,
+    `dt ≥ 0`), the integrator output is non-decreasing.
+
+    Requires `s.y ∈ [-limit, limit]` (the invariant maintained by every prior call). -/
+theorem itUpdate_nonneg_input_nondecreasing (p : ITParams) (s : ITState) (input : Rat)
+    (hdt : 0 ≤ p.dt) (hinput : 0 ≤ input) (hu : 0 ≤ s.u) (hlim : 0 ≤ p.limit)
+    (hy_lo : -p.limit ≤ s.y) (hy_hi : s.y ≤ p.limit) :
+    s.y ≤ (itUpdate p s input).y := by
+  simp only [itUpdate]
+  -- incr = (s.u + input) / 2 * p.dt ≥ 0
+  have hincr_nn : 0 ≤ (s.u + input) / 2 * p.dt := by
+    apply Rat.mul_nonneg _ hdt
+    rw [Rat.div_def]
+    exact Rat.mul_nonneg (Rat.add_nonneg hu hinput)
+      (Rat.le_of_lt (Rat.inv_pos.mpr (by native_decide)))
+  -- raw = s.y + incr ≥ s.y
+  have hraw_ge : s.y ≤ s.y + (s.u + input) / 2 * p.dt :=
+    calc s.y = s.y + 0 := (Rat.add_zero s.y).symm
+      _ ≤ s.y + (s.u + input) / 2 * p.dt := Rat.add_le_add_left.mpr hincr_nn
+  simp only [rConstrain]
+  by_cases h1 : s.y + (s.u + input) / 2 * p.dt < -p.limit
+  · exact absurd h1 (Rat.not_lt.mpr (Rat.le_trans hy_lo hraw_ge))
+  · by_cases h2 : s.y + (s.u + input) / 2 * p.dt > p.limit
+    · simp only [if_neg h1, if_pos h2]; exact hy_hi
+    · simp only [if_neg h1, if_neg h2]; exact hraw_ge
+
+/-- When the state is in range and inputs are non-positive (`input ≤ 0`, `u ≤ 0`,
+    `dt ≥ 0`), the integrator output is non-increasing.
+
+    Requires `s.y ∈ [-limit, limit]` (the invariant maintained by every prior call). -/
+theorem itUpdate_nonpos_input_nonincreasing (p : ITParams) (s : ITState) (input : Rat)
+    (hdt : 0 ≤ p.dt) (hinput : input ≤ 0) (hu : s.u ≤ 0) (hlim : 0 ≤ p.limit)
+    (hy_lo : -p.limit ≤ s.y) (hy_hi : s.y ≤ p.limit) :
+    (itUpdate p s input).y ≤ s.y := by
+  simp only [itUpdate]
+  have hincr_np : (s.u + input) / 2 * p.dt ≤ 0 := by
+    have hsum_np : s.u + input ≤ 0 := by
+      calc s.u + input
+          ≤ s.u + 0 := Rat.add_le_add_left.mpr hinput
+        _ = s.u     := Rat.add_zero s.u
+        _ ≤ 0       := hu
+    have hsum_nn_inv : 0 ≤ (2 : Rat)⁻¹ :=
+      Rat.le_of_lt (Rat.inv_pos.mpr (by native_decide))
+    have hfrac_np : (s.u + input) / 2 ≤ 0 := by
+      rw [Rat.div_def]
+      calc (s.u + input) * (2 : Rat)⁻¹
+          ≤ 0 * (2 : Rat)⁻¹ := Rat.mul_le_mul_of_nonneg_right hsum_np hsum_nn_inv
+        _ = 0 := Rat.zero_mul _
+    calc (s.u + input) / 2 * p.dt
+        ≤ 0 * p.dt := Rat.mul_le_mul_of_nonneg_right hfrac_np hdt
+      _ = 0 := Rat.zero_mul _
+  have hraw_le : s.y + (s.u + input) / 2 * p.dt ≤ s.y :=
+    calc s.y + (s.u + input) / 2 * p.dt
+        ≤ s.y + 0 := Rat.add_le_add_left.mpr hincr_np
+      _ = s.y := Rat.add_zero s.y
+  simp only [rConstrain]
+  by_cases h1 : s.y + (s.u + input) / 2 * p.dt < -p.limit
+  · simp only [if_pos h1]; exact hy_lo
+  · by_cases h2 : s.y + (s.u + input) / 2 * p.dt > p.limit
+    · exact absurd h2 (Rat.not_lt.mpr (Rat.le_trans hraw_le hy_hi))
+    · simp only [if_neg h1, if_neg h2]; exact hraw_le
+
+/-- The trapezoidal increment is symmetric: swapping `u_prev` and `input` gives
+    the same increment.
+
+    This reflects that `(a + b)/2 = (b + a)/2`. -/
+theorem itUpdate_trap_symmetric (p : ITParams) (s : ITState) (input : Rat) :
+    s.y + (s.u + input) / 2 * p.dt =
+    s.y + (input + s.u) / 2 * p.dt := by
+  congr 1; congr 1; congr 1
+  exact Rat.add_comm s.u input
+
+/-- The output of `itFold` over an empty list is the initial state. -/
+theorem itFold_nil (p : ITParams) (s₀ : ITState) :
+    itFold p s₀ [] = s₀ := by
+  simp [itFold]
+
+/-- `itFold` over a single-element list equals one `itUpdate`. -/
+theorem itFold_singleton (p : ITParams) (s₀ : ITState) (x : Rat) :
+    itFold p s₀ [x] = itUpdate p s₀ x := by
+  simp [itFold]
+
+/-- `itFold` is equivalent to sequential `itUpdate` applications (cons decomposition). -/
+theorem itFold_cons (p : ITParams) (s₀ : ITState) (x : Rat) (xs : List Rat) :
+    itFold p s₀ (x :: xs) = itFold p (itUpdate p s₀ x) xs := by
+  simp [itFold]
+
 end PX4.BlockIntegralTrap
